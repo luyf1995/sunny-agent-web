@@ -1,0 +1,9 @@
+[PROCEDURE] :{"cmd": "", "id": [], "NDC":[], "size":0.1, "text_contents": "calib start", "duration": 0, "audio_file": "", "audio_text": "本次测试用例为基础测试", "wait": 1}
+[PROCEDURE] :{"cmd": "trigger", "id": [35,36,37,38,39], "NDC": [[0, 0], [0.3, 0], [-0.3, 0], [0, 0.3], [0, -0.3]], "size":0.1, "text_contents": "calib start", "duration": 0, "audio_file": "", "wait": 1}
+[PROCEDURE] :{"cmd": "record", "id": [1], "NDC":[[0, 0]], "size":0.1, "text_contents": "calib: 1", "duration": 1, "audio_file": "", "wait": 0.5}
+[PROCEDURE] :{"cmd": "record", "id": [2], "NDC":[[-0.5, -0.5]], "size":0.1, "text_contents": "calib: 2", "duration": 1, "audio_file": "", "wait": 0.5}
+[PROCEDURE] :{"cmd": "record", "id": [3], "NDC":[[0.5, -0.5]], "size":0.1, "text_contents": "calib: 3", "duration": 1, "audio_file": "", "wait": 0.5}
+[PROCEDURE] :{"cmd": "record", "id": [4], "NDC":[[0.5, 0.5]], "size":0.1, "text_contents": "calib: 4", "duration": 1, "audio_file": "", "wait": 0.5}
+[PROCEDURE] :{"cmd": "record", "id": [5], "NDC":[[-0.5, 0.5]], "size":0.1, "text_contents": "calib: 5", "duration": 1, "audio_file": "", "wait": 0.5}
+[PROCEDURE] :{"cmd": "trigger", "id": [41,42,43,44,45], "NDC": [[0, 0], [0.3, 0], [-0.3, 0], [0, 0.3], [0, -0.3]], "size":0.1, "text_contents": "calib start", "duration": 0, "audio_file": "", "wait": 1}
+[PROCEDURE] :{"cmd": "", "id": [], "NDC":[], "size":0.1, "text_contents": "calib end", "duration": 0, "audio_file": "calib_end.wav", "wait": 1}

@@ -1,0 +1,13 @@
+.el-form-item__label {
+  --el-text-color-regular: #1e293b;
+
+  color: var(--el-text-color-regular);
+  font-weight: 500;
+}
+
+.el-button--primary {
+  --el-button-bg-color: #2563eb;
+  --el-button-border-color: #2563eb;
+  --el-button-hover-bg-color: #3b82f6;
+  --el-button-hover-border-color: #3b82f6;
+}

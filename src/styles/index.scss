@@ -1,0 +1,50 @@
+@use './vars';
+@use './mixin';
+@use './element-reset';
+
+* {
+  padding: 0;
+  margin: 0;
+  outline: none !important;
+  box-sizing: border-box;
+}
+
+body,
+html,
+#app {
+  width: 100%;
+  height: 100%;
+  font-size: 14px;
+
+  // font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', SimSun, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: #1e293b;
+}
+
+a:focus,
+a:active {
+  outline: none;
+}
+
+a,
+a:focus,
+a:hover {
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+div:focus {
+  outline: none;
+}
+
+.clearfix {
+  &::after {
+    display: block;
+    clear: both;
+    height: 0;
+    font-size: 0;
+    visibility: hidden;
+    content: ' ';
+  }
+}
