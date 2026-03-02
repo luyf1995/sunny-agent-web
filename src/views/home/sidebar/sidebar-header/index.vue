@@ -1,22 +1,45 @@
 <template>
-  <div class="sidebar-header">
-    <div class="sidebar-logo">
-      <logo-icon :width="24" :height="24" />
-      <h1 class="sidebar-title">Sunny Agent</h1>
+  <div v-memo="[collapsed]" class="sidebar-header" :class="{ collapsed }">
+    <div class="sidebar-logo" @click="handleLogoClick">
+      <logo :width="24" :height="24" />
+      <h1 v-if="!collapsed" class="sidebar-title">Sunny Agent</h1>
     </div>
-    <button class="collapse-btn" title="收起">
-      <collapse-icon />
-    </button>
+    <button-icon v-if="!collapsed" title="收起" class="collapse-btn" @click="handleToggleCollapse">
+      <panel-left-close :size="18" />
+    </button-icon>
   </div>
 </template>
 <script setup lang="ts">
-import LogoIcon from '@/components/svgs/logo-icon.vue'
-import CollapseIcon from '@/components/svgs/collapse-icon.vue'
+import { PanelLeftClose } from 'lucide-vue-next'
+
+import ButtonIcon from '@/components/button-icon/index.vue'
+import Logo from '@/components/logo/index.vue'
+
+const props = defineProps<{
+  collapsed: boolean
+}>()
+const emit = defineEmits(['toggle-collapse'])
+
+/**
+ * 切换侧边栏收起状态
+ */
+const handleToggleCollapse = () => {
+  emit('toggle-collapse')
+}
+
+/**
+ * 处理logo点击事件
+ */
+const handleLogoClick = () => {
+  if (props.collapsed) {
+    handleToggleCollapse()
+  }
+}
 </script>
 <style scoped lang="scss">
 .sidebar-header {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   padding: 16px;
   border-bottom: 1px solid #e2e8f0;
@@ -25,37 +48,38 @@ import CollapseIcon from '@/components/svgs/collapse-icon.vue'
 
 .sidebar-logo {
   display: flex;
+  justify-content: center;
   align-items: center;
   overflow: hidden;
   color: #1e40af;
   gap: 10px;
-  line-height: 25px;
 }
 
 .sidebar-title {
   font-size: 16px;
   font-weight: 600;
+  white-space: nowrap;
 }
 
 .collapse-btn {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  margin-left: auto;
   width: 32px;
   height: 32px;
   color: #64748b;
-  background: transparent;
-  border: none;
-  border-radius: 8px;
-  transition:
-    background 0.2s,
-    color 0.2s;
-  cursor: pointer;
-  flex-shrink: 0;
+  transition: color 0.2s;
 
   &:hover {
     color: #1e293b;
-    background-color: #f1f5f9;
+  }
+}
+
+.collapsed {
+  .sidebar-logo {
+    cursor: pointer;
+
+    &:hover {
+      opacity: 0.8;
+    }
   }
 }
 </style>

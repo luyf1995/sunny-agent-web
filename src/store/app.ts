@@ -1,20 +1,12 @@
 import { defineStore } from 'pinia'
 
-interface IAppState {
-  isCollapsed: boolean
-}
+interface IAppState {}
 
 const appStore = defineStore('app', {
   state: (): IAppState => {
-    return {
-      isCollapsed: false
-    }
+    return {}
   },
-  actions: {
-    setIsCollapsed(isCollapsed: boolean) {
-      this.isCollapsed = isCollapsed
-    }
-  }
+  actions: {}
 })
 
 export default appStore

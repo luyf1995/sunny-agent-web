@@ -1,11 +1,40 @@
 <template>
-  <div class="sidebar">
-    <sidebar-header />
-    <div class="sidebar-content"></div>
+  <div v-memo="[collapsed]" class="sidebar" :class="{ collapsed }">
+    <sidebar-header :collapsed="collapsed" @toggle-collapse="handleToggleCollapse" />
+    <div class="sidebar-content">
+      <sidebar-project :collapsed="collapsed" />
+      <sidebar-conversation :collapsed="collapsed" />
+    </div>
+    <sidebar-footer :collapsed="collapsed" />
   </div>
 </template>
 <script lang="ts" setup>
+import { ref, watch } from 'vue'
+
 import SidebarHeader from './sidebar-header/index.vue'
+import SidebarProject from './sidebar-project/index.vue'
+import SidebarConversation from './sidebar-conversation/index.vue'
+import SidebarFooter from './sidebar-footer/index.vue'
+
+import { Local } from '@/utils/storage'
+
+const collapsed = ref(Local.get('collapsed') || false)
+
+/**
+ * 切换侧边栏折叠状态
+ */
+const handleToggleCollapse = () => {
+  collapsed.value = !collapsed.value
+}
+
+// 监听折叠状态变化，同步到本地存储
+watch(
+  collapsed,
+  newValue => {
+    Local.set('collapsed', newValue)
+  },
+  { immediate: false }
+)
 </script>
 <style scoped lang="scss">
 .sidebar {
@@ -17,5 +46,18 @@ import SidebarHeader from './sidebar-header/index.vue'
   border-right: 1px solid #e2e8f0;
   flex-direction: column;
   flex-shrink: 0;
+
+  &.collapsed {
+    width: 64px;
+  }
+
+  .sidebar-content {
+    display: flex;
+    overflow-y: auto;
+    padding: 16px;
+    flex: 1;
+    flex-direction: column;
+    gap: 16px;
+  }
 }
 </style>

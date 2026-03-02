@@ -3,7 +3,7 @@
     <div class="login-container">
       <div class="login-header">
         <div class="login-logo">
-          <logo-icon />
+          <logo />
         </div>
         <h1>Sunny Agent</h1>
         <p class="login-subtitle">登录以继续</p>
@@ -19,7 +19,7 @@
           <el-button type="primary" class="login-btn" :loading="loading" @click="handleLogin">
             <template v-if="loading"> 登录中... </template>
             <template v-else>
-              <login-icon />
+              <log-in :size="18" />
               <span>登录</span>
             </template>
           </el-button>
@@ -31,9 +31,9 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { LogIn } from 'lucide-vue-next'
 
-import LoginIcon from '@/components/svgs/login-icon.vue'
-import LogoIcon from '@/components/svgs/logo-icon.vue'
+import Logo from '@/components/logo/index.vue'
 
 import useUserStore from '@/store/user'
 

@@ -1,0 +1,43 @@
+.sidebar-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 12px;
+
+  & + .sidebar-panel {
+    margin-top: 8px;
+    border-top: 1px solid #e2e8f0;
+  }
+
+  &__header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 4px 0;
+    font-size: 13px;
+    color: #94a3b8;
+    gap: 8px;
+    font-weight: 600;
+
+    span {
+      color: #1e293b;
+    }
+  }
+
+  &__btn {
+    margin-left: auto;
+    width: 24px;
+    height: 24px;
+    color: #94a3b8;
+  }
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .collapsed .sidebar-panel__header {
+  color: #1e293b;
+}
+}
