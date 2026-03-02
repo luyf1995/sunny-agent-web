@@ -26,6 +26,7 @@
     "nprogress": "^0.2.0",
     "path-browserify": "^1.0.1",
     "pinia": "^2.1.7",
+    "pinia-plugin-persistedstate": "^4.7.1",
     "screenfull": "^6.0.2",
     "vue": "^3.4.15",
     "vue-draggable-resizable": "^3.0.0",

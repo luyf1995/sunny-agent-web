@@ -4,7 +4,7 @@
   gap: 8px;
   padding-top: 12px;
 
-  & + .sidebar-panel {
+  & ~ .sidebar-panel {
     margin-top: 8px;
     border-top: 1px solid #e2e8f0;
   }
@@ -37,7 +37,8 @@
     gap: 4px;
   }
 
-  .collapsed .sidebar-panel__header {
-  color: #1e293b;
-}
+  &.collapsed .sidebar-panel__header {
+    color: #1e293b;
+    cursor: pointer;
+  }
 }

@@ -1,3 +1,9 @@
+:root {
+  --el-border-color: #e2e8f0;
+  --el-border: 1px solid var(--el-border-color);
+  --el-border-radius-base: 8px;
+}
+
 .el-form-item__label {
   --el-text-color-regular: #1e293b;
 
@@ -5,9 +11,66 @@
   font-weight: 500;
 }
 
+.el-input {
+  --el-input-border-radius: 8px;
+
+  .el-input__inner {
+    --el-input-inner-height: 40px;
+  }
+}
+
+.el-button {
+  padding: 10px 20px;
+  height: 40px;
+
+  &.is-disabled,
+  &.is-disabled:hover {
+    background-color: #92b1f5;
+    border-color: #92b1f5;
+  }
+}
+
 .el-button--primary {
   --el-button-bg-color: #2563eb;
   --el-button-border-color: #2563eb;
   --el-button-hover-bg-color: #3b82f6;
   --el-button-hover-border-color: #3b82f6;
+}
+
+.el-tree {
+  --el-tree-node-content-height: 32px;
+  --el-tree-text-color: #1e293b;
+
+  font-size: 13px;
+  background-color: transparent;
+
+  .el-tree-node__content {
+    border-radius: 6px;
+  }
+
+  &.el-tree--highlight-current .el-tree-node.is-current > .el-tree-node__content {
+    background-color: #d6e3f9;
+  }
+}
+
+.el-dialog {
+  --el-dialog-border-radius: 12px;
+
+  .el-dialog__title {
+    font-size: 16px;
+  }
+
+  .dialog-header__btn {
+    .el-button.is-link {
+      font-size: 20px;
+      color: #1e293b;
+    }
+  }
+}
+
+.el-popover {
+  --el-popover-border-radius: 8px;
+  --el-popover-padding: 0;
+
+  min-width: 0;
 }
