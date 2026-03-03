@@ -1,9 +1,9 @@
 import { defineStore } from 'pinia'
 
-interface IAppState {}
+interface AppState {}
 
 const appStore = defineStore('app', {
-  state: (): IAppState => {
+  state: (): AppState => {
     return {}
   },
   actions: {}

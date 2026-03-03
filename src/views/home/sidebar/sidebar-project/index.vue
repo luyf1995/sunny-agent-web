@@ -27,9 +27,9 @@ import { ref } from 'vue'
 import { FolderKanban, FolderPlus } from 'lucide-vue-next'
 
 import ButtonIcon from '@/components/button-icon/index.vue'
-import AddProject from '@/components/projects/add-project.vue'
-import ProjectList from '@/components/projects/project-list.vue'
-import ProjectPopover from '@/components/projects/project-popover.vue'
+import AddProject from '@/components/projects/add-project/index.vue'
+import ProjectList from '@/components/projects/project-list/index.vue'
+import ProjectPopover from '@/components/projects/project-popover/index.vue'
 
 const props = defineProps<{
   collapsed: boolean

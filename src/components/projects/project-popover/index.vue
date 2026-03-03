@@ -2,13 +2,14 @@
   <el-popover :visible="visible" placement="right-start" :width="200">
     <div v-click-outside="close" class="popover-panel">
       <div class="popover-panel__header">
-        <div>对话列表</div>
+        <div>项目列表</div>
         <button-icon>
           <x :size="16" />
         </button-icon>
       </div>
       <div class="popover-panel__body">
-        <conversation-item v-for="item in list" :key="item.name" :data="item" :show-menu="false"> </conversation-item>
+        <project-item v-for="item in list" :key="item.name" :data="item" type="project" :show-menu="false">
+        </project-item>
       </div>
     </div>
     <template #reference>
@@ -22,14 +23,14 @@ import { ClickOutside as vClickOutside } from 'element-plus'
 import { X } from 'lucide-vue-next'
 
 import ButtonIcon from '@/components/button-icon/index.vue'
-import ConversationItem from './conversation-item.vue'
+import ProjectItem from '../project-item/index.vue'
 
-interface Conversation {
+interface Project {
   name: string
 }
 
 const props = defineProps<{
-  list: Conversation[]
+  list: Project[]
 }>()
 
 const visible = ref(false)
@@ -43,20 +44,5 @@ const show = () => (visible.value = true)
 const close = () => (visible.value = false)
 </script>
 <style scoped lang="scss">
-.popover-panel {
-  &__header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 16px;
-    font-size: 14px;
-    color: #1e293b;
-    border-bottom: 1px solid #e2e8f0;
-    font-weight: 500;
-  }
-
-  &__body {
-    padding: 8px;
-  }
-}
+@use './index';
 </style>

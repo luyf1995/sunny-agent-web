@@ -3,7 +3,13 @@
     <slot></slot>
   </button>
 </template>
-<script setup lang="ts"></script>
+<script setup lang="ts">
+interface Props {
+  type?: 'primary' | 'danger' | 'info' | 'success' | 'warning'
+}
+
+const props = defineProps<Props>()
+</script>
 <style scoped lang="scss">
 .button-icon {
   display: flex;

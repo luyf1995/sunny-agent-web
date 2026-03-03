@@ -26,8 +26,8 @@ import { ref } from 'vue'
 import { MessagesSquare, MessageSquarePlus } from 'lucide-vue-next'
 
 import ButtonIcon from '@/components/button-icon/index.vue'
-import ConversationList from '@/components/conversations/conversation-list.vue'
-import ConversationPopover from '@/components/conversations/conversation-popover.vue'
+import ConversationList from '@/components/conversations/conversation-list/index.vue'
+import ConversationPopover from '@/components/conversations/conversation-popover/index.vue'
 
 const props = defineProps<{
   collapsed: boolean

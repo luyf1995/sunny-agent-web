@@ -1,0 +1,40 @@
+.node-item {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 8px;
+  overflow: hidden;
+  height: 32px;
+  cursor: pointer;
+
+  &.is-project {
+    height: 38px;
+  }
+
+  &:hover {
+    .node-item__menu {
+      opacity: 1;
+    }
+  }
+
+  &__label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex: 1;
+  }
+
+  &__menu {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 5px;
+    margin-left: auto;
+    opacity: 0;
+    transition: opacity 0.15s;
+
+    :deep(.lucide) {
+      width: 20px;
+    }
+  }
+}

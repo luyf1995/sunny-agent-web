@@ -1,0 +1,37 @@
+.conversation-item {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 8px;
+  gap: 8px;
+  cursor: pointer;
+
+  &__label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex: 1;
+  }
+
+  &__menu {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-left: auto;
+    opacity: 0;
+    transition: opacity 0.15s;
+
+    :deep(.lucide) {
+      width: 20px;
+    }
+  }
+
+  &:hover {
+    color: #1e293b;
+    background-color: #f1f5f9;
+
+    .conversation-item__menu {
+      opacity: 1;
+    }
+  }
+}

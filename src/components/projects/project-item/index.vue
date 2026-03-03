@@ -1,5 +1,5 @@
 <template>
-  <div class="node-item" :class="{ 'is-project': isProject }">
+  <div class="node-item" :class="{ 'is-project': isProject }" @click="handleSelect">
     <component :is="renderIcon(data)" class="node-item__icon" :size="13" />
     <div class="node-item__label">{{ data.name }}</div>
     <div v-if="showMenu" class="node-item__menu">
@@ -8,10 +8,12 @@
   </div>
 </template>
 <script setup lang="ts">
+import { computed } from 'vue'
 import { Folder, FolderMinus, FolderOpen, MessageSquare, MessageSquarePlus, Pencil, Trash2 } from 'lucide-vue-next'
+import { useModuleStore } from '@/store'
 
 import MenuPopover from '@/components/menu-popover/index.vue'
-import { computed } from 'vue'
+import { ModuleType } from '@/store/module'
 
 const props = withDefaults(
   defineProps<{
@@ -24,7 +26,16 @@ const props = withDefaults(
   }
 )
 
+const moduleStore = useModuleStore()
+
 const isProject = computed(() => props.type === 'project')
+
+/**
+ * 选择
+ */
+const handleSelect = () => {
+  moduleStore.setCurrentModule(isProject.value ? ModuleType.Project : ModuleType.ProjectConversation, props.data)
+}
 
 /**
  * 渲染节点图标
@@ -98,40 +109,5 @@ const buildMenus = (data: any) => {
 }
 </script>
 <style scoped lang="scss">
-.node-item {
-  display: flex;
-  flex: 1;
-  align-items: center;
-  gap: 8px;
-  overflow: hidden;
-  height: 32px;
-  cursor: pointer;
-
-  &.is-project {
-    height: 38px;
-  }
-
-  &:hover {
-    .node-item__menu {
-      opacity: 1;
-    }
-  }
-
-  &__label {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    flex: 1;
-  }
-
-  &__menu {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-right: 10px;
-    margin-left: auto;
-    opacity: 0;
-    transition: opacity 0.15s;
-  }
-}
+@use './index';
 </style>

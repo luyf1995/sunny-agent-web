@@ -1,0 +1,101 @@
+.project-home {
+  display: flex;
+  align-items: center;
+  overflow-y: auto;
+  padding: 48px 24px;
+  height: 100%;
+  flex-direction: column;
+
+  .project-home-content {
+    width: 100%;
+    max-width: 700px;
+
+    .project-home-header {
+      margin-bottom: 32px;
+      text-align: center;
+
+      .project-home-icon {
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 16px;
+        width: 80px;
+        height: 80px;
+        color: #64748b;
+        background: #f1f5f9;
+        border-radius: 16px;
+      }
+
+      .project-home-title {
+        margin: 0 0 8px;
+        font-size: 24px;
+        color: #1e293b;
+        font-weight: 600;
+      }
+
+      .project-home-meta {
+        margin: 0;
+        font-size: 14px;
+        color: #64748b;
+      }
+    }
+
+    .project-home-chat {
+      margin-bottom: 24px;
+    }
+
+    .project-home-cards {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .project-home-conversations {
+      margin-top: 24px;
+
+      .conversations-title {
+        margin: 0 0 16px;
+        font-size: 16px;
+        color: #1e293b;
+        font-weight: 600;
+      }
+
+      .conversations-list {
+        display: flex;
+        flex-direction: column;
+
+        .conversation-item {
+          display: flex;
+          align-items: center;
+          padding: 14px 8px;
+          margin-bottom: 2px;
+          color: #64748b;
+          border-radius: 8px;
+          gap: 12px;
+          border-bottom: 1px solid #e2e8f0;
+          cursor: pointer;
+
+          &__title {
+            overflow: hidden;
+            font-size: 14px;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            color: #1e293b;
+            flex: 1;
+          }
+
+          &__time {
+            font-size: 12px;
+            color: #94a3b8;
+            flex-shrink: 0;
+          }
+
+          &:hover {
+            background: #f1f5f9;
+          }
+        }
+      }
+    }
+  }
+}

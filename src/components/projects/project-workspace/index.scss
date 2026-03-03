@@ -1,0 +1,26 @@
+.project-workspace {
+  display: flex;
+  padding: 16px;
+  height: 100%;
+  gap: 16px;
+  background-color: #f1f5f9;
+
+  .panel-card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgb(0 0 0 / 8%);
+  }
+
+  .database-panel {
+    overflow: hidden;
+    width: 280px;
+    transition:
+      width 0.2s ease,
+      min-width 0.2s ease;
+    flex-direction: column;
+  }
+
+  .chat-panel {
+    flex: 1;
+  }
+}

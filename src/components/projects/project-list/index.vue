@@ -4,6 +4,7 @@
     :data="list"
     :props="TREE_PROPS"
     highlight-current
+    :expand-on-click-node="false"
     :icon="ChevronRight"
     class="project-list"
   >
@@ -20,7 +21,7 @@
 <script setup lang="ts">
 import { ChevronRight, FolderPlus } from 'lucide-vue-next'
 
-import ProjectItem from './project-item.vue'
+import ProjectItem from '../project-item/index.vue'
 import ButtonLink from '@/components/button-link/index.vue'
 
 interface Props {
@@ -37,23 +38,5 @@ const TREE_PROPS = {
 }
 </script>
 <style scoped lang="scss">
-:deep(.el-tree-node__content) {
-  height: auto;
-}
-
-:deep(.el-tree-node__expand-icon) {
-  font-size: 14px;
-  color: #1e293b;
-}
-
-.empty {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 24px 16px;
-  font-size: 13px;
-  color: #64748b;
-  flex-direction: column;
-  gap: 8px;
-}
+@use './index';
 </style>

@@ -18,7 +18,7 @@
 import { ref } from 'vue'
 import { MessageSquare } from 'lucide-vue-next'
 
-import ConversationItem from './conversation-item.vue'
+import ConversationItem from '../conversation-item/index.vue'
 
 interface Conversation {
   name: string
@@ -31,33 +31,5 @@ const props = defineProps<{
 const current = ref<Conversation>()
 </script>
 <style scoped lang="scss">
-.conversation-list {
-  font-size: 13px;
-  color: #64748b;
-
-  .is-current {
-    color: #1e293b;
-    background-color: #d6e3f9;
-  }
-}
-
-.empty {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 24px 16px;
-  font-size: 13px;
-  text-align: center;
-  flex-direction: column;
-  gap: 8px;
-  color: #64748b;
-
-  .empty-icon {
-    opacity: 0.5;
-  }
-
-  span {
-    line-height: 1.5;
-  }
-}
+@use './index';
 </style>

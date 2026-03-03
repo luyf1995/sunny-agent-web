@@ -1,5 +1,5 @@
 <template>
-  <div class="conversation-item">
+  <div class="conversation-item" @click="handleSelect">
     <message-square :size="13" />
     <div class="conversation-item__label">{{ data.name }}</div>
     <div v-if="showMenu" class="conversation-item__menu">
@@ -12,6 +12,9 @@ import { ref } from 'vue'
 
 import MenuPopover from '@/components/menu-popover/index.vue'
 import { MessageSquare, FolderPlus, Pencil, Trash2 } from 'lucide-vue-next'
+
+import { useModuleStore } from '@/store'
+import { ModuleType } from '@/store/module'
 
 interface Conversation {
   name: string
@@ -26,6 +29,14 @@ const props = withDefaults(
     showMenu: true
   }
 )
+
+const moduleStore = useModuleStore()
+/**
+ * 选择
+ */
+const handleSelect = () => {
+  moduleStore.setCurrentModule(ModuleType.Conversation, props.data)
+}
 
 /**
  * 构建弹出菜单
@@ -62,37 +73,5 @@ const buildPopperMenus = (item: Conversation) => {
 }
 </script>
 <style scoped lang="scss">
-.conversation-item {
-  display: flex;
-  align-items: center;
-  padding: 8px 12px;
-  border-radius: 8px;
-  gap: 8px;
-  cursor: pointer;
-
-  &__label {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    flex: 1;
-  }
-
-  &__menu {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-left: auto;
-    opacity: 0;
-    transition: opacity 0.15s;
-  }
-
-  &:hover {
-    color: #1e293b;
-    background-color: #f1f5f9;
-
-    .conversation-item__menu {
-      opacity: 1;
-    }
-  }
-}
+@use './index';
 </style>

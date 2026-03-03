@@ -15,7 +15,7 @@
     </ul>
     <template #reference>
       <slot name="reference" :show="handleShow">
-        <ellipsis-vertical :size="13" @click.stop="handleShow" />
+        <ellipsis-vertical :size="14" @click.stop="handleShow" />
       </slot>
     </template>
   </el-popover>
@@ -29,8 +29,8 @@ interface MenuItem {
   icon?: Component
   label: string
   onClick: (...args: any[]) => any
-  class?: string
-  style?: string
+  class?: string | Record<string, any>
+  style?: string | Record<string, any>
 }
 
 interface Props {

@@ -72,5 +72,7 @@
   --el-popover-border-radius: 8px;
   --el-popover-padding: 0;
 
-  min-width: 0;
+  &.el-popper {
+    min-width: 0;
+  }
 }

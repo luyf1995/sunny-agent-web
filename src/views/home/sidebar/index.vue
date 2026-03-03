@@ -27,7 +27,6 @@ const handleToggleCollapse = () => {
   collapsed.value = !collapsed.value
 }
 
-// 监听折叠状态变化，同步到本地存储
 watch(
   collapsed,
   newValue => {
