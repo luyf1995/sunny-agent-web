@@ -19,6 +19,29 @@
   }
 }
 
+.el-pagination {
+  --el-pagination-font-size: 12px;
+
+  .el-select {
+    width: 100px;
+
+    .el-select__wrapper {
+      min-height: 32px;
+      font-size: var(--el-pagination-font-size);
+    }
+  }
+
+  .el-pagination__editor.el-input {
+    width: 40px;
+  }
+
+  .el-input__inner {
+    --el-input-inner-height: 30px;
+
+    font-size: var(--el-pagination-font-size);
+  }
+}
+
 .el-button {
   padding: 10px 20px;
   height: 40px;

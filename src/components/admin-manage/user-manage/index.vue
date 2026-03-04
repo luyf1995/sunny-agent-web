@@ -7,19 +7,31 @@
       </el-button>
     </div>
     <div class="user-table">
-      <sy-table :columns="columns" :data="data" :pagination="false" :border="false"></sy-table>
+      <sy-table
+        v-model:page="searchForm.page"
+        v-model:page-size="searchForm.page_size"
+        :columns="columns"
+        :data="tableData"
+        :pagination="true"
+        :border="false"
+        :height="tableHeight"
+        @page-change="getUserList"
+      ></sy-table>
     </div>
-    <add-user v-model="addUserVisible" />
+    <add-user v-model="addUserVisible" @success="getUserList" />
   </div>
 </template>
 <script setup lang="tsx">
 import { ref, VNode } from 'vue'
-import { UserPlus, Shield, X, Check, Trash2 } from 'lucide-vue-next'
-import { ElMessageBox } from 'element-plus'
+import { UserPlus, Shield, Trash2 } from 'lucide-vue-next'
+import { ElMessage, ElMessageBox } from 'element-plus'
 
 import SyTable from '@/components/sy-table/index.vue'
 import ButtonIcon from '@/components/button-icon/index.vue'
 import AddUser from './add-user.vue'
+
+import useTableHeight from '@/hooks/use-table-height'
+import { deleteUser, getUserList } from '@/api/user'
 
 interface UserMeta {
   username: string
@@ -28,6 +40,7 @@ interface UserMeta {
   createTime: string
 }
 
+const { tableHeight } = useTableHeight(['.user-table'], 16)
 const columns = ref([
   {
     prop: 'username',
@@ -79,12 +92,10 @@ const columns = ref([
     label: '操作',
     align: 'left',
     fixed: 'right',
+    width: 80,
     slot: (h: () => VNode, { row }: { row: UserMeta }) => {
       return (
         <div class="table-action">
-          <ButtonIcon border class="action-btn" title="禁用用户">
-            {row.status === 'active' ? <X size={16} /> : <Check size={16} />}
-          </ButtonIcon>
           <ButtonIcon border class="action-btn" title="删除用户" onClick={() => handleDelete(row)}>
             <Trash2 size={16} />
           </ButtonIcon>
@@ -94,7 +105,7 @@ const columns = ref([
   }
 ])
 
-const data = ref([
+const tableData = ref<UserMeta[]>([
   {
     username: 'admin',
     role: 'admin',
@@ -103,8 +114,30 @@ const data = ref([
   }
 ])
 
-const addUserVisible = ref(false)
+const searchForm = ref({
+  page: 1,
+  page_size: 15
+})
+/**
+ * 获取用户列表
+ */
+const fetchUserList = async () => {
+  try {
+    const { data } = await getUserList(searchForm.value)
+    tableData.value = data ?? []
+  } catch (error) {
+    console.error(error)
+  }
+}
+/**
+ * 搜索
+ */
+const onSeach = () => {
+  searchForm.value.page = 1
+  fetchUserList()
+}
 
+const addUserVisible = ref(false)
 /**
  * 添加用户
  */
@@ -116,88 +149,20 @@ const handleAddUser = () => {
  * 删除
  * @param {any} row
  */
-const handleDelete = (row: any) => {
+const handleDelete = async (row: any) => {
   ElMessageBox.confirm('是否确认删除', '警告', { type: 'warning' })
-    .then(() => {})
+    .then(async () => {
+      try {
+        await deleteUser(row.id)
+        ElMessage.success('删除成功！')
+        fetchUserList()
+      } catch (error) {
+        console.error(error)
+      }
+    })
     .catch(() => {})
 }
 </script>
 <style scoped lang="scss">
-.user-manage {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-
-  .user-tool {
-    display: flex;
-    justify-content: flex-end;
-    margin-bottom: 16px;
-    flex-shrink: 0;
-
-    .add-btn {
-      display: flex;
-      align-items: center;
-      font-size: 13px;
-
-      :deep(.lucide) {
-        margin-right: 8px;
-      }
-    }
-  }
-
-  .user-table {
-    font-size: 13px;
-    border: var(--border);
-    border-radius: 12px;
-    flex: 1;
-
-    :deep(.el-table) {
-      border-radius: 12px;
-
-      .user-info {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        color: #1e293b;
-        font-weight: 500;
-
-        &__icon {
-          color: #2563eb;
-          flex-shrink: 0;
-        }
-
-        &__tag {
-          padding: 2px 6px;
-          font-size: 11px;
-          color: #2563eb;
-          background: #eff6ff;
-          border-radius: 4px;
-          font-weight: 500;
-        }
-      }
-
-      .table-action {
-        display: flex;
-        gap: 8px;
-
-        .action-btn {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          width: 32px;
-          height: 32px;
-          color: #64748b;
-          border: var(--border);
-          border-radius: 8px;
-
-          &:hover {
-            color: #dc2626;
-            background: #fef2f2;
-            border-color: #dc2626;
-          }
-        }
-      }
-    }
-  }
-}
+@use './index';
 </style>

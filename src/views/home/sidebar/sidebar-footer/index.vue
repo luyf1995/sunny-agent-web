@@ -14,7 +14,7 @@
           <span class="user-item__value">admin</span>
         </div>
       </div>
-      <button-icon class="logout-btn">
+      <button-icon class="logout-btn" @click="userStore.logout">
         <log-out :size="16" />
         退出登录
       </button-icon>
@@ -33,6 +33,10 @@ import { Settings, User, LogOut } from 'lucide-vue-next'
 
 import ButtonIcon from '@/components/button-icon/index.vue'
 import AdminManage from '@/components/admin-manage/index.vue'
+
+import { useUserStore } from '@/store'
+
+const userStore = useUserStore()
 
 const props = defineProps<{
   collapsed: boolean

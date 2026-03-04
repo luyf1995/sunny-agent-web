@@ -1,104 +1,86 @@
 import { defineStore } from 'pinia'
-import { Session } from '@/utils/storage'
-// import { login, logout } from '@/api/system/user'
+import { loginBySSO, logout, logoutBySSO, verifySSOTicket } from '@/api/auth'
+import { UserInfo } from '@/api/user/types'
 
 interface UserState {
-  token: string
-  userInfo: null
+  accessToken: string
+  refreshToken: string
+  userInfo: UserInfo | null
 }
 
 const userStore = defineStore('user', {
+  persist: true,
   state: (): UserState => {
     return {
-      token: Session.get('token'),
+      accessToken: '',
+      refreshToken: '',
       userInfo: null
     }
   },
   actions: {
     /**
      * 设置Token
-     * @param {String} token
+     * @param {String} accessToken
+     * @param {string} refreshToken
      */
-    setToken(token: string) {
-      this.token = token
-      Session.set('token', token)
+    setToken(accessToken: string, refreshToken: string) {
+      this.setAccessToken(accessToken)
+      this.setRefreshToken(refreshToken)
     },
     /**
-     * 获取用户信息
+     * 设置accessToken
+     * @param {String} accessToken
      */
-    getUserInfo(): Promise<UserInfo> {
-      return new Promise((resolve, reject) => {
-        // getUserInfo()
-        //   .then(({ data }) => {
-        //     this.setUserInfo(data)
-        //     resolve(data)
-        //   })
-        //   .catch(error => {
-        //     reject(error)
-        //   })
-        resolve()
+    setAccessToken(accessToken: string) {
+      this.accessToken = accessToken
+    },
+    /**
+     * refreshToken
+     * @param {String} refreshToken
+     */
+    setRefreshToken(refreshToken: string) {
+      this.refreshToken = refreshToken
+    },
+    /**
+     * 验证sso ticket
+     * @param {string} ticket
+     * @param {string} service
+     */
+    verifySSOTicket(ticket: string, service?: string) {
+      return verifySSOTicket(ticket, service).then(({ data }) => {
+        this.setToken(data.access_token, data.refresh_token)
+        this.setUserInfo(data.user)
+        return data
       })
-    },
-    /**
-     * 设置用户信息
-     * @param {UserInfo} userInfo
-     */
-    setUserInfo(userInfo: UserInfo | null) {
-      this.userInfo = userInfo
-      Session.set('userInfo', userInfo)
     },
     /**
      * 登录
-     * @param {Login} loginForm
      */
-    login(loginForm: Login) {
-      return new Promise((resolve, reject) => {
-        // login(params).then(({ data }) => {
-        const token = 'xxxx'
-        this.setToken(token)
-        resolve(token)
-        // })
-      })
+    login() {
+      loginBySSO()
     },
     /**
      * 登出
      */
     logout() {
-      return new Promise((resolve, reject) => {
-        // logout()
-        //   .then(() => {
-        //     this.removeToken()
-        //     this.removeUserInfo()
-        //     resolve(null)
-        //   })
-        //   .catch(error => {
-        //     reject(error)
-        //   })
-      })
+      this.removeToken()
+      this.setUserInfo(null)
+      logoutBySSO()
     },
+
     /**
-     * 前端登出
-     * @param {Boolean} needClear 是否需要清空sessionStorage中的信息
+     * 设置用户信息
+     * @param {UserInfo | null} userInfo
      */
-    logoutByFrontEnd(needClear = true) {
-      if (needClear) {
-        this.removeToken()
-        this.removeUserInfo()
-      }
+    setUserInfo(userInfo: UserInfo | null) {
+      this.userInfo = userInfo
     },
     /**
-     * 移除Token
-     * @return {Promise}
+     * 移除token
      */
     removeToken() {
-      this.setToken('')
-      Session.remove('token')
-    },
-    /**
-     * 移除用户信息
-     * @return {Promise}
-     */
-    removeUserInfo() {
+      this.setAccessToken('')
+      this.setRefreshToken('')
       this.setUserInfo(null)
     }
   }

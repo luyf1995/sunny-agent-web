@@ -7,7 +7,7 @@ import zhCn from 'element-plus/es/locale/lang/zh-cn'
 import pinia from '@/store/index'
 import router from '@/router/index'
 import '@/styles/index.scss'
-import './permission'
+import './router/guard'
 
 const app = createApp(App)
 app.use(router).use(ElementPlus, { locale: zhCn }).use(pinia).mount('#app')

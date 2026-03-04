@@ -28,7 +28,7 @@ module.exports = {
     'no-var': 'error',
     'arrow-parens': ['error', 'as-needed'], // 箭头函数的参数可以不使用圆括号
     'consistent-return': 'off', // 要求 return 语句要么总是指定返回的值，要么不指定
-    camelcase: 'error', // 强制驼峰法命名
+    camelcase: 'off', // 强制驼峰法命名
     eqeqeq: 'error', // 强制全等( === 和 !==)
     'func-names': 'off', // 函数表达式必须有名字
     'global-require': 'off', // 取消对require的验证，使得可以使用require来加载图片的相对路径

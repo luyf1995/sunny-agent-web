@@ -11,7 +11,9 @@ export default () => {
     VITE_API_URL_PREFIX,
     VITE_API_FLV_PORT,
     VITE_AUDIO_PATH,
-    VITE_MARKER_FILE_PATH
+    VITE_MARKER_FILE_PATH,
+    VITE_SSO_LOGIN_URL,
+    VITE_SSO_LOGOUT_URL
   } = getAppEnvConfig()
   return {
     appTitle: VITE_APP_TITLE,
@@ -20,6 +22,8 @@ export default () => {
     apiUrlPrefix: VITE_API_URL_PREFIX,
     apiFlvPort: VITE_API_FLV_PORT,
     audioPath: VITE_AUDIO_PATH,
-    markerFilePath: VITE_MARKER_FILE_PATH
+    markerFilePath: VITE_MARKER_FILE_PATH,
+    ssoLoginUrl: VITE_SSO_LOGIN_URL,
+    ssoLogoutUrl: VITE_SSO_LOGOUT_URL
   }
 }

@@ -13,12 +13,15 @@
     </template>
     <div class="user-dialog__body">
       <el-form ref="addFormRef" :model="addForm" :rules="rules" label-position="top">
-        <el-form-item label="用户名" prop="username">
-          <el-input v-model="addForm.username" placeholder="请输入用户名"></el-input>
+        <el-form-item label="工号" prop="usernumb">
+          <el-input v-model="addForm.usernumb" placeholder="请输入工号"></el-input>
         </el-form-item>
-        <el-form-item label="密码" prop="password">
+        <el-form-item label="姓名" prop="username">
+          <el-input v-model="addForm.username" placeholder="请输入姓名"></el-input>
+        </el-form-item>
+        <!-- <el-form-item label="密码" prop="password">
           <el-input v-model="addForm.password" placeholder="请输入密码"></el-input>
-        </el-form-item>
+        </el-form-item> -->
         <el-form-item label="角色" prop="role">
           <el-select v-model="addForm.role" placeholder="请选择角色">
             <el-option v-for="item in ROLE_LIST" :key="item.value" :label="item.label" :value="item.value" />
@@ -43,22 +46,18 @@ import { cloneDeep } from 'lodash-es'
 import SyDialog from '@/components/sy-dialog/index.vue'
 import ButtonIcon from '@/components/button-icon/index.vue'
 
-const ROLE_LIST = [
-  {
-    label: '用户',
-    value: 'user'
-  },
-  {
-    label: '管理员',
-    value: 'admin'
-  }
-]
+import { createUser } from '@/api/user'
+import { ROLE_LIST } from './utils'
+import { ElMessage } from 'element-plus'
 
 const DEFAULT_FORM = {
+  usernumb: '',
   username: '',
   password: '',
   role: ''
 }
+
+const emits = defineEmits(['success'])
 
 const visible = defineModel('modelValue', {
   type: Boolean,
@@ -74,8 +73,8 @@ const addFormRef = ref()
 const addForm = ref(cloneDeep(DEFAULT_FORM))
 
 const rules = ref({
-  username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
-  password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
+  usernumb: [{ required: true, message: '请输入工号', trigger: 'blur' }],
+  username: [{ required: true, message: '请输入姓名', trigger: 'blur' }],
   role: [{ required: true, message: '请选择角色', trigger: 'change' }]
 })
 
@@ -92,13 +91,14 @@ const init = () => {
  */
 const handleSubmit = async () => {
   if (!addFormRef.value) return
-
   try {
     await addFormRef.value.validate()
-    console.log(addForm.value)
-    // visible.value = false
+    await createUser(addForm.value)
+    ElMessage.success('创建成功！')
+    visible.value = false
+    emits('success')
   } catch (error) {
-    console.error('表单验证失败:', error)
+    console.error('error', error)
   }
 }
 </script>
