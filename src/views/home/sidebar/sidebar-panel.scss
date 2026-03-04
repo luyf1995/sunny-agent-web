@@ -6,7 +6,7 @@
 
   & ~ .sidebar-panel {
     margin-top: 8px;
-    border-top: 1px solid #e2e8f0;
+    border-top: var(--border);
   }
 
   &__header {

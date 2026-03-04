@@ -22,7 +22,7 @@ const message = ref('')
 <style scoped lang="scss">
 .chat-input {
   padding: 16px;
-  border: 1px solid #e2e8f0;
+  border: var(--border);
   border-radius: 12px;
   box-shadow: 0 1px 3px rgb(0 0 0 / 5%);
 

@@ -14,6 +14,7 @@ export interface Props extends ExtractPublicPropTypes<DialogProps> {
   content?: SlotType
   header?: SlotType
   footer?: SlotType
+  showHeader?: boolean
   showFullscreen?: boolean
   showFooter?: boolean
   showSubmit?: boolean

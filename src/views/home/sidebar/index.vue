@@ -42,7 +42,7 @@ watch(
   height: 100%;
   background-color: #f1f5f9;
   transition: width 0.2s ease;
-  border-right: 1px solid #e2e8f0;
+  border-right: var(--border);
   flex-direction: column;
   flex-shrink: 0;
 

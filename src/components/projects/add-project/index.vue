@@ -7,7 +7,7 @@
     </el-form>
     <template #footer>
       <div class="dialog-footer">
-        <sy-button @click="visible = false">取消</sy-button>
+        <el-button @click="visible = false">取消</el-button>
         <sy-button type="primary" :disabled="!addForm.name" @click="handleSubmit">创建项目</sy-button>
       </div>
     </template>

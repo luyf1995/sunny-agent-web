@@ -73,7 +73,7 @@
           color: #64748b;
           border-radius: 8px;
           gap: 12px;
-          border-bottom: 1px solid #e2e8f0;
+          border-bottom: var(--border);
           cursor: pointer;
 
           &__title {

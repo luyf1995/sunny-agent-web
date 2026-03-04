@@ -9,20 +9,22 @@
     @closed="handleDialogClosed"
   >
     <template #header="{ close, titleId, titleClass }">
-      <div class="dialog-header">
-        <h4 :id="titleId" :class="titleClass">{{ title }}</h4>
-        <div class="dialog-header__btn">
-          <el-button
-            v-if="showFullscreen"
-            link
-            :icon="FullScreen"
-            :title="fullscreen ? '取消全屏' : '全屏'"
-            @click="fullscreen = !fullscreen"
-          >
-          </el-button>
-          <el-button link :icon="Close" @click="close"> </el-button>
+      <slot v-if="showHeader" name="header">
+        <div class="dialog-header">
+          <h4 :id="titleId" :class="titleClass">{{ title }}</h4>
+          <div class="dialog-header__btn">
+            <el-button
+              v-if="showFullscreen"
+              link
+              :icon="FullScreen"
+              :title="fullscreen ? '取消全屏' : '全屏'"
+              @click="fullscreen = !fullscreen"
+            >
+            </el-button>
+            <el-button link :icon="Close" @click="close"> </el-button>
+          </div>
         </div>
-      </div>
+      </slot>
     </template>
     <slot></slot>
     <template #footer>

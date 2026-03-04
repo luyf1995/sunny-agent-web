@@ -42,7 +42,7 @@ const handleLogoClick = () => {
   justify-content: center;
   align-items: center;
   padding: 16px;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: var(--border);
   gap: 12px;
 }
 
