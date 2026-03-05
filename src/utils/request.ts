@@ -2,15 +2,18 @@ import axios, { AxiosResponse, InternalAxiosRequestConfig } from 'axios'
 import { ElLoading, ElMessage } from 'element-plus'
 import useAppConfig from '@/hooks/use-app-config'
 import { useUserStore } from '@/store'
-import router from '@/router'
+import { loginBySSO } from '@/api/auth'
 
 const { apiUrl, apiUrlPrefix } = useAppConfig()
 
-// 业务状态码
-export enum Code {
+// http状态码
+export enum HttpCode {
   SUCCCESS = 200,
   ERROR = 500,
-  UNAUTHORIZED = 401 // token 失效
+  UNAUTHORIZED = 401 // token 失效、ticket验证失败
+}
+export enum BusinessCode {
+  TOKEN_INVALID = 40100 // token 失效
 }
 
 export interface IResponse<T = any> {
@@ -65,8 +68,9 @@ request.interceptors.request.use(
     const { baseURL, url, noLoading } = config
 
     !userStore && (userStore = useUserStore())
+    console.log()
     // 请求头携带token
-    config!.headers!.Authorization = 'Bearer ' + userStore.token
+    config!.headers!.Authorization = 'Bearer ' + userStore.accessToken
 
     if (!noLoading) {
       if (queue.size === 0) {
@@ -108,22 +112,28 @@ request.interceptors.response.use(
     const { baseURL, url } = error.config
     const { status, data } = error.response || {}
 
+    // 业务code
+    const { code, message } = data || {}
+
     const mainUrl = url.split('?')[0]
     removeQueueAndCancelLoading(baseURL + mainUrl)
 
     if (!status) {
       showElMessage()
-    } else if (status === 401) {
+    } else if (status === HttpCode.UNAUTHORIZED) {
       // 认证失败，跳转到401页面
       userStore && userStore.removeToken()
-      // TODO:需要区分是ticket验证失败还是token过期
-      // 如果是ticket验证失败，则需要跳转到401页面
+      // 需要区分是ticket验证失败还是token过期
       // 如果是token过期，则需要清除token后，跳转到SSO页面。
-      // router.push('/401')
+      if (code === BusinessCode.TOKEN_INVALID) {
+        // token失效
+        loginBySSO()
+        showElMessage(message)
+      }
     } else {
       // 非取消请求的报错需要弹框展示
       if (!(error instanceof axios.Cancel)) {
-        showElMessage(data.message)
+        showElMessage(message)
       }
     }
     return Promise.reject(error)

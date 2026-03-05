@@ -22,9 +22,9 @@
         <!-- <el-form-item label="密码" prop="password">
           <el-input v-model="addForm.password" placeholder="请输入密码"></el-input>
         </el-form-item> -->
-        <el-form-item label="角色" prop="role">
-          <el-select v-model="addForm.role" placeholder="请选择角色">
-            <el-option v-for="item in ROLE_LIST" :key="item.value" :label="item.label" :value="item.value" />
+        <el-form-item label="角色" prop="role_id">
+          <el-select v-model="addForm.role_id" placeholder="请选择角色">
+            <el-option v-for="item in roleList" :key="item.id" :label="item.name" :value="item.id" />
           </el-select>
         </el-form-item>
       </el-form>
@@ -42,19 +42,19 @@
 import { ref, watch } from 'vue'
 import { UserPlus, X } from 'lucide-vue-next'
 import { cloneDeep } from 'lodash-es'
+import { ElMessage } from 'element-plus'
 
 import SyDialog from '@/components/sy-dialog/index.vue'
 import ButtonIcon from '@/components/button-icon/index.vue'
 
 import { createUser } from '@/api/user'
-import { ROLE_LIST } from './utils'
-import { ElMessage } from 'element-plus'
+import { RoleInfo } from '@/api/role/types'
+import { getRoleList } from '@/api/role'
 
 const DEFAULT_FORM = {
   usernumb: '',
   username: '',
-  password: '',
-  role: ''
+  role_id: ''
 }
 
 const emits = defineEmits(['success'])
@@ -84,6 +84,24 @@ const rules = ref({
 const init = () => {
   addForm.value = cloneDeep(DEFAULT_FORM)
   addFormRef.value?.resetFields()
+  fetchRoleList()
+}
+
+/**
+ * 角色列表
+ */
+const roleList = ref<RoleInfo[]>([])
+
+/**
+ * 获取角色列表
+ */
+const fetchRoleList = async () => {
+  try {
+    const { data } = await getRoleList()
+    roleList.value = data.items ?? []
+  } catch (error) {
+    console.error('error', error)
+  }
 }
 
 /**

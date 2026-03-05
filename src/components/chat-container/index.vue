@@ -4,12 +4,15 @@
       <h1>Sunny Agents</h1>
       <span class="thread-id">线程: 26099b3b</span>
     </div>
-    <div class="chat-message"></div>
+    <div class="chat-message">
+      <message-list />
+    </div>
     <chat-input />
   </div>
 </template>
 <script setup lang="ts">
 import ChatInput from './chat-input/index.vue'
+import MessageList from './message-list/index.vue'
 </script>
 <style scoped lang="scss">
 .chat-container {

@@ -28,6 +28,11 @@
             @selected="({ command }) => handleSkillSelected(command)"
           />
         </div>
+        <div class="input-toolbar__right">
+          <el-button type="primary" title="发送" class="send-btn" @click="handleSend">
+            <send :size="18" />
+          </el-button>
+        </div>
       </div>
       <div v-if="skillSuggestionsVisible" class="skill-suggestion-container">
         <skill-suggestion
@@ -40,14 +45,22 @@
   </div>
 </template>
 <script setup lang="ts">
-import { computed, ref, watch, watchEffect } from 'vue'
-import { Search, Database } from 'lucide-vue-next'
+import { computed, ref, watch } from 'vue'
+import { Search, Database, Send } from 'lucide-vue-next'
 
 import FileUpload from './file-upload/index.vue'
 import SkillSelector from './skill-selector/index.vue'
 import SkillSuggestion from './skill-suggestion/index.vue'
 
+import { useChat } from '@/hooks/use-chat'
+
 const COMMAND_SYMBOL = '/'
+
+const { messages, isStreaming, threadId, sendMessage, cancel, newThread, loadThread } = useChat({
+  onConversationCreated: () => {
+    console.log('New conversation created!')
+  }
+})
 
 const message = ref('')
 
@@ -175,6 +188,13 @@ const handleInput = (e: InputEvent) => {
   target.style.height = 'auto'
   target.style.height = Math.min(target.scrollHeight, 200) + 'px'
 }
+
+/**
+ * 发送聊天消息
+ */
+const handleSend = () => {
+  if (message.value.trim() === '') return
+}
 </script>
 <style scoped lang="scss">
 .chat-input {
@@ -234,6 +254,11 @@ const handleInput = (e: InputEvent) => {
         display: flex;
         align-items: center;
         gap: 8px;
+      }
+
+      .send-btn {
+        width: 42px;
+        height: 42px;
       }
     }
 

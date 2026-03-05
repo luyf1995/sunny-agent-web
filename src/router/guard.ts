@@ -13,7 +13,7 @@ const whiteList = ['/404', '/401', '/sso']
 router.beforeEach(async (to: any, from: any, next: any) => {
   const userStore = useUserStore(pinia)
 
-  debugger
+  // debugger
   NProgress.start()
   document.title = getPageTitle(to.meta.title)
   // next()

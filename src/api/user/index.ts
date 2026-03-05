@@ -1,5 +1,5 @@
 import request from '@/utils/request'
-import { CreateUserParams, UserInfo } from './types'
+import { CreateUserParams, UserInfo, CurrentUserInfo } from './types'
 import { AxiosPromise } from 'axios'
 import { PageResult } from '../common/types'
 import { QueryUserParams } from './types'
@@ -7,10 +7,10 @@ import { QueryUserParams } from './types'
 /**
  * 获取当前用户信息
  */
-export const getCurrentUserInfo = (): Promise<UserInfo> =>
+export const getCurrentUserInfo = (): Promise<CurrentUserInfo> =>
   request({
     method: 'get',
-    url: '/users/me'
+    url: '/api/users/me'
   })
 
 /**
@@ -20,18 +20,18 @@ export const getCurrentUserInfo = (): Promise<UserInfo> =>
 export const getUserList = (params: QueryUserParams): AxiosPromise<PageResult<UserInfo[]>> =>
   request({
     method: 'get',
-    url: '/users',
+    url: '/api/users',
     params
   })
 
 /**
  * 创建用户
  */
-export const createUser = (params: CreateUserParams): AxiosPromise<UserInfo> =>
+export const createUser = (params: CreateUserParams): AxiosPromise<void> =>
   request({
     method: 'post',
-    url: '/users',
-    params
+    url: '/api/users',
+    data: params
   })
 
 /**
@@ -41,5 +41,5 @@ export const createUser = (params: CreateUserParams): AxiosPromise<UserInfo> =>
 export const deleteUser = (id: number): AxiosPromise<void> =>
   request({
     method: 'delete',
-    url: `/users/${id}`
+    url: `/api/users/${id}`
   })

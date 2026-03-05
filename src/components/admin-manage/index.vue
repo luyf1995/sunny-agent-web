@@ -7,7 +7,7 @@
     body-class="admin-dialog__body"
     top="10vh"
   >
-    <div class="admin-panel">
+    <div v-if="visible" class="admin-panel">
       <admin-sidebar v-model="currentNav" />
       <div class="content-panel">
         <div class="content-header">
