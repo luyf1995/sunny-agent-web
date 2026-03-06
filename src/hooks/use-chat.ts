@@ -99,7 +99,7 @@ export function useChat(options: UseChatOptions = {}) {
               if (toolCallIndex !== -1 && messages.value[index].contents![toolCallIndex].toolCall) {
                 messages.value[index].contents![toolCallIndex].toolCall = {
                   ...messages.value[index].contents![toolCallIndex].toolCall,
-                  status: event.data.status,
+                  status: event.data.status ?? event.data.result.status,
                   result: event.data.result
                 }
               }

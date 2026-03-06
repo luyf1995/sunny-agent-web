@@ -1,0 +1,9 @@
+- [x] types.ts 中正确添加 ToolCallSkillCallArgs 接口
+- [x] types.ts 中正确添加 ToolCallSkillCallResult 接口
+- [x] ToolCallName 枚举中正确添加 SkillCall 类型
+- [x] ToolCall 接口的 args 和 result 联合类型正确更新
+- [x] skill-call.vue 组件正确创建，包含完整的模板、脚本和样式
+- [x] 组件能正确展示调用状态（running 显示加载动画，success 显示成功，error 显示错误）
+- [x] 组件样式与现有工具组件风格一致
+- [x] tool-call/index.vue 中正确注册 SkillCall 组件
+- [x] COMPONENT_MAP 中正确添加 SkillCall 映射

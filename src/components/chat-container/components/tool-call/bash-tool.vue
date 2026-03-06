@@ -8,13 +8,13 @@
       {{ command }}
     </div>
     <div class="bash-tool__result">
-      {{ result.error ? result.error : result }}
+      {{ data.status === ToolCallStatus.Success ? result.stdout : result.error }}
     </div>
   </div>
 </template>
 <script setup lang="ts">
 import { computed } from 'vue'
-import { ToolCall, ToolCallBashToolArgs, ToolCallBashToolResult } from '@/api/chat/types'
+import { ToolCall, ToolCallBashToolArgs, ToolCallBashToolResult, ToolCallStatus } from '@/api/chat/types'
 
 interface Props {
   data: ToolCall

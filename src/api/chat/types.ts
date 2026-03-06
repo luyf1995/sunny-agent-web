@@ -27,7 +27,8 @@ export enum ToolCallName {
   TodoWrite = 'todo_write', // 写代办
   TodoRead = 'todo_read', // 读代办
   BashTool = 'bash_tool', // Bash调用
-  WebSearch = 'web_search' // 网络搜索
+  WebSearch = 'web_search', // 网络搜索
+  SkillCall = 'skill_call' // 技能调用
 }
 
 export interface ToolCall {
@@ -40,6 +41,7 @@ export interface ToolCall {
     | ToolCallReadFileArgs
     | ToolCallWriteFileArgs
     | ToolCallWebSearchArgs
+    | ToolCallSkillCallArgs
   status: ToolCallStatus
   result:
     | Record<string, any>
@@ -48,6 +50,7 @@ export interface ToolCall {
     | ToolCallReadFileResult
     | ToolCallWriteFileResult
     | ToolCallWebSearchResult
+    | ToolCallSkillCallResult
 }
 
 export enum ToolCallStatus {
@@ -87,6 +90,9 @@ export interface ToolCallBashToolArgs {
 export interface ToolCallBashToolResult {
   status: ToolCallStatus
   error?: string
+  stdout: string
+  stderr: string
+  returncode: number
 }
 /** end **/
 
@@ -124,7 +130,17 @@ export interface ToolCallWebSearchResult {
 }
 export interface ToolCallWebSearchResultItem {
   title: string
-  link: string
+  url: string
   snippet: string
+}
+/** end **/
+
+/**  tool_call -> skill_call **/
+export interface ToolCallSkillCallArgs {
+  skill_name: string
+}
+export interface ToolCallSkillCallResult {
+  status: ToolCallStatus
+  error?: string
 }
 /** end **/
