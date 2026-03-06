@@ -1,4 +1,5 @@
 import { useUserStore } from '@/store'
+import { loginBySSO } from '@/api/auth'
 import type { SSEEvent } from './types'
 
 import useAppConfig from '@/hooks/use-app-config'
@@ -32,6 +33,12 @@ export async function* streamChat(threadId: string, message: string, signal: Abo
   })
 
   if (!response.ok) {
+    if (response.status === 401) {
+      // 认证失败，清除token并跳转到SSO登录
+      userStore.removeToken()
+      loginBySSO()
+      throw new Error('登录已过期，请重新登录')
+    }
     throw new Error(`流式对话请求失败: ${response.status}`)
   }
 
@@ -40,26 +47,38 @@ export async function* streamChat(threadId: string, message: string, signal: Abo
   let buffer = ''
   let currentEvent = ''
 
-  while (true) {
-    const { done, value } = await reader.read()
-    if (done) break
+  const abortHandler = () => {
+    reader.cancel()
+  }
+  signal.addEventListener('abort', abortHandler)
 
-    buffer += decoder.decode(value, { stream: true })
-    const lines = buffer.split('\n')
-    buffer = lines.pop() ?? ''
+  try {
+    while (true) {
+      if (signal.aborted) break
 
-    for (const line of lines) {
-      if (line.startsWith('event: ')) {
-        currentEvent = line.slice(7).trim()
-      } else if (line.startsWith('data: ') && currentEvent) {
-        try {
-          const data = JSON.parse(line.slice(6))
-          yield { event: currentEvent, data } as SSEEvent
-        } catch {
-          console.error('json解析错误:', line.slice(6))
+      const { done, value } = await reader.read()
+      if (done) break
+
+      buffer += decoder.decode(value, { stream: true })
+      const lines = buffer.split('\n')
+      buffer = lines.pop() ?? ''
+
+      for (const line of lines) {
+        if (line.startsWith('event: ')) {
+          currentEvent = line.slice(7).trim()
+        } else if (line.startsWith('data: ') && currentEvent) {
+          try {
+            const data = JSON.parse(line.slice(6))
+            yield { event: currentEvent, data } as SSEEvent
+          } catch {
+            console.error('json解析错误:', line.slice(6))
+          }
+          currentEvent = ''
         }
-        currentEvent = ''
       }
     }
+  } finally {
+    signal.removeEventListener('abort', abortHandler)
+    reader.releaseLock()
   }
 }

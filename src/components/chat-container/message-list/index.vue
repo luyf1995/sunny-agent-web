@@ -12,7 +12,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, nextTick } from 'vue'
 import MessageBubble from './message-bubble.vue'
 
 import { Message } from '@/api/chat/types'
@@ -30,20 +30,41 @@ const props = withDefaults(defineProps<Props>(), {
 const containerRef = ref<HTMLDivElement>()
 const footerRef = ref<HTMLDivElement>()
 
+const scrollToBottom = (smooth = false) => {
+  nextTick(() => {
+    footerRef.value?.scrollIntoView({ behavior: smooth ? 'smooth' : 'instant' })
+  })
+}
+
 watch(
   () => props.messages,
   () => {
     if (!containerRef.value) return
+
+    if (props.isStreaming) {
+      scrollToBottom(false)
+      return
+    }
+
     const threshold = 150
     const isNearBottom =
       containerRef.value.scrollHeight - containerRef.value.scrollTop - containerRef.value.clientHeight < threshold
-    console.log(11111, isNearBottom)
+
     if (isNearBottom) {
-      footerRef.value?.scrollIntoView({ behavior: 'smooth' })
+      scrollToBottom(true)
     }
   },
   {
     deep: true
+  }
+)
+
+watch(
+  () => props.isStreaming,
+  isStreaming => {
+    if (isStreaming) {
+      scrollToBottom(false)
+    }
   }
 )
 </script>
@@ -68,5 +89,19 @@ watch(
 
 .streaming-indicator .dot:nth-child(3) {
   animation-delay: 0.4s;
+}
+
+@keyframes pulse {
+  0%,
+  80%,
+  100% {
+    opacity: 0.3;
+    transform: scale(0.8);
+  }
+
+  40% {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 </style>

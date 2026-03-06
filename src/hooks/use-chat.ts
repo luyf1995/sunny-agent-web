@@ -1,7 +1,8 @@
-import { ref, onUnmounted, watch } from 'vue'
-import { Message, RoleType, ToolCallStatus } from '@/api/chat/types'
+import { ref, onUnmounted, watch, computed } from 'vue'
+import { Message, RoleType, ToolCallStatus, QuestionItem } from '@/api/chat/types'
 import { streamChat, nextId } from '@/api/chat/index'
 import { ChatSSEEvent } from '@/api/chat/event'
+import { ToolCallName } from '@/api/chat/types'
 
 interface UseChatOptions {
   initialThreadId?: string | null
@@ -13,6 +14,9 @@ export function useChat(options: UseChatOptions = {}) {
   const isStreaming = ref(false)
   const threadId = ref<string | null>(options.initialThreadId ?? null)
   const abortController = ref<AbortController | null>(null)
+  const askUserQuestions = ref<QuestionItem[] | null>(null)
+
+  const showAskUser = computed(() => askUserQuestions.value !== null && askUserQuestions.value.length > 0)
 
   const onConversationCreated = ref(options.onConversationCreated)
 
@@ -88,6 +92,9 @@ export function useChat(options: UseChatOptions = {}) {
                 toolCall
               })
             }
+            if (event.data.name === ToolCallName.AskUser) {
+              askUserQuestions.value = event.data.args?.questions || []
+            }
             break
           }
           case ChatSSEEvent.ToolResult: {
@@ -131,6 +138,11 @@ export function useChat(options: UseChatOptions = {}) {
     abortController.value?.abort()
   }
 
+  // 清除 ask-user 问题
+  const clearAskUser = () => {
+    askUserQuestions.value = null
+  }
+
   // 组件卸载时取消请求
   onUnmounted(() => {
     abort()
@@ -142,6 +154,9 @@ export function useChat(options: UseChatOptions = {}) {
     isStreaming,
     threadId,
     sendMessage,
-    abort
+    abort,
+    askUserQuestions,
+    showAskUser,
+    clearAskUser
   }
 }

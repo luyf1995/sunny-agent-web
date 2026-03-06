@@ -7,26 +7,41 @@
     <div class="chat-message">
       <message-list :messages="messages" :is-streaming="isStreaming" />
     </div>
-    <chat-input v-model="message" :is-streaming="isStreaming" @send="handleSend" @abort="abort" />
+    <div class="chat-input-wrapper">
+      <chat-input v-if="!showAskUser" v-model="message" :is-streaming="isStreaming" @send="handleSend" @abort="abort" />
+      <ask-user-overlay v-else :questions="askUserQuestions!" @submit="handleAskUserSubmit" @close="clearAskUser" />
+    </div>
   </div>
 </template>
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, provide } from 'vue'
 
 import ChatInput from './chat-input/index.vue'
 import MessageList from './message-list/index.vue'
+import AskUserOverlay from './ask-user-overlay.vue'
 
 import { useChat } from '@/hooks/use-chat'
 
-const { messages, isStreaming, threadId, sendMessage, abort } = useChat()
+const { messages, isStreaming, threadId, sendMessage, abort, askUserQuestions, showAskUser, clearAskUser } = useChat()
 
 const message = ref('')
 
-/**
- * 发送聊天消息
- */
+provide('sendMessage', sendMessage)
+
 const handleSend = async () => {
   await sendMessage(message.value)
+}
+
+const handleAskUserSubmit = async (answers: string[]) => {
+  const responseText = answers
+    .map((answer, index) => {
+      const question = askUserQuestions.value?.[index]
+      return `问题${index + 1}: ${question?.question}\n回答: ${answer}`
+    })
+    .join('\n\n')
+
+  clearAskUser()
+  await sendMessage(responseText)
 }
 </script>
 <style scoped lang="scss">
@@ -64,6 +79,11 @@ const handleSend = async () => {
     min-height: 0;
     flex: 1;
     scroll-behavior: smooth;
+  }
+
+  .chat-input-wrapper {
+    position: relative;
+    flex-shrink: 0;
   }
 }
 </style>

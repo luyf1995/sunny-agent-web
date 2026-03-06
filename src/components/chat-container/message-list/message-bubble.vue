@@ -5,7 +5,7 @@
     </div>
     <div class="message-body">
       <div v-for="(item, index) in message.contents" :key="index" class="message-content">
-        <tool-call v-if="item.type === ChatSSEEvent.ToolCall && item.toolCall" :data="item.toolCall" />
+        <tool-call v-if="item && showToolCall(item)" :data="item.toolCall" />
         <markdown v-else :content="item.text" />
       </div>
     </div>
@@ -18,7 +18,7 @@ import { User, Bot } from 'lucide-vue-next'
 import Markdown from '@/components/stream-markdown/index.vue'
 import ToolCall from '../components/tool-call/index.vue'
 
-import { Message } from '@/api/chat/types'
+import { Message, MessageContent, ToolCallName } from '@/api/chat/types'
 import { ChatSSEEvent } from '@/api/chat/event'
 
 interface Props {
@@ -28,12 +28,20 @@ interface Props {
 const props = defineProps<Props>()
 
 const isUser = computed(() => props.message.role === 'user')
+
+const showToolCall = (item: MessageContent) => {
+  return item.type === ChatSSEEvent.ToolCall && item.toolCall
+}
 </script>
 <style scoped lang="scss">
 .message-bubble {
   display: flex;
   gap: 12px;
   margin-bottom: 20px;
+
+  & + .message-bubble {
+    margin-top: 10px;
+  }
 
   &.user-bubble {
     justify-content: flex-end;
@@ -61,6 +69,12 @@ const isUser = computed(() => props.message.role === 'user')
   .message-body {
     flex: 1;
     min-width: 0;
+
+    .message-content {
+      & + .message-content {
+        margin-top: 10px;
+      }
+    }
   }
 }
 </style>

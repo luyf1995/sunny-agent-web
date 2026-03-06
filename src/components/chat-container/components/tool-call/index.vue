@@ -1,5 +1,5 @@
 <template>
-  <div class="tool-call">
+  <div v-if="data" class="tool-call">
     <component :is="COMPONENT_MAP[data.name]" :data="data"></component>
   </div>
 </template>
@@ -16,7 +16,7 @@ import SkillCall from './skill-call.vue'
 import { ToolCall, ToolCallName } from '@/api/chat/types'
 
 interface Props {
-  data: ToolCall
+  data?: ToolCall
 }
 const props = defineProps<Props>()
 

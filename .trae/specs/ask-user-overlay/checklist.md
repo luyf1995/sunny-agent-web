@@ -1,0 +1,13 @@
+- [ ] use-chat.ts 中正确添加 askUserQuestion 状态
+- [ ] use-chat.ts 中正确处理 ask_user 工具调用事件
+- [ ] chat-container 中正确显示 ask-user 覆盖层
+- [ ] 覆盖层正确覆盖聊天输入框区域
+- [ ] 显示覆盖层时正确隐藏聊天输入框
+- [ ] ask-user 组件正确接收 QuestionItem[] 数据
+- [ ] 每次只显示一个问题
+- [ ] 左右切换功能正常工作
+- [ ] 进度指示器正确显示当前问题序号和总数
+- [ ] 未回答问题时禁用下一题/提交按钮
+- [ ] 已回答问题时启用下一题/提交按钮
+- [ ] 提交后正确隐藏覆盖层并恢复聊天输入框
+- [ ] tool-call/index.vue 中已移除 AskUser 组件注册
