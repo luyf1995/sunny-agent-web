@@ -5,14 +5,29 @@
       <span class="thread-id">线程: 26099b3b</span>
     </div>
     <div class="chat-message">
-      <message-list />
+      <message-list :messages="messages" :is-streaming="isStreaming" />
     </div>
-    <chat-input />
+    <chat-input v-model="message" :is-streaming="isStreaming" @send="handleSend" @abort="abort" />
   </div>
 </template>
 <script setup lang="ts">
+import { ref, watch } from 'vue'
+
 import ChatInput from './chat-input/index.vue'
 import MessageList from './message-list/index.vue'
+
+import { useChat } from '@/hooks/use-chat'
+
+const { messages, isStreaming, threadId, sendMessage, abort } = useChat()
+
+const message = ref('')
+
+/**
+ * 发送聊天消息
+ */
+const handleSend = async () => {
+  await sendMessage(message.value)
+}
 </script>
 <style scoped lang="scss">
 .chat-container {

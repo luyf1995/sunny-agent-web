@@ -1,72 +1,130 @@
-// types.ts
-export type DisplayScenario = 'quick' | 'agent' | 'planning'
+import { ChatSSEEvent } from './event'
 
-export interface ThinkingStep {
-  content: string
-  type: string
-  timestamp: number
+export enum RoleType {
+  User = 'user',
+  Assistant = 'assistant'
 }
-
-export interface ThinkingState {
-  steps: ThinkingStep[]
-  isThinking: boolean
-  startTime: number
-  durationSeconds: number
-}
-
-export interface ToolCall {
-  id: string
-  name: string
-  args: Record<string, any>
-  status: 'running' | 'done' | 'error'
-  output?: string
-}
-
-export interface SpawnedTask {
-  task_id: string
-  subagent_type: string
-  description: string
-  status: 'pending' | 'running' | 'completed' | 'failed'
-  toolCalls: ToolCall[]
-  todos?: string[]
-  output?: string
-  duration_ms?: number
-}
-
-export interface UploadedFile {
-  file_id: string
-  filename: string
-  size: number
-  content_type: string
-  source: string
-  download_url: string
-}
-
-export interface Message {
-  id: string
-  role: 'user' | 'assistant'
-  content: string
-  files?: UploadedFile[]
-  toolCalls?: ToolCall[]
-  thinking?: ThinkingState
-  displayScenario?: DisplayScenario
-  spawnedTasks?: SpawnedTask[]
-  todos?: string[]
-}
-
 export interface SSEEvent {
   event: string
   data: any
 }
 
-export interface Agent {
+export interface Message {
   id: string
-  name: string
-  description?: string
+  role: string
+  contents: MessageContent[]
+}
+export interface MessageContent {
+  type: ChatSSEEvent
+  text?: string // 文本内容
+  toolCall?: ToolCall // 工具调用
 }
 
-export interface Skill {
-  id: string
-  name: string
-  description?: string
+// 工具类型枚举
+export enum ToolCallName {
+  WriteFile = 'write_file', // 写文件
+  ReadFile = 'read_file', // 读文件
+  TodoWrite = 'todo_write', // 写代办
+  TodoRead = 'todo_read', // 读代办
+  BashTool = 'bash_tool', // Bash调用
+  WebSearch = 'web_search' // 网络搜索
 }
+
+export interface ToolCall {
+  step: number // 步骤
+  name: ToolCallName // 工具类型
+  args:
+    | Record<string, any>
+    | ToolCallTodoArgs
+    | ToolCallBashToolArgs
+    | ToolCallReadFileArgs
+    | ToolCallWriteFileArgs
+    | ToolCallWebSearchArgs
+  status: ToolCallStatus
+  result:
+    | Record<string, any>
+    | ToolCallTodoResult
+    | ToolCallBashToolResult
+    | ToolCallReadFileResult
+    | ToolCallWriteFileResult
+    | ToolCallWebSearchResult
+}
+
+export enum ToolCallStatus {
+  Running = 'running',
+  Success = 'success',
+  Error = 'error'
+}
+
+/** tool_call -> todo_write / todo_read */
+export interface ToolCallTodoArgs {
+  todos: TodoItem[]
+}
+export enum TodoItemStatus {
+  Pending = 'pending',
+  InProgress = 'in_progress',
+  Completed = 'completed'
+}
+export interface TodoItem {
+  id: string
+  content: string
+  status: TodoItemStatus
+  priority: string
+}
+
+export interface ToolCallTodoResult {
+  status: ToolCallStatus
+  title: string
+  todos: TodoItem[]
+  error?: string
+}
+/** end **/
+
+/**  tool_call -> bash_tool **/
+export interface ToolCallBashToolArgs {
+  command: string
+}
+export interface ToolCallBashToolResult {
+  status: ToolCallStatus
+  error?: string
+}
+/** end **/
+
+/**  tool_call -> read_file **/
+export interface ToolCallReadFileArgs {
+  path: string
+}
+export interface ToolCallReadFileResult {
+  status: ToolCallStatus
+  error?: string
+}
+/** end **/
+
+/**  tool_call -> write_file **/
+export interface ToolCallWriteFileArgs {
+  path: string
+}
+export interface ToolCallWriteFileResult {
+  status: ToolCallStatus
+  error?: string
+}
+/** end **/
+
+/**  tool_call -> web_search **/
+export interface ToolCallWebSearchArgs {
+  query: string
+  count: number
+}
+export interface ToolCallWebSearchResult {
+  status: ToolCallStatus
+  error?: string
+  query: string
+  summary: string
+  results: ToolCallWebSearchResultItem[]
+}
+export interface ToolCallWebSearchResultItem {
+  title: string
+  link: string
+  snippet: string
+}
+/** end **/

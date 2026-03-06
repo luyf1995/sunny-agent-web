@@ -1,31 +1,33 @@
 <template>
-  <div class="message-bubble" :class="{ 'user-bubble': message.role === 'user' }">
+  <div class="message-bubble" :class="{ 'user-bubble': isUser }">
     <div class="message-avatar">
-      <component :is="message.role === 'user' ? User : Bot" :size="18" />
+      <component :is="isUser ? User : Bot" :size="18" />
     </div>
     <div class="message-body">
-      <div class="message-content">
-        <markdown :message="message.content" />
+      <div v-for="(item, index) in message.contents" :key="index" class="message-content">
+        <tool-call v-if="item.type === ChatSSEEvent.ToolCall && item.toolCall" :data="item.toolCall" />
+        <markdown v-else :content="item.text" />
       </div>
     </div>
   </div>
 </template>
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed } from 'vue'
 import { User, Bot } from 'lucide-vue-next'
-import Markdown from '../../components/markdown/index.vue'
 
-interface Message {
-  id: string
-  role: string
-  content: string
-}
+import Markdown from '@/components/stream-markdown/index.vue'
+import ToolCall from '../components/tool-call/index.vue'
+
+import { Message } from '@/api/chat/types'
+import { ChatSSEEvent } from '@/api/chat/event'
 
 interface Props {
   message: Message
+  isStreaming: boolean
 }
-
 const props = defineProps<Props>()
+
+const isUser = computed(() => props.message.role === 'user')
 </script>
 <style scoped lang="scss">
 .message-bubble {
@@ -34,6 +36,8 @@ const props = defineProps<Props>()
   margin-bottom: 20px;
 
   &.user-bubble {
+    justify-content: flex-end;
+
     .message-avatar {
       color: #3b82f6;
       background: #eff6ff;

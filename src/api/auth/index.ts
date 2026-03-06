@@ -2,7 +2,6 @@ import { AxiosPromise } from 'axios'
 import { TicketRes } from './types'
 import request from '@/utils/request'
 import useAppConfig from '@/hooks/use-app-config'
-import { removeUrlHash } from '@/utils/url'
 
 const { ssoLoginUrl, ssoLogoutUrl } = useAppConfig()
 
