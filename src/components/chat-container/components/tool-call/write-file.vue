@@ -1,5 +1,5 @@
 <template>
-  <div class="write-file" :class="result.status === ToolCallStatus.Success ? 'success' : 'error'">
+  <div class="write-file" :class="isSuccess ? 'success' : 'error'">
     <pencil-line :size="14" class="write-file__icon" />
     <div class="write-file__info">
       <div class="write-file__path">
@@ -10,8 +10,8 @@
       </div>
     </div>
     <div class="write-file__result">
-      <component :is="result.status === ToolCallStatus.Success ? FileCheck : TriangleAlert" :size="14" />
-      {{ result.status === ToolCallStatus.Success ? '成功' : '失败' }}
+      <component :is="isSuccess ? FileCheck : TriangleAlert" :size="14" />
+      {{ isSuccess ? '成功' : '失败' }}
     </div>
   </div>
 </template>
@@ -19,7 +19,7 @@
 import { computed } from 'vue'
 import { PencilLine, TriangleAlert, FileCheck } from 'lucide-vue-next'
 
-import { ToolCall, ToolCallReadFileArgs, ToolCallReadFileResult, ToolCallStatus } from '@/api/chat/types'
+import { ToolCall, ToolCallReadFileArgs, ToolCallReadFileResult, ToolCallStatus } from '@/api/chat/tool-call'
 
 interface Props {
   data: ToolCall
@@ -30,6 +30,12 @@ const path = computed(() => (props.data.args as ToolCallReadFileArgs).path)
 const filename = computed(() => path.value.split('/').pop() || '/')
 
 const result = computed(() => props.data.result as ToolCallReadFileResult)
+
+// const isRunning = computed(() => props.data.status === ToolCallStatus.Running)
+
+const isSuccess = computed(() => props.data.status === ToolCallStatus.Success)
+
+const isError = computed(() => props.data.status === ToolCallStatus.Error)
 </script>
 <style scoped lang="scss">
 .write-file {

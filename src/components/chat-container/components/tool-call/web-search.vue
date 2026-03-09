@@ -40,7 +40,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { Search, AlertCircle, ExternalLink } from 'lucide-vue-next'
-import { ToolCall, ToolCallWebSearchArgs, ToolCallWebSearchResult, ToolCallStatus } from '@/api/chat/types'
+import { ToolCall, ToolCallWebSearchArgs, ToolCallWebSearchResult, ToolCallStatus } from '@/api/chat/tool-call'
 
 interface Props {
   data: ToolCall

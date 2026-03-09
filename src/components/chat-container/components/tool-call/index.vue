@@ -13,7 +13,7 @@ import BashTool from './bash-tool.vue'
 import WebSearch from './web-search.vue'
 import SkillCall from './skill-call.vue'
 
-import { ToolCall, ToolCallName } from '@/api/chat/types'
+import { ToolCall, ToolCallName } from '@/api/chat/tool-call'
 
 interface Props {
   data?: ToolCall
@@ -34,6 +34,7 @@ const COMPONENT_MAP = {
 <style scoped lang="scss">
 .tool-call {
   padding: 10px;
+  margin-bottom: 5px;
   font-size: 12px;
   background-color: #f1f5f9;
   border: var(--border);

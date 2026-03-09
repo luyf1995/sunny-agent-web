@@ -18,7 +18,8 @@ import { User, Bot } from 'lucide-vue-next'
 import Markdown from '@/components/stream-markdown/index.vue'
 import ToolCall from '../components/tool-call/index.vue'
 
-import { Message, MessageContent, ToolCallName } from '@/api/chat/types'
+import { Message, MessageContent } from '@/api/chat/types'
+import { ToolCallName } from '@/api/chat/tool-call'
 import { ChatSSEEvent } from '@/api/chat/event'
 
 interface Props {
@@ -30,7 +31,7 @@ const props = defineProps<Props>()
 const isUser = computed(() => props.message.role === 'user')
 
 const showToolCall = (item: MessageContent) => {
-  return item.type === ChatSSEEvent.ToolCall && item.toolCall
+  return item.type === ChatSSEEvent.ToolCall && item.toolCall && item.toolCall.name !== ToolCallName.AskUser
 }
 </script>
 <style scoped lang="scss">
@@ -69,12 +70,6 @@ const showToolCall = (item: MessageContent) => {
   .message-body {
     flex: 1;
     min-width: 0;
-
-    .message-content {
-      & + .message-content {
-        margin-top: 10px;
-      }
-    }
   }
 }
 </style>

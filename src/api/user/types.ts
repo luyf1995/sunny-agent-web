@@ -1,5 +1,10 @@
 import { PageQuery } from '../common/types'
 
+export enum UserRoleType {
+  Admin = 'admin',
+  User = 'user'
+}
+
 // 用户信息
 export interface CurrentUserInfo {
   id: string
@@ -8,7 +13,7 @@ export interface CurrentUserInfo {
   email: string // 邮箱
   company: string // 公司
   department: string // 部门
-  role: RoleInfo // 角色
+  role: UserRoleType // 角色
 }
 
 // 角色信息

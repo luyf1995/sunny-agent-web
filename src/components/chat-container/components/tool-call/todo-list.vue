@@ -12,7 +12,7 @@ import { computed } from 'vue'
 
 import { Loader, CircleCheckBig, Circle } from 'lucide-vue-next'
 
-import { ToolCall, TodoItem, TodoItemStatus, ToolCallTodoArgs, ToolCallTodoResult } from '@/api/chat/types'
+import { ToolCall, TodoItem, TodoItemStatus, ToolCallTodoArgs, ToolCallTodoResult } from '@/api/chat/tool-call'
 
 interface Props {
   data: ToolCall

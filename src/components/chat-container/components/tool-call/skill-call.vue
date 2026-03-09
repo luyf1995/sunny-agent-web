@@ -23,7 +23,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { Wand2, AlertCircle, CheckCircle } from 'lucide-vue-next'
-import { ToolCall, ToolCallSkillCallArgs, ToolCallSkillCallResult, ToolCallStatus } from '@/api/chat/types'
+import { ToolCall, ToolCallSkillCallArgs, ToolCallSkillCallResult, ToolCallStatus } from '@/api/chat/tool-call'
 
 interface Props {
   data: ToolCall

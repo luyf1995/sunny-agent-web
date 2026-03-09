@@ -1,5 +1,5 @@
 <template>
-  <div class="read-file" :class="result.status === ToolCallStatus.Success ? 'success' : 'error'">
+  <div class="read-file" :class="isSuccess ? 'success' : 'error'">
     <folder-search :size="14" class="read-file__icon" />
     <div class="read-file__info">
       <div class="read-file__path">
@@ -10,12 +10,8 @@
       </div>
     </div>
     <div class="read-file__result">
-      <component
-        :is="result.status === ToolCallStatus.Success ? FileCheck : TriangleAlert"
-        :size="14"
-        class="result-icon"
-      />
-      <span>{{ result.status === ToolCallStatus.Success ? 'Success' : 'Error' }}</span>
+      <component :is="isSuccess ? FileCheck : TriangleAlert" :size="14" class="result-icon" />
+      <span>{{ isSuccess ? 'Success' : 'Error' }}</span>
     </div>
   </div>
 </template>
@@ -23,7 +19,7 @@
 import { computed } from 'vue'
 import { FolderSearch, TriangleAlert, FileCheck } from 'lucide-vue-next'
 
-import { ToolCall, ToolCallReadFileArgs, ToolCallReadFileResult, ToolCallStatus } from '@/api/chat/types'
+import { ToolCall, ToolCallReadFileArgs, ToolCallReadFileResult, ToolCallStatus } from '@/api/chat/tool-call'
 
 interface Props {
   data: ToolCall
@@ -34,6 +30,12 @@ const path = computed(() => (props.data.args as ToolCallReadFileArgs).path)
 const filename = computed(() => path.value.split('/').pop() || '/')
 
 const result = computed(() => props.data.result as ToolCallReadFileResult)
+
+// const isRunning = computed(() => props.data.status === ToolCallStatus.Running)
+
+const isSuccess = computed(() => props.data.status === ToolCallStatus.Success)
+
+const isError = computed(() => props.data.status === ToolCallStatus.Error)
 </script>
 <style scoped lang="scss">
 .read-file {

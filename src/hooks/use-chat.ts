@@ -1,8 +1,8 @@
 import { ref, onUnmounted, watch, computed } from 'vue'
-import { Message, RoleType, ToolCallStatus, QuestionItem } from '@/api/chat/types'
+import { Message, RoleType } from '@/api/chat/types'
+import { ToolCallName, ToolCallStatus, QuestionItem } from '@/api/chat/tool-call'
 import { streamChat, nextId } from '@/api/chat/index'
 import { ChatSSEEvent } from '@/api/chat/event'
-import { ToolCallName } from '@/api/chat/types'
 
 interface UseChatOptions {
   initialThreadId?: string | null

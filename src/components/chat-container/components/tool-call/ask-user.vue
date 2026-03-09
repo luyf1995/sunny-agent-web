@@ -41,7 +41,7 @@
 <script setup lang="ts">
 import { ref, computed, inject, reactive, watch } from 'vue'
 import { HelpCircle } from 'lucide-vue-next'
-import { ToolCall, ToolCallAskUserArgs, QuestionItem } from '@/api/chat/types'
+import { ToolCall, ToolCallAskUserArgs, QuestionItem } from '@/api/chat/tool-call'
 
 interface Props {
   data: ToolCall

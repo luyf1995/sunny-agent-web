@@ -12,7 +12,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref, watch, nextTick } from 'vue'
+import { ref, watch, nextTick, onMounted, onUnmounted } from 'vue'
 import MessageBubble from './message-bubble.vue'
 
 import { Message } from '@/api/chat/types'
@@ -29,6 +29,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const containerRef = ref<HTMLDivElement>()
 const footerRef = ref<HTMLDivElement>()
+const autoScrollEnabled = ref(true)
 
 const scrollToBottom = (smooth = false) => {
   nextTick(() => {
@@ -36,13 +37,29 @@ const scrollToBottom = (smooth = false) => {
   })
 }
 
+const handleWheel = (e: WheelEvent) => {
+  if (props.isStreaming && e.deltaY < 0) {
+    autoScrollEnabled.value = false
+  }
+}
+
+onMounted(() => {
+  containerRef.value?.addEventListener('wheel', handleWheel, { passive: true })
+})
+
+onUnmounted(() => {
+  containerRef.value?.removeEventListener('wheel', handleWheel)
+})
+
 watch(
   () => props.messages,
   () => {
     if (!containerRef.value) return
 
     if (props.isStreaming) {
-      scrollToBottom(false)
+      if (autoScrollEnabled.value) {
+        scrollToBottom(false)
+      }
       return
     }
 
@@ -63,6 +80,7 @@ watch(
   () => props.isStreaming,
   isStreaming => {
     if (isStreaming) {
+      autoScrollEnabled.value = true
       scrollToBottom(false)
     }
   }
