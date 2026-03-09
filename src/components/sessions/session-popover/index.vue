@@ -8,8 +8,7 @@
         </button-icon>
       </div>
       <div class="popover-panel__body">
-        <conversation-item v-for="item in list" :key="item.session_id" :data="item" :show-menu="false">
-        </conversation-item>
+        <session-item v-for="item in list" :key="item.session_id" :data="item" :show-menu="false"> </session-item>
       </div>
     </div>
     <template #reference>
@@ -23,21 +22,15 @@ import { ClickOutside as vClickOutside } from 'element-plus'
 import { X } from 'lucide-vue-next'
 
 import ButtonIcon from '@/components/button-icon/index.vue'
-import ConversationItem from '../conversation-item/index.vue'
-import { ConversationInfo } from '@/api/conversation/types'
+import SessionItem from '../session-item/index.vue'
+import { SessionInfo } from '@/api/session/types'
 
 const props = defineProps<{
-  list: ConversationInfo[]
+  list: SessionInfo[]
 }>()
 
 const visible = ref(false)
-/**
- * 显示弹出层
- */
 const show = () => (visible.value = true)
-/**
- * 关闭弹出层
- */
 const close = () => (visible.value = false)
 </script>
 <style scoped lang="scss">

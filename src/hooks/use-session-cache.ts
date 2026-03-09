@@ -2,7 +2,7 @@ import { ref, reactive } from 'vue'
 import { Message } from '@/api/chat/types'
 import { QuestionItem } from '@/api/chat/tool-call'
 
-export interface ConversationCache {
+export interface SessionCache {
   sessionId: string
   messages: Message[]
   isStreaming: boolean
@@ -10,14 +10,14 @@ export interface ConversationCache {
   askUserQuestions: QuestionItem[] | null
 }
 
-const cacheMap = reactive(new Map<string, ConversationCache>())
+const cacheMap = reactive(new Map<string, SessionCache>())
 
-export function useConversationCache() {
-  const getCache = (sessionId: string): ConversationCache | undefined => {
+export function useSessionCache() {
+  const getCache = (sessionId: string): SessionCache | undefined => {
     return cacheMap.get(sessionId)
   }
 
-  const setCache = (sessionId: string, cache: Partial<ConversationCache>): void => {
+  const setCache = (sessionId: string, cache: Partial<SessionCache>): void => {
     const existing = cacheMap.get(sessionId)
     if (existing) {
       Object.assign(existing, cache)

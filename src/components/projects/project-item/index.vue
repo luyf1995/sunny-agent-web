@@ -17,7 +17,7 @@ import { ModuleType } from '@/store/module'
 
 const props = withDefaults(
   defineProps<{
-    type: 'project' | 'conversation'
+    type: 'project' | 'session'
     data: any
     showMenu?: boolean
   }>(),
@@ -30,25 +30,17 @@ const moduleStore = useModuleStore()
 
 const isProject = computed(() => props.type === 'project')
 
-/**
- * 选择
- */
 const handleSelect = () => {
-  moduleStore.setCurrentModule(isProject.value ? ModuleType.Project : ModuleType.ProjectConversation, props.data)
+  moduleStore.setCurrentModule(isProject.value ? ModuleType.Project : ModuleType.ProjectSession, props.data)
 }
 
-/**
- * 渲染节点图标
- */
 const renderIcon = node => {
   if (isProject.value) {
     return node.isExpanded ? FolderOpen : Folder
   }
   return MessageSquare
 }
-/**
- * 构建菜单项
- */
+
 const buildMenus = (data: any) => {
   if (isProject.value) {
     return [

@@ -1,4 +1,4 @@
-.conversation-item {
+.session-item {
   display: flex;
   align-items: center;
   padding: 8px 12px;
@@ -30,7 +30,7 @@
     color: #1e293b;
     background-color: #f1f5f9;
 
-    .conversation-item__menu {
+    .session-item__menu {
       opacity: 1;
     }
   }

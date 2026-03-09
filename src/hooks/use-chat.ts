@@ -3,11 +3,11 @@ import { Message, MessageRoleType } from '@/api/chat/types'
 import { ToolCallName, ToolCallStatus, QuestionItem } from '@/api/chat/tool-call'
 import { streamChat, nextId } from '@/api/chat/index'
 import { ChatSSEEvent } from '@/api/chat/event'
-import { getConversationDetail } from '@/api/conversation'
-import { useConversationCache } from './use-conversation-cache'
+import { getSessionDetail } from '@/api/session'
+import { useSessionCache } from './use-session-cache'
 
 interface UseChatOptions {
-  onConversationCreated?: (...args: any[]) => void
+  onSessionCreated?: (...args: any[]) => void
 }
 
 export function useChat(options: UseChatOptions = {}) {
@@ -22,7 +22,7 @@ export function useChat(options: UseChatOptions = {}) {
     setStreaming,
     setAbortController,
     setAskUserQuestions
-  } = useConversationCache()
+  } = useSessionCache()
 
   const currentSessionId = ref<string | null>(null)
   const messages = ref<Message[]>([])
@@ -31,20 +31,17 @@ export function useChat(options: UseChatOptions = {}) {
 
   const showAskUser = computed(() => askUserQuestions.value !== null && askUserQuestions.value.length > 0)
 
-  const onConversationCreated = ref(options.onConversationCreated)
+  const onSessionCreated = ref(options.onSessionCreated)
 
   watch(
-    () => options.onConversationCreated,
+    () => options.onSessionCreated,
     newC => {
-      onConversationCreated.value = newC
+      onSessionCreated.value = newC
     },
     { immediate: true }
   )
 
-  /**
-   * 切换当前对话
-   */
-  const switchConversation = (sessionId: string | null) => {
+  const switchSession = (sessionId: string | null) => {
     currentSessionId.value = sessionId
 
     if (!sessionId) {
@@ -66,18 +63,15 @@ export function useChat(options: UseChatOptions = {}) {
     }
   }
 
-  const hasConversationCache = (sessionId: string): boolean => {
+  const hasSessionCache = (sessionId: string): boolean => {
     return hasCache(sessionId)
   }
 
-  /**
-   * 发送消息
-   */
   const sendMessage = async (sessionId: string | null | undefined, text: string) => {
     if (!text.trim()) return
 
     const targetSessionId = sessionId || `temp-${Date.now()}`
-    const isNewConversation = !sessionId
+    const isNewSession = !sessionId
 
     const userMsg: Message = {
       id: nextId(),
@@ -120,15 +114,15 @@ export function useChat(options: UseChatOptions = {}) {
     const controller = new AbortController()
     setAbortController(targetSessionId, controller)
 
-    let conversationCreatedTriggered = false
+    let sessionCreatedTriggered = false
     let actualSessionId = targetSessionId
 
     try {
       for await (const event of streamChat(sessionId ?? '', text, controller.signal)) {
         switch (event.event) {
           case ChatSSEEvent.Status:
-            if (event.data.phase === 'executing' && !conversationCreatedTriggered && isNewConversation) {
-              conversationCreatedTriggered = true
+            if (event.data.phase === 'executing' && !sessionCreatedTriggered && isNewSession) {
+              sessionCreatedTriggered = true
               actualSessionId = event.data.session_id
 
               const oldCache = getCache(targetSessionId)
@@ -142,8 +136,8 @@ export function useChat(options: UseChatOptions = {}) {
                 removeCache(targetSessionId)
               }
 
-              if (onConversationCreated.value) {
-                onConversationCreated.value({
+              if (onSessionCreated.value) {
+                onSessionCreated.value({
                   session_id: event.data.session_id,
                   title: event.data.title
                 })
@@ -279,9 +273,6 @@ export function useChat(options: UseChatOptions = {}) {
     messages.value = []
   }
 
-  /**
-   * 获取对话消息历史
-   */
   const getHistoryMessages = async (sessionId: string) => {
     if (!sessionId) return
 
@@ -295,7 +286,7 @@ export function useChat(options: UseChatOptions = {}) {
 
     clearMessages()
     try {
-      const { data } = await getConversationDetail(sessionId)
+      const { data } = await getSessionDetail(sessionId)
       const historyMsgs = data.messages || []
       if (historyMsgs.length === 0) return
 
@@ -367,10 +358,7 @@ export function useChat(options: UseChatOptions = {}) {
     }
   }
 
-  /**
-   * 删除对话缓存
-   */
-  const removeConversationCache = (sessionId: string) => {
+  const removeSessionCache = (sessionId: string) => {
     removeCache(sessionId)
   }
 
@@ -389,9 +377,9 @@ export function useChat(options: UseChatOptions = {}) {
     clearAskUser,
     getHistoryMessages,
     clearMessages,
-    switchConversation,
-    removeConversationCache,
-    isConversationStreaming: isCacheStreaming,
-    hasConversationCache
+    switchSession,
+    removeSessionCache,
+    isSessionStreaming: isCacheStreaming,
+    hasSessionCache
   }
 }

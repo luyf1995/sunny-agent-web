@@ -25,9 +25,9 @@ const currentModuleComponent = computed(() => {
   switch (currentModuleType.value) {
     case ModuleType.Project:
       return ProjectHome
-    case ModuleType.ProjectConversation:
+    case ModuleType.ProjectSession:
       return ProjectWorkspace
-    case ModuleType.Conversation:
+    case ModuleType.Session:
       return ChatContainer
     default:
       return null

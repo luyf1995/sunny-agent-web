@@ -3,7 +3,7 @@
     <sidebar-header :collapsed="collapsed" @toggle-collapse="handleToggleCollapse" />
     <div class="sidebar-content">
       <sidebar-project :collapsed="collapsed" />
-      <sidebar-conversation :collapsed="collapsed" />
+      <sidebar-session :collapsed="collapsed" />
     </div>
     <sidebar-footer :collapsed="collapsed" />
   </div>
@@ -13,16 +13,13 @@ import { ref, watch } from 'vue'
 
 import SidebarHeader from './sidebar-header/index.vue'
 import SidebarProject from './sidebar-project/index.vue'
-import SidebarConversation from './sidebar-conversation/index.vue'
+import SidebarSession from './sidebar-session/index.vue'
 import SidebarFooter from './sidebar-footer/index.vue'
 
 import { Local } from '@/utils/storage'
 
 const collapsed = ref(Local.get('collapsed') || false)
 
-/**
- * 切换侧边栏折叠状态
- */
 const handleToggleCollapse = () => {
   collapsed.value = !collapsed.value
 }

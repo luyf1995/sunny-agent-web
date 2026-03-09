@@ -1,7 +1,7 @@
-import { ConversationInfo } from '@/api/conversation/types'
+import { SessionInfo } from '@/api/session/types'
 
 type EventMap = {
-  'conversation:unshift': ConversationInfo // 新建对话
+  'session:unshift': SessionInfo
 }
 
 type EventHandler<T = void> = (payload: T) => void
@@ -9,11 +9,6 @@ type EventHandler<T = void> = (payload: T) => void
 class EventBus {
   private events: Map<keyof EventMap, EventHandler[]> = new Map()
 
-  /**
-   * 监听事件
-   * @param {string} type 事件名
-   * @param {EventHandler<EventMap[K]>} handler 回调函数（参数类型自动推导）
-   */
   on<K extends keyof EventMap>(type: K, handler: EventHandler<EventMap[K]>) {
     if (!this.events.has(type)) {
       this.events.set(type, [])
@@ -21,11 +16,6 @@ class EventBus {
     this.events.get(type)!.push(handler)
   }
 
-  /**
-   * 监听一次事件（触发后自动移除）
-   * @param {string} type 事件名
-   * @param {EventHandler<EventMap[K]>} handler 回调函数
-   */
   once<K extends keyof EventMap>(type: K, handler: EventHandler<EventMap[K]>) {
     const wrapHandler: EventHandler<EventMap[K]> = payload => {
       handler(payload)
@@ -34,11 +24,6 @@ class EventBus {
     this.on(type, wrapHandler)
   }
 
-  /**
-   * 触发事件
-   * @param {string} type 事件名
-   * @param {EventMap[K]} payload 事件参数
-   */
   emit<K extends keyof EventMap>(type: K, payload?: EventMap[K]) {
     const handlers = this.events.get(type)
     if (handlers) {
@@ -52,11 +37,6 @@ class EventBus {
     }
   }
 
-  /**
-   * 取消事件监听
-   * @param {string} type 事件名
-   * @param {EventHandler<EventMap[K]>} handler 要移除的回调
-   */
   off<K extends keyof EventMap>(type: K, handler?: EventHandler<EventMap[K]>) {
     const handlers = this.events.get(type)
     if (!handlers) return
@@ -71,9 +51,6 @@ class EventBus {
     }
   }
 
-  /**
-   * 清空所有事件监听
-   */
   clear() {
     this.events.clear()
   }

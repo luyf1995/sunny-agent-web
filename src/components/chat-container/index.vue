@@ -1,11 +1,7 @@
 <template>
   <div class="chat-container">
     <div class="chat-main">
-      <!-- <div class="chat-header">
-      <h1>Sunny Agents</h1>
-      <span class="thread-id">线程: 26099b3b</span>
-    </div> -->
-      <div v-if="!currentConversation && messages.length === 0" class="chat-empty">有什么我能帮你的吗？</div>
+      <div v-if="!currentSession && messages.length === 0" class="chat-empty">有什么我能帮你的吗？</div>
       <div v-else class="chat-message">
         <message-list :messages="messages" :is-streaming="isStreaming" />
       </div>
@@ -43,12 +39,12 @@ const {
   clearAskUser,
   getHistoryMessages,
   clearMessages,
-  switchConversation,
-  removeConversationCache,
-  hasConversationCache
+  switchSession,
+  removeSessionCache,
+  hasSessionCache
 } = useChat({
-  onConversationCreated: conversation => {
-    eventBus.emit('conversation:unshift', conversation)
+  onSessionCreated: session => {
+    eventBus.emit('session:unshift', session)
   }
 })
 const moduleStore = useModuleStore()
@@ -56,18 +52,18 @@ const moduleStore = useModuleStore()
 provide('sendMessage', sendMessage)
 
 const message = ref('')
-const currentConversation = computed(() => moduleStore.currentConversation)
+const currentSession = computed(() => moduleStore.currentSession)
 
 watch(
-  currentConversation,
+  currentSession,
   async (value, oldValue) => {
-    const conversationId = value?.session_id || null
+    const sessionId = value?.session_id || null
 
-    switchConversation(conversationId)
+    switchSession(sessionId)
 
-    if (conversationId && !hasConversationCache(conversationId)) {
-      getHistoryMessages(conversationId)
-    } else if (!conversationId) {
+    if (sessionId && !hasSessionCache(sessionId)) {
+      getHistoryMessages(sessionId)
+    } else if (!sessionId) {
       clearMessages()
     }
   },
@@ -77,7 +73,7 @@ watch(
 )
 
 const handleSend = async () => {
-  await sendMessage(currentConversation.value?.session_id, message.value)
+  await sendMessage(currentSession.value?.session_id, message.value)
 }
 
 const handleAskUserSubmit = async (answers: string[]) => {
@@ -89,7 +85,7 @@ const handleAskUserSubmit = async (answers: string[]) => {
     .join('\n\n')
 
   clearAskUser()
-  await sendMessage(currentConversation.value?.session_id, responseText)
+  await sendMessage(currentSession.value?.session_id, responseText)
 }
 </script>
 <style scoped lang="scss">

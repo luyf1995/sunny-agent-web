@@ -20,11 +20,11 @@ import { ElForm, ElMessage } from 'element-plus'
 import SyButton from '@/components/sy-button/index.vue'
 import SyDialog from '@/components/sy-dialog/index.vue'
 
-import { EditConversationParams, ConversationInfo } from '@/api/conversation/types'
-import { editConversation } from '@/api/conversation'
+import { EditSessionParams, SessionInfo } from '@/api/session/types'
+import { editSession } from '@/api/session'
 
 interface Props {
-  data?: ConversationInfo
+  data?: SessionInfo
 }
 
 const props = defineProps<Props>()
@@ -35,7 +35,7 @@ const visible = defineModel('modelValue', {
 })
 
 const emits = defineEmits<{
-  (e: 'success', data: ConversationInfo): void
+  (e: 'success', data: SessionInfo): void
 }>()
 
 watch(visible, (value: boolean) => {
@@ -44,7 +44,7 @@ watch(visible, (value: boolean) => {
   }
 })
 
-const renameForm = ref<EditConversationParams>({
+const renameForm = ref<EditSessionParams>({
   session_id: '',
   title: ''
 })
@@ -62,7 +62,7 @@ const init = () => {
   }
 }
 
-const doValidate = (callback: (params: EditConversationParams) => void) => {
+const doValidate = (callback: (params: EditSessionParams) => void) => {
   renameFormRef.value?.validate((valid: boolean) => {
     if (valid) {
       callback(renameForm.value)
@@ -73,7 +73,7 @@ const doValidate = (callback: (params: EditConversationParams) => void) => {
 }
 
 const handleRename = () => {
-  doValidate((params: EditConversationParams) => {
+  doValidate((params: EditSessionParams) => {
     if (!params.session_id) {
       ElMessage({
         type: 'error',
@@ -81,8 +81,8 @@ const handleRename = () => {
       })
       return
     }
-    editConversation(params).then(() => {
-      const updatedData: ConversationInfo = {
+    editSession(params).then(() => {
+      const updatedData: SessionInfo = {
         ...props.data!,
         title: params.title
       }

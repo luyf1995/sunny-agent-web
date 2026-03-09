@@ -1,34 +1,34 @@
 <template>
   <div
-    class="conversation-item"
-    :class="{ 'is-current': currentConversation?.session_id === data.session_id }"
+    class="session-item"
+    :class="{ 'is-current': currentSession?.session_id === data.session_id }"
     @click="handleSelect"
   >
     <message-square :size="13" />
-    <div class="conversation-item__label">{{ data.title }}</div>
-    <div v-if="showMenu" class="conversation-item__menu">
+    <div class="session-item__label">{{ data.title }}</div>
+    <div v-if="showMenu" class="session-item__menu">
       <menu-popover :menus="buildPopperMenus(data)"> </menu-popover>
     </div>
   </div>
-  <rename-conversation v-model="renameVisible" :data="data" @success="handleRenameSuccess" />
+  <rename-session v-model="renameVisible" :data="data" @success="handleRenameSuccess" />
 </template>
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 
 import MenuPopover from '@/components/menu-popover/index.vue'
-import RenameConversation from '../rename-conversation/index.vue'
+import RenameSession from '../rename-session/index.vue'
 import { MessageSquare, FolderPlus, Pencil, Trash2 } from 'lucide-vue-next'
 
 import { useModuleStore } from '@/store'
 import { ModuleType } from '@/store/module'
-import { ConversationInfo } from '@/api/conversation/types'
-import { deleteConversation } from '@/api/conversation'
+import { SessionInfo } from '@/api/session/types'
+import { deleteSession } from '@/api/session'
 
 const props = withDefaults(
   defineProps<{
     showMenu?: boolean
-    data: ConversationInfo
+    data: SessionInfo
   }>(),
   {
     showMenu: true
@@ -37,20 +37,20 @@ const props = withDefaults(
 
 const emit = defineEmits<{
   (e: 'deleted', id: string): void
-  (e: 'renamed', data: ConversationInfo): void
+  (e: 'renamed', data: SessionInfo): void
 }>()
 
 const moduleStore = useModuleStore()
 const renameVisible = ref(false)
 
-const currentConversation = computed(() => moduleStore.currentConversation)
+const currentSession = computed(() => moduleStore.currentSession)
 
 const handleSelect = () => {
-  moduleStore.setCurrentModuleType(ModuleType.Conversation)
-  moduleStore.setCurrentConversation(props.data)
+  moduleStore.setCurrentModuleType(ModuleType.Session)
+  moduleStore.setCurrentSession(props.data)
 }
 
-const handleDelete = async (item: ConversationInfo, next: () => void) => {
+const handleDelete = async (item: SessionInfo, next: () => void) => {
   try {
     await ElMessageBox.confirm('确定要删除该会话吗？', '提示', {
       confirmButtonText: '确定',
@@ -58,7 +58,7 @@ const handleDelete = async (item: ConversationInfo, next: () => void) => {
       type: 'warning'
     })
 
-    await deleteConversation(item.session_id)
+    await deleteSession(item.session_id)
     emit('deleted', item.session_id)
     next()
   } catch (error) {
@@ -71,11 +71,11 @@ const handleRename = (next: () => void) => {
   next()
 }
 
-const handleRenameSuccess = (data: ConversationInfo) => {
+const handleRenameSuccess = (data: SessionInfo) => {
   emit('renamed', data)
 }
 
-const buildPopperMenus = (item: ConversationInfo) => {
+const buildPopperMenus = (item: SessionInfo) => {
   return [
     {
       icon: FolderPlus,

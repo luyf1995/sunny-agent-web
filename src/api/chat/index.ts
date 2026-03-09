@@ -17,12 +17,8 @@ export function nextId() {
 /**
  * 流式对话
  */
-export async function* streamChat(
-  conversationId: string,
-  message: string,
-  signal: AbortSignal
-): AsyncGenerator<SSEEvent> {
-  const body: Record<string, unknown> = { session_id: conversationId ?? '', message }
+export async function* streamChat(sessionId: string, message: string, signal: AbortSignal): AsyncGenerator<SSEEvent> {
+  const body: Record<string, unknown> = { session_id: sessionId ?? '', message }
 
   const response = await fetch(STREAM_CHAT_URL, {
     method: 'POST',

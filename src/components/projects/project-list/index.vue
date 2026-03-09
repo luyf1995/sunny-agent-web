@@ -9,7 +9,7 @@
     class="project-list"
   >
     <template #default="{ node, data }">
-      <project-item :data="data" :type="node.level === 1 ? 'project' : 'conversation'"></project-item>
+      <project-item :data="data" :type="node.level === 1 ? 'project' : 'session'"></project-item>
     </template>
   </el-tree>
   <div v-else class="empty">
