@@ -42,3 +42,8 @@ export interface L3Step {
   step_index: number
   tool_args: Record<ToolCallName, ToolCallArgs> // key => ToolCallName value => ToolCallArgs
 }
+
+export interface EditConversationParams {
+  session_id: string // 会话ID
+  title: string // 会话标题
+}

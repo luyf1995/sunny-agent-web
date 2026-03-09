@@ -58,7 +58,7 @@ const fetchProjectList = async () => {
     console.error(error)
   }
 }
-fetchProjectList()
+// fetchProjectList()
 
 const saveDialogVisible = ref(false)
 const saveDialogData = ref()

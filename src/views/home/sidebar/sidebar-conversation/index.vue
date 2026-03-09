@@ -33,6 +33,7 @@ import { getConversationList } from '@/api/conversation'
 import { ConversationInfo } from '@/api/conversation/types'
 import { useModuleStore } from '@/store'
 import { ModuleType } from '@/store/module'
+import eventBus from '@/utils/event-bus'
 
 const props = defineProps<{
   collapsed: boolean
@@ -55,6 +56,11 @@ const getList = async () => {
 }
 getList()
 
+eventBus.on('conversation:unshift', async (conversation: ConversationInfo) => {
+  conversationList.value.unshift(conversation)
+  moduleStore.setCurrentConversation(conversation ?? null)
+})
+
 /**
  * 新建对话
  */
@@ -68,6 +74,8 @@ const handleAdd = () => {
  * @param {string} id 会话ID
  */
 const handleDeleted = (id: string) => {
+  moduleStore.setCurrentConversation(null)
+
   getList()
 }
 </script>

@@ -1,16 +1,24 @@
 <template>
   <div class="chat-container">
-    <!-- <div class="chat-header">
+    <div class="chat-main">
+      <!-- <div class="chat-header">
       <h1>Sunny Agents</h1>
       <span class="thread-id">线程: 26099b3b</span>
     </div> -->
-    <div v-if="!currentConversation" class="chat-empty">有什么我能帮你的吗？</div>
-    <div v-else class="chat-message">
-      <message-list :messages="messages" :is-streaming="isStreaming" />
-    </div>
-    <div class="chat-input-wrapper">
-      <chat-input v-if="!showAskUser" v-model="message" :is-streaming="isStreaming" @send="handleSend" @abort="abort" />
-      <ask-user-overlay v-else :questions="askUserQuestions!" @submit="handleAskUserSubmit" @close="clearAskUser" />
+      <div v-if="!currentConversation && messages.length === 0" class="chat-empty">有什么我能帮你的吗？</div>
+      <div v-else class="chat-message">
+        <message-list :messages="messages" :is-streaming="isStreaming" />
+      </div>
+      <div class="chat-input-wrapper">
+        <chat-input
+          v-if="!showAskUser"
+          v-model="message"
+          :is-streaming="isStreaming"
+          @send="handleSend"
+          @abort="abort"
+        />
+        <ask-user-overlay v-else :questions="askUserQuestions!" @submit="handleAskUserSubmit" @close="clearAskUser" />
+      </div>
     </div>
   </div>
 </template>
@@ -23,9 +31,23 @@ import AskUserOverlay from './ask-user-overlay.vue'
 
 import { useChat } from '@/hooks/use-chat'
 import { useModuleStore } from '@/store'
+import eventBus from '@/utils/event-bus'
 
-const { messages, isStreaming, sendMessage, abort, askUserQuestions, showAskUser, clearAskUser, getHistoryMessages } =
-  useChat()
+const {
+  messages,
+  isStreaming,
+  sendMessage,
+  abort,
+  askUserQuestions,
+  showAskUser,
+  clearAskUser,
+  getHistoryMessages,
+  clearMessages
+} = useChat({
+  onConversationCreated: conversation => {
+    eventBus.emit('conversation:unshift', conversation)
+  }
+})
 const moduleStore = useModuleStore()
 
 provide('sendMessage', sendMessage)
@@ -38,6 +60,8 @@ watch(
   async value => {
     if (value) {
       getHistoryMessages(value.session_id)
+    } else if (!isStreaming.value) {
+      clearMessages()
     }
   },
   {
@@ -70,12 +94,17 @@ const handleAskUserSubmit = async (answers: string[]) => {
 </script>
 <style scoped lang="scss">
 .chat-container {
-  display: flex;
-  margin: 0 auto;
-  width: 100%;
-  max-width: 800px;
+  overflow: auto;
   height: 100%;
-  flex-direction: column;
+
+  .chat-main {
+    display: flex;
+    margin: 0 auto;
+    width: 100%;
+    max-width: 800px;
+    height: 100%;
+    flex-direction: column;
+  }
 
   .chat-header {
     display: flex;

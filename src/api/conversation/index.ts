@@ -1,7 +1,7 @@
 import { request } from '@/utils/request'
 
 import { PageResult } from '../common/types'
-import { ConversationDetail, ConversationInfo, ConversationPageParams } from './types'
+import { ConversationDetail, ConversationInfo, ConversationPageParams, EditConversationParams } from './types'
 
 /**
  * 获取会话列表
@@ -24,3 +24,10 @@ export const getConversationDetail = (conversationId: string) =>
  * @param {string} conversationId 会话ID
  */
 export const deleteConversation = (conversationId: string) => request.delete(`/api/sessions/${conversationId}`)
+
+/**
+ * 编辑会话
+ * @param {EditConversationParams} params
+ */
+export const editConversation = (params: EditConversationParams) =>
+  request.put(`/api/sessions/${params.session_id}`, params)
