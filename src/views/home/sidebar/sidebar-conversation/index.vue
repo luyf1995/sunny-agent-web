@@ -17,7 +17,7 @@
     </div>
 
     <div v-if="!collapsed" class="sidebar-panel__content">
-      <conversation-list :list="conversationList" @deleted="handleDeleted" />
+      <conversation-list :list="conversationList" @deleted="handleDeleted" @renamed="handleRenamed" />
     </div>
   </div>
 </template>
@@ -77,6 +77,16 @@ const handleDeleted = (id: string) => {
   moduleStore.setCurrentConversation(null)
 
   getList()
+}
+
+const handleRenamed = (data: ConversationInfo) => {
+  const index = conversationList.value.findIndex(item => item.session_id === data.session_id)
+  if (index !== -1) {
+    conversationList.value[index] = { ...conversationList.value[index], title: data.title }
+  }
+  if (moduleStore.currentConversation?.session_id === data.session_id) {
+    moduleStore.setCurrentConversation({ ...moduleStore.currentConversation, title: data.title })
+  }
 }
 </script>
 <style scoped lang="scss">

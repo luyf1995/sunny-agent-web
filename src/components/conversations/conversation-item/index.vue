@@ -1,17 +1,23 @@
 <template>
-  <div class="conversation-item" @click="handleSelect">
+  <div
+    class="conversation-item"
+    :class="{ 'is-current': currentConversation?.session_id === data.session_id }"
+    @click="handleSelect"
+  >
     <message-square :size="13" />
     <div class="conversation-item__label">{{ data.title }}</div>
     <div v-if="showMenu" class="conversation-item__menu">
       <menu-popover :menus="buildPopperMenus(data)"> </menu-popover>
     </div>
   </div>
+  <rename-conversation v-model="renameVisible" :data="data" @success="handleRenameSuccess" />
 </template>
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 
 import MenuPopover from '@/components/menu-popover/index.vue'
+import RenameConversation from '../rename-conversation/index.vue'
 import { MessageSquare, FolderPlus, Pencil, Trash2 } from 'lucide-vue-next'
 
 import { useModuleStore } from '@/store'
@@ -31,20 +37,19 @@ const props = withDefaults(
 
 const emit = defineEmits<{
   (e: 'deleted', id: string): void
+  (e: 'renamed', data: ConversationInfo): void
 }>()
 
 const moduleStore = useModuleStore()
-/**
- * 选择会话
- */
+const renameVisible = ref(false)
+
+const currentConversation = computed(() => moduleStore.currentConversation)
+
 const handleSelect = () => {
   moduleStore.setCurrentModuleType(ModuleType.Conversation)
   moduleStore.setCurrentConversation(props.data)
 }
 
-/**
- * 删除会话
- */
 const handleDelete = async (item: ConversationInfo, next: () => void) => {
   try {
     await ElMessageBox.confirm('确定要删除该会话吗？', '提示', {
@@ -54,7 +59,6 @@ const handleDelete = async (item: ConversationInfo, next: () => void) => {
     })
 
     await deleteConversation(item.session_id)
-    // ElMessage.success('删除成功')
     emit('deleted', item.session_id)
     next()
   } catch (error) {
@@ -62,10 +66,15 @@ const handleDelete = async (item: ConversationInfo, next: () => void) => {
   }
 }
 
-/**
- * 构建弹出菜单
- * @param {ConversationInfo} item 对话项
- */
+const handleRename = (next: () => void) => {
+  renameVisible.value = true
+  next()
+}
+
+const handleRenameSuccess = (data: ConversationInfo) => {
+  emit('renamed', data)
+}
+
 const buildPopperMenus = (item: ConversationInfo) => {
   return [
     {
@@ -79,10 +88,7 @@ const buildPopperMenus = (item: ConversationInfo) => {
     {
       icon: Pencil,
       label: '重命名',
-      onClick: (next: () => void) => {
-        console.log('重命名')
-        next()
-      }
+      onClick: (next: () => void) => handleRename(next)
     },
     {
       icon: Trash2,

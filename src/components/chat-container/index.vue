@@ -53,7 +53,7 @@ const moduleStore = useModuleStore()
 provide('sendMessage', sendMessage)
 
 const message = ref('')
-const currentConversation = computed(() => moduleStore.getCurrentConversation())
+const currentConversation = computed(() => moduleStore.currentConversation)
 
 watch(
   currentConversation,

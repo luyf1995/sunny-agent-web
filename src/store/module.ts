@@ -35,13 +35,6 @@ const appStore = defineStore('module', {
      */
     setCurrentConversation(conversation: ConversationInfo | null) {
       this.currentConversation = conversation
-    },
-    /**
-     * 获取当前会话
-     * @returns 会话信息
-     */
-    getCurrentConversation() {
-      return this.currentConversation
     }
   }
 })

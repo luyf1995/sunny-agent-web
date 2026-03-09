@@ -4,9 +4,9 @@
       v-for="item in list"
       :key="item.session_id"
       :data="item"
-      :class="{ 'is-current': item.session_id === current?.session_id }"
       @click="handleSelect(item)"
       @deleted="handleDeleted"
+      @renamed="handleRenamed"
     >
     </conversation-item>
   </div>
@@ -30,11 +30,10 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'deleted', id: string): void
+  (e: 'renamed', data: ConversationInfo): void
 }>()
 
 const moduleStore = useModuleStore()
-
-const current = computed(() => moduleStore.getCurrentConversation())
 
 /**
  * 选择会话
@@ -50,6 +49,10 @@ const handleSelect = (item: ConversationInfo) => {
  */
 const handleDeleted = (id: string) => {
   emit('deleted', id)
+}
+
+const handleRenamed = (data: ConversationInfo) => {
+  emit('renamed', data)
 }
 </script>
 <style scoped lang="scss">

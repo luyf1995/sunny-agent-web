@@ -55,7 +55,7 @@
 <script setup lang="ts">
 import { ref, computed, reactive, watch } from 'vue'
 import { HelpCircle, ChevronLeft, ChevronRight, X } from 'lucide-vue-next'
-import type { QuestionItem } from '@/api/chat/types'
+import type { QuestionItem } from '@/api/chat/tool-call'
 
 interface Props {
   questions: QuestionItem[]

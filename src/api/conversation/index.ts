@@ -30,4 +30,4 @@ export const deleteConversation = (conversationId: string) => request.delete(`/a
  * @param {EditConversationParams} params
  */
 export const editConversation = (params: EditConversationParams) =>
-  request.put(`/api/sessions/${params.session_id}`, params)
+  request.patch(`/api/sessions/${params.session_id}`, params)
