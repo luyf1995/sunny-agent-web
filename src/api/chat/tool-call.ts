@@ -10,28 +10,30 @@ export enum ToolCallName {
   AskUser = 'ask_user' // 询问用户
 }
 
+export type ToolCallArgs =
+  | Record<string, any>
+  | ToolCallTodoArgs
+  | ToolCallBashToolArgs
+  | ToolCallReadFileArgs
+  | ToolCallWriteFileArgs
+  | ToolCallWebSearchArgs
+  | ToolCallSkillCallArgs
+  | ToolCallAskUserArgs
+export type ToolCallResult =
+  | Record<string, any>
+  | ToolCallTodoResult
+  | ToolCallBashToolResult
+  | ToolCallReadFileResult
+  | ToolCallWriteFileResult
+  | ToolCallWebSearchResult
+  | ToolCallSkillCallResult
+  | ToolCallAskUserResult
 export interface ToolCall {
   step: number // 步骤
   name: ToolCallName // 工具类型
-  args:
-    | Record<string, any>
-    | ToolCallTodoArgs
-    | ToolCallBashToolArgs
-    | ToolCallReadFileArgs
-    | ToolCallWriteFileArgs
-    | ToolCallWebSearchArgs
-    | ToolCallSkillCallArgs
-    | ToolCallAskUserArgs
+  args: ToolCallArgs
   status: ToolCallStatus
-  result:
-    | Record<string, any>
-    | ToolCallTodoResult
-    | ToolCallBashToolResult
-    | ToolCallReadFileResult
-    | ToolCallWriteFileResult
-    | ToolCallWebSearchResult
-    | ToolCallSkillCallResult
-    | ToolCallAskUserResult
+  result: ToolCallResult
 }
 
 export enum ToolCallStatus {

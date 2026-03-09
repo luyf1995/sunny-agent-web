@@ -1,0 +1,22 @@
+import { PageQuery } from '../common/types'
+
+export interface FileInfo {}
+
+export interface ProjectInfo {
+  id: string
+  name: string
+  file_count: number // 文件数量
+  session_count: number // 会话数量
+  owner_id: string // 所有者ID
+  create_time: string // 创建时间
+  update_time: string // 更新时间
+}
+
+export interface ProjectPageParams extends PageQuery {
+  // name?: string
+}
+
+export interface SaveProjectParams {
+  id?: string
+  name: string
+}

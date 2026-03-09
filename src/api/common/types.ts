@@ -1,3 +1,10 @@
+// 新增、编辑弹框类型枚举
+export enum DialogTypeEnum {
+  ADD = 'add',
+  EDIT = 'edit',
+  VIEW = 'view' // 查看
+}
+
 // 分页
 export interface PageQuery {
   page: number // 页码

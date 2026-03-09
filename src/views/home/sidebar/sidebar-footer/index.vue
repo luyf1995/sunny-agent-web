@@ -1,5 +1,5 @@
 <template>
-  <div v-memo="[collapsed]" class="sidebar-footer">
+  <div class="sidebar-footer">
     <button-icon
       v-if="!collapsed && isAdmin"
       title="系统管理"

@@ -1,5 +1,5 @@
 <template>
-  <div v-memo="[collapsed]" class="sidebar-header" :class="{ collapsed }">
+  <div class="sidebar-header" :class="{ collapsed }">
     <div class="sidebar-logo" @click="handleLogoClick">
       <logo :width="24" :height="24" />
       <h1 v-if="!collapsed" class="sidebar-title">Sunny Agent</h1>

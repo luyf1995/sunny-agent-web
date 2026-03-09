@@ -1,3 +1,4 @@
+import { ConversationDetail, ConversationInfo } from '@/api/conversation/types'
 import { defineStore } from 'pinia'
 
 export enum ModuleType {
@@ -9,20 +10,38 @@ export enum ModuleType {
 interface ModuleState {
   currentModuleType: ModuleType | null
   currentModule: any
+
+  currentConversation: ConversationInfo | null
 }
 
 const appStore = defineStore('module', {
   persist: true,
   state: (): ModuleState => {
     return {
-      currentModuleType: null,
-      currentModule: null
+      currentModuleType: ModuleType.Conversation,
+      currentModule: null,
+      // 当前会话
+      currentConversation: null
     }
   },
   actions: {
-    setCurrentModule(moduleType: ModuleType, module: any) {
+    setCurrentModuleType(moduleType: ModuleType) {
       this.currentModuleType = moduleType
-      this.currentModule = module
+    },
+
+    /**
+     * 设置当前会话
+     * @param conversation 会话信息
+     */
+    setCurrentConversation(conversation: ConversationInfo | null) {
+      this.currentConversation = conversation
+    },
+    /**
+     * 获取当前会话
+     * @returns 会话信息
+     */
+    getCurrentConversation() {
+      return this.currentConversation
     }
   }
 })

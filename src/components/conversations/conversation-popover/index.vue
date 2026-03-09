@@ -8,7 +8,8 @@
         </button-icon>
       </div>
       <div class="popover-panel__body">
-        <conversation-item v-for="item in list" :key="item.name" :data="item" :show-menu="false"> </conversation-item>
+        <conversation-item v-for="item in list" :key="item.session_id" :data="item" :show-menu="false">
+        </conversation-item>
       </div>
     </div>
     <template #reference>
@@ -23,13 +24,10 @@ import { X } from 'lucide-vue-next'
 
 import ButtonIcon from '@/components/button-icon/index.vue'
 import ConversationItem from '../conversation-item/index.vue'
-
-interface Conversation {
-  name: string
-}
+import { ConversationInfo } from '@/api/conversation/types'
 
 const props = defineProps<{
-  list: Conversation[]
+  list: ConversationInfo[]
 }>()
 
 const visible = ref(false)

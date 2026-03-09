@@ -1,5 +1,5 @@
 <template>
-  <div v-memo="[collapsed]" class="sidebar-panel" :class="{ collapsed }">
+  <div class="sidebar-panel" :class="{ collapsed }">
     <div class="sidebar-panel__header">
       <messages-square v-if="!collapsed" :size="18" class="sidebar-panel__icon" />
       <conversation-popover v-else :list="conversationList">
@@ -17,7 +17,7 @@
     </div>
 
     <div v-if="!collapsed" class="sidebar-panel__content">
-      <conversation-list :list="conversationList" />
+      <conversation-list :list="conversationList" @deleted="handleDeleted" />
     </div>
   </div>
 </template>
@@ -29,24 +29,46 @@ import ButtonIcon from '@/components/button-icon/index.vue'
 import ConversationList from '@/components/conversations/conversation-list/index.vue'
 import ConversationPopover from '@/components/conversations/conversation-popover/index.vue'
 
+import { getConversationList } from '@/api/conversation'
+import { ConversationInfo } from '@/api/conversation/types'
+import { useModuleStore } from '@/store'
+import { ModuleType } from '@/store/module'
+
 const props = defineProps<{
   collapsed: boolean
 }>()
 
-const current = ref<any>()
-const conversationList = ref<any>([
-  {
-    name: 'New Conversation'
+const moduleStore = useModuleStore()
+
+const conversationList = ref<ConversationInfo[]>([])
+
+/**
+ * 获取会话列表
+ */
+const getList = async () => {
+  try {
+    const { data } = await getConversationList()
+    conversationList.value = data?.items ?? []
+  } catch (error) {
+    console.error(error)
   }
-])
+}
+getList()
 
 /**
  * 新建对话
  */
 const handleAdd = () => {
-  conversationList.value.push({
-    name: 'New Conversation'
-  })
+  moduleStore.setCurrentModuleType(ModuleType.Conversation)
+  moduleStore.setCurrentConversation(null)
+}
+
+/**
+ * 删除会话
+ * @param {string} id 会话ID
+ */
+const handleDeleted = (id: string) => {
+  getList()
 }
 </script>
 <style scoped lang="scss">

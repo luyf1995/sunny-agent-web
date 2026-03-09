@@ -1,5 +1,5 @@
 <template>
-  <div v-memo="[collapsed]" class="sidebar" :class="{ collapsed }">
+  <div class="sidebar" :class="{ collapsed }">
     <sidebar-header :collapsed="collapsed" @toggle-collapse="handleToggleCollapse" />
     <div class="sidebar-content">
       <sidebar-project :collapsed="collapsed" />

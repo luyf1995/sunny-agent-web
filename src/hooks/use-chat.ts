@@ -1,18 +1,19 @@
 import { ref, onUnmounted, watch, computed } from 'vue'
-import { Message, RoleType } from '@/api/chat/types'
+import { Message, MessageRoleType } from '@/api/chat/types'
 import { ToolCallName, ToolCallStatus, QuestionItem } from '@/api/chat/tool-call'
 import { streamChat, nextId } from '@/api/chat/index'
 import { ChatSSEEvent } from '@/api/chat/event'
+import { getConversationDetail } from '@/api/conversation'
 
 interface UseChatOptions {
-  initialThreadId?: string | null
+  conversationId?: string | null
   onConversationCreated?: () => void
 }
 
 export function useChat(options: UseChatOptions = {}) {
   const messages = ref<Message[]>([])
   const isStreaming = ref(false)
-  const threadId = ref<string | null>(options.initialThreadId ?? null)
+  const conversationId = ref<string | null>(options.conversationId ?? null)
   const abortController = ref<AbortController | null>(null)
   const askUserQuestions = ref<QuestionItem[] | null>(null)
 
@@ -22,20 +23,24 @@ export function useChat(options: UseChatOptions = {}) {
 
   watch(
     () => options.onConversationCreated,
-    newCb => {
-      onConversationCreated.value = newCb
+    newC => {
+      onConversationCreated.value = newC
     },
     { immediate: true }
   )
-
-  const sendMessage = async (text: string) => {
+  /**
+   * 发送消息
+   * @param conversationId 会话id
+   * @param text 消息内容
+   */
+  const sendMessage = async (conversationId: string | null | undefined, text: string) => {
     if (isStreaming.value) return
     if (!text.trim()) return
 
     // 用户消息
     const userMsg: Message = {
       id: nextId(),
-      role: RoleType.User,
+      role: MessageRoleType.User,
       contents: [
         {
           type: ChatSSEEvent.Delta,
@@ -49,7 +54,7 @@ export function useChat(options: UseChatOptions = {}) {
     const assistantId = nextId()
     const assistantMsg: Message = {
       id: assistantId,
-      role: RoleType.Assistant,
+      role: MessageRoleType.Assistant,
       contents: []
     }
     messages.value.push(assistantMsg)
@@ -62,7 +67,7 @@ export function useChat(options: UseChatOptions = {}) {
 
     try {
       // 处理SSE流式响应
-      for await (const event of streamChat('', text, controller.signal)) {
+      for await (const event of streamChat(conversationId ?? '', text, controller.signal)) {
         switch (event.event) {
           case ChatSSEEvent.Delta:
             const index = messages.value.findIndex(m => m.id === assistantId)
@@ -133,14 +138,99 @@ export function useChat(options: UseChatOptions = {}) {
     }
   }
 
-  // 取消当前流式请求
+  /**
+   * 取消当前流式请求
+   */
   const abort = () => {
     abortController.value?.abort()
   }
 
-  // 清除 ask-user 问题
+  /**
+   * 清除 ask-user 问题
+   */
   const clearAskUser = () => {
     askUserQuestions.value = null
+  }
+  /**
+   * 清空消息
+   */
+  const clearMessages = () => {
+    messages.value = []
+  }
+
+  /**
+   * 获取对话消息历史
+   * @param {string} conversationId 会话id
+   */
+  const getHistoryMessages = async (conversationId: string) => {
+    clearMessages()
+    try {
+      if (!conversationId) return []
+      const { data } = await getConversationDetail(conversationId)
+      const historyMsgs = data.messages || []
+      if (historyMsgs.length === 0) return
+      for (let msg of historyMsgs) {
+        const historyMsgs: Message = {
+          id: msg.message_id,
+          role: msg.role,
+          contents: []
+        }
+        if (msg.role === MessageRoleType.User) {
+          // 用户消息
+          historyMsgs.contents = [
+            {
+              type: ChatSSEEvent.Delta,
+              text: msg.content
+            }
+          ]
+        } else {
+          // 助手消息
+          const resultContent = msg.content || ''
+          let lastToolStartIndexInContents = -1
+          for (let i = 0, length = msg.l3_steps.length; i < length; i++) {
+            const step = msg.l3_steps[i]
+            if (step.role === MessageRoleType.Assistant) {
+              // 工具开始调用
+              if (step.content) {
+                historyMsgs.contents.push({
+                  type: ChatSSEEvent.Delta,
+                  text: step.content
+                })
+              }
+              if (step.tool_args) {
+                historyMsgs.contents.push({
+                  type: ChatSSEEvent.ToolCall,
+                  toolCall: {
+                    step: step.step_index,
+                    name: Object.keys(step.tool_args)?.[0] as ToolCallName,
+                    args: Object.values(step.tool_args)?.[0],
+                    status: ToolCallStatus.Success,
+                    result: {}
+                  }
+                })
+                lastToolStartIndexInContents = historyMsgs.contents.length - 1
+              }
+            } else if (step.role === MessageRoleType.Tool) {
+              // 工具调用结果
+              if (historyMsgs.contents[lastToolStartIndexInContents].toolCall) {
+                console.log('工具调用结果', step.content)
+                historyMsgs.contents[lastToolStartIndexInContents].toolCall!.status = ToolCallStatus.Success
+                historyMsgs.contents[lastToolStartIndexInContents].toolCall!.result = JSON.parse(step.content || '{}')
+              }
+            }
+          }
+          historyMsgs.contents.push({
+            type: ChatSSEEvent.Delta,
+            text: resultContent
+          })
+        }
+
+        messages.value.push(historyMsgs)
+        console.log(111, messages.value)
+      }
+    } catch (e) {
+      console.log(e)
+    }
   }
 
   // 组件卸载时取消请求
@@ -148,15 +238,16 @@ export function useChat(options: UseChatOptions = {}) {
     abort()
   })
 
-  // 返回响应式状态和方法
   return {
     messages,
     isStreaming,
-    threadId,
+    conversationId,
     sendMessage,
     abort,
     askUserQuestions,
     showAskUser,
-    clearAskUser
+    clearAskUser,
+    getHistoryMessages,
+    clearMessages
   }
 }

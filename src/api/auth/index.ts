@@ -29,8 +29,8 @@ export const logoutBySSO = () => {
  * @param {string} ticket sso登录返回的ticket
  * @param {string} service 服务地址
  */
-export const verifySSOTicket = (ticket: string, service: string = SSO_SERVICE): AxiosPromise<TicketRes> =>
-  request({
+export const verifySSOTicket = (ticket: string, service: string = SSO_SERVICE) =>
+  request<TicketRes>({
     method: 'get',
     url: '/auth/sso/callback',
     params: {

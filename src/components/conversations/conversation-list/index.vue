@@ -2,10 +2,11 @@
   <div v-if="list.length > 0" class="conversation-list">
     <conversation-item
       v-for="item in list"
-      :key="item.name"
+      :key="item.session_id"
       :data="item"
-      :class="{ 'is-current': item.name === current?.name }"
-      @click="current = item"
+      :class="{ 'is-current': item.session_id === current?.session_id }"
+      @click="handleSelect(item)"
+      @deleted="handleDeleted"
     >
     </conversation-item>
   </div>
@@ -15,20 +16,41 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { MessageSquare } from 'lucide-vue-next'
 
 import ConversationItem from '../conversation-item/index.vue'
+import { ConversationInfo } from '@/api/conversation/types'
 
-interface Conversation {
-  name: string
-}
+import { useModuleStore } from '@/store'
 
 const props = defineProps<{
-  list: Conversation[]
+  list: ConversationInfo[]
 }>()
 
-const current = ref<Conversation>()
+const emit = defineEmits<{
+  (e: 'deleted', id: string): void
+}>()
+
+const moduleStore = useModuleStore()
+
+const current = computed(() => moduleStore.getCurrentConversation())
+
+/**
+ * 选择会话
+ * @param {ConversationInfo} item 会话项
+ */
+const handleSelect = (item: ConversationInfo) => {
+  moduleStore.currentConversation = item
+}
+
+/**
+ * 删除会话
+ * @param {string} id 会话ID
+ */
+const handleDeleted = (id: string) => {
+  emit('deleted', id)
+}
 </script>
 <style scoped lang="scss">
 @use './index';

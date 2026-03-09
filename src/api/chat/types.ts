@@ -1,10 +1,12 @@
+import { PageQuery } from '../common/types'
 import { ChatSSEEvent } from './event'
 import { ToolCall } from './tool-call'
 
 // 消息角色类型
-export enum RoleType {
-  User = 'user',
-  Assistant = 'assistant'
+export enum MessageRoleType {
+  User = 'user', // 用户
+  Assistant = 'assistant', // 助手
+  Tool = 'tool' // 工具
 }
 // SSE 事件类型
 export interface SSEEvent {

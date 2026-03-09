@@ -1,6 +1,6 @@
 <template>
   <div class="chat-input">
-    <div class="agent-list">
+    <!-- <div class="agent-list">
       <div class="agent-item">
         <search :size="16" />
         <span class="agent-item__name">深度研究</span>
@@ -9,7 +9,7 @@
         <database :size="16" />
         <span class="agent-item__name">数据库</span>
       </div>
-    </div>
+    </div> -->
     <div class="input-container">
       <textarea
         v-model="message"

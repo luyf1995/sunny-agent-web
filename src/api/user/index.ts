@@ -7,8 +7,8 @@ import { QueryUserParams } from './types'
 /**
  * 获取当前用户信息
  */
-export const getCurrentUserInfo = (): Promise<CurrentUserInfo> =>
-  request({
+export const getCurrentUserInfo = () =>
+  request<CurrentUserInfo>({
     method: 'get',
     url: '/api/users/me'
   })
@@ -17,8 +17,8 @@ export const getCurrentUserInfo = (): Promise<CurrentUserInfo> =>
  * 获取用户列表
  * @param {QueryUserParams} params
  */
-export const getUserList = (params: QueryUserParams): AxiosPromise<PageResult<UserInfo[]>> =>
-  request({
+export const getUserList = (params: QueryUserParams) =>
+  request<PageResult<UserInfo[]>>({
     method: 'get',
     url: '/api/users',
     params
@@ -27,8 +27,8 @@ export const getUserList = (params: QueryUserParams): AxiosPromise<PageResult<Us
 /**
  * 创建用户
  */
-export const createUser = (params: CreateUserParams): AxiosPromise<void> =>
-  request({
+export const createUser = (params: CreateUserParams) =>
+  request<void>({
     method: 'post',
     url: '/api/users',
     data: params
@@ -38,8 +38,8 @@ export const createUser = (params: CreateUserParams): AxiosPromise<void> =>
  * 删除用户
  * @param {number} id 用户id
  */
-export const deleteUser = (id: number): AxiosPromise<void> =>
-  request({
+export const deleteUser = (id: number) =>
+  request<void>({
     method: 'delete',
     url: `/api/users/${id}`
   })

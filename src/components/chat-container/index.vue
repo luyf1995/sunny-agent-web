@@ -1,10 +1,11 @@
 <template>
   <div class="chat-container">
-    <div class="chat-header">
+    <!-- <div class="chat-header">
       <h1>Sunny Agents</h1>
       <span class="thread-id">线程: 26099b3b</span>
-    </div>
-    <div class="chat-message">
+    </div> -->
+    <div v-if="!currentConversation" class="chat-empty">有什么我能帮你的吗？</div>
+    <div v-else class="chat-message">
       <message-list :messages="messages" :is-streaming="isStreaming" />
     </div>
     <div class="chat-input-wrapper">
@@ -14,24 +15,47 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref, provide } from 'vue'
+import { ref, provide, computed, watch } from 'vue'
 
 import ChatInput from './chat-input/index.vue'
 import MessageList from './message-list/index.vue'
 import AskUserOverlay from './ask-user-overlay.vue'
 
 import { useChat } from '@/hooks/use-chat'
+import { useModuleStore } from '@/store'
 
-const { messages, isStreaming, threadId, sendMessage, abort, askUserQuestions, showAskUser, clearAskUser } = useChat()
-
-const message = ref('')
+const { messages, isStreaming, sendMessage, abort, askUserQuestions, showAskUser, clearAskUser, getHistoryMessages } =
+  useChat()
+const moduleStore = useModuleStore()
 
 provide('sendMessage', sendMessage)
 
+const message = ref('')
+const currentConversation = computed(() => moduleStore.getCurrentConversation())
+
+watch(
+  currentConversation,
+  async value => {
+    if (value) {
+      getHistoryMessages(value.session_id)
+    }
+  },
+  {
+    immediate: true
+  }
+)
+
+/**
+ * 提交用户输入
+ */
 const handleSend = async () => {
-  await sendMessage(message.value)
+  await sendMessage(currentConversation.value?.session_id, message.value)
 }
 
+/**
+ * 提交用户回答
+ * @param {string[]} answers 用户回答数组
+ */
 const handleAskUserSubmit = async (answers: string[]) => {
   const responseText = answers
     .map((answer, index) => {
@@ -41,7 +65,7 @@ const handleAskUserSubmit = async (answers: string[]) => {
     .join('\n\n')
 
   clearAskUser()
-  await sendMessage(responseText)
+  await sendMessage(currentConversation.value?.session_id, responseText)
 }
 </script>
 <style scoped lang="scss">
@@ -71,6 +95,15 @@ const handleAskUserSubmit = async (answers: string[]) => {
       font-size: 12px;
       color: #94a3b8;
     }
+  }
+
+  .chat-empty {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 30px;
+    font-weight: 600;
+    flex: 1;
   }
 
   .chat-message {
