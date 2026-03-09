@@ -4,19 +4,30 @@ import { ToolCallName, ToolCallStatus, QuestionItem } from '@/api/chat/tool-call
 import { streamChat, nextId } from '@/api/chat/index'
 import { ChatSSEEvent } from '@/api/chat/event'
 import { getConversationDetail } from '@/api/conversation'
+import { useConversationCache } from './use-conversation-cache'
 
 interface UseChatOptions {
-  conversationId?: string | null
   onConversationCreated?: (...args: any[]) => void
 }
 
 export function useChat(options: UseChatOptions = {}) {
+  const {
+    getCache,
+    setCache,
+    removeCache,
+    hasCache,
+    addMessage,
+    updateMessage,
+    isStreaming: isCacheStreaming,
+    setStreaming,
+    setAbortController,
+    setAskUserQuestions
+  } = useConversationCache()
+
+  const currentSessionId = ref<string | null>(null)
   const messages = ref<Message[]>([])
   const isStreaming = ref(false)
-  const conversationId = ref<string | null>(options.conversationId ?? null)
-  const abortController = ref<AbortController | null>(null)
   const askUserQuestions = ref<QuestionItem[] | null>(null)
-  const skipNextHistoryLoad = ref(false)
 
   const showAskUser = computed(() => askUserQuestions.value !== null && askUserQuestions.value.length > 0)
 
@@ -31,15 +42,42 @@ export function useChat(options: UseChatOptions = {}) {
   )
 
   /**
-   * 发送消息
-   * @param conversationId 会话id
-   * @param text 消息内容
+   * 切换当前对话
    */
-  const sendMessage = async (conversationId: string | null | undefined, text: string) => {
-    if (isStreaming.value) return
+  const switchConversation = (sessionId: string | null) => {
+    currentSessionId.value = sessionId
+
+    if (!sessionId) {
+      messages.value = []
+      isStreaming.value = false
+      askUserQuestions.value = null
+      return
+    }
+
+    const cache = getCache(sessionId)
+    if (cache) {
+      messages.value = [...cache.messages]
+      isStreaming.value = cache.isStreaming
+      askUserQuestions.value = cache.askUserQuestions
+    } else {
+      messages.value = []
+      isStreaming.value = false
+      askUserQuestions.value = null
+    }
+  }
+
+  const hasConversationCache = (sessionId: string): boolean => {
+    return hasCache(sessionId)
+  }
+
+  /**
+   * 发送消息
+   */
+  const sendMessage = async (sessionId: string | null | undefined, text: string) => {
     if (!text.trim()) return
 
-    const isNewConversation = !conversationId
+    const targetSessionId = sessionId || `temp-${Date.now()}`
+    const isNewConversation = !sessionId
 
     const userMsg: Message = {
       id: nextId(),
@@ -51,7 +89,6 @@ export function useChat(options: UseChatOptions = {}) {
         }
       ]
     }
-    messages.value.push(userMsg)
 
     const assistantId = nextId()
     const assistantMsg: Message = {
@@ -59,22 +96,52 @@ export function useChat(options: UseChatOptions = {}) {
       role: MessageRoleType.Assistant,
       contents: []
     }
-    messages.value.push(assistantMsg)
 
-    isStreaming.value = true
+    if (!hasCache(targetSessionId)) {
+      setCache(targetSessionId, {
+        messages: [userMsg, assistantMsg],
+        isStreaming: true,
+        abortController: null,
+        askUserQuestions: null
+      })
+    } else {
+      addMessage(targetSessionId, userMsg)
+      addMessage(targetSessionId, assistantMsg)
+    }
 
-    let conversationCreatedTriggered = false
+    if (targetSessionId === currentSessionId.value) {
+      const cache = getCache(targetSessionId)
+      if (cache) {
+        messages.value = [...cache.messages]
+        isStreaming.value = true
+      }
+    }
 
     const controller = new AbortController()
-    abortController.value = controller
+    setAbortController(targetSessionId, controller)
+
+    let conversationCreatedTriggered = false
+    let actualSessionId = targetSessionId
 
     try {
-      for await (const event of streamChat(conversationId ?? '', text, controller.signal)) {
+      for await (const event of streamChat(sessionId ?? '', text, controller.signal)) {
         switch (event.event) {
           case ChatSSEEvent.Status:
             if (event.data.phase === 'executing' && !conversationCreatedTriggered && isNewConversation) {
               conversationCreatedTriggered = true
-              skipNextHistoryLoad.value = true
+              actualSessionId = event.data.session_id
+
+              const oldCache = getCache(targetSessionId)
+              if (oldCache && targetSessionId !== actualSessionId) {
+                setCache(actualSessionId, {
+                  messages: oldCache.messages,
+                  isStreaming: true,
+                  abortController: controller,
+                  askUserQuestions: oldCache.askUserQuestions
+                })
+                removeCache(targetSessionId)
+              }
+
               if (onConversationCreated.value) {
                 onConversationCreated.value({
                   session_id: event.data.session_id,
@@ -85,17 +152,23 @@ export function useChat(options: UseChatOptions = {}) {
             break
 
           case ChatSSEEvent.Delta: {
-            const index = messages.value.findIndex(m => m.id === assistantId)
-            if (index === -1) break
+            updateMessage(actualSessionId, assistantId, msg => {
+              const lastContent = msg.contents?.slice(-1)[0]
+              if (!lastContent || lastContent.type !== ChatSSEEvent.Delta) {
+                msg.contents?.push({
+                  type: ChatSSEEvent.Delta,
+                  text: event.data.content || ''
+                })
+              } else {
+                lastContent.text += event.data.content || ''
+              }
+            })
 
-            const lastContent = messages.value[index].contents?.slice(-1)[0]
-            if (!lastContent || lastContent.type !== ChatSSEEvent.Delta) {
-              messages.value[index].contents?.push({
-                type: ChatSSEEvent.Delta,
-                text: event.data.content || ''
-              })
-            } else {
-              lastContent.text += event.data.content || ''
+            if (actualSessionId === currentSessionId.value) {
+              const cache = getCache(actualSessionId)
+              if (cache) {
+                messages.value = [...cache.messages]
+              }
             }
             break
           }
@@ -108,43 +181,65 @@ export function useChat(options: UseChatOptions = {}) {
               status: ToolCallStatus.Running,
               result: {}
             }
-            const index = messages.value.findIndex(m => m.id === assistantId)
-            if (index !== -1) {
-              messages.value[index].contents?.push({
+            updateMessage(actualSessionId, assistantId, msg => {
+              msg.contents?.push({
                 type: ChatSSEEvent.ToolCall,
                 toolCall
               })
-            }
+            })
+
             if (event.data.name === ToolCallName.AskUser) {
-              askUserQuestions.value = event.data.args?.questions || []
+              setAskUserQuestions(actualSessionId, event.data.args?.questions || [])
+              if (actualSessionId === currentSessionId.value) {
+                askUserQuestions.value = event.data.args?.questions || []
+              }
+            }
+
+            if (actualSessionId === currentSessionId.value) {
+              const cache = getCache(actualSessionId)
+              if (cache) {
+                messages.value = [...cache.messages]
+              }
             }
             break
           }
 
           case ChatSSEEvent.ToolResult: {
-            const index = messages.value.findIndex(m => m.id === assistantId)
-            if (index !== -1) {
-              const toolCallIndex = messages.value[index].contents!.findIndex(
+            updateMessage(actualSessionId, assistantId, msg => {
+              const toolCallIndex = msg.contents!.findIndex(
                 tc => tc.type === ChatSSEEvent.ToolCall && tc.toolCall!.step === event.data.step
               )
-              if (toolCallIndex !== -1 && messages.value[index].contents![toolCallIndex].toolCall) {
-                messages.value[index].contents![toolCallIndex].toolCall = {
-                  ...messages.value[index].contents![toolCallIndex].toolCall,
+              if (toolCallIndex !== -1 && msg.contents![toolCallIndex].toolCall) {
+                msg.contents![toolCallIndex].toolCall = {
+                  ...msg.contents![toolCallIndex].toolCall,
                   status: event.data.status ?? event.data.result.status,
                   result: event.data.result
                 }
+              }
+            })
+
+            if (actualSessionId === currentSessionId.value) {
+              const cache = getCache(actualSessionId)
+              if (cache) {
+                messages.value = [...cache.messages]
               }
             }
             break
           }
 
           case ChatSSEEvent.Error: {
-            const index = messages.value.findIndex(m => m.id === assistantId)
-            if (index !== -1) {
-              messages.value[index].contents?.push({
+            updateMessage(actualSessionId, assistantId, msg => {
+              msg.contents?.push({
                 type: ChatSSEEvent.Error,
                 text: event.data.message
               })
+            })
+
+            if (actualSessionId === currentSessionId.value) {
+              const cache = getCache(actualSessionId)
+              if (cache) {
+                messages.value = [...cache.messages]
+              }
             }
             break
           }
@@ -156,17 +251,28 @@ export function useChat(options: UseChatOptions = {}) {
     } catch (err: unknown) {
       console.error(err)
     } finally {
-      isStreaming.value = false
-      abortController.value = null
+      setStreaming(actualSessionId, false)
+      setAbortController(actualSessionId, null)
+
+      if (actualSessionId === currentSessionId.value) {
+        isStreaming.value = false
+      }
     }
   }
 
-  const abort = () => {
-    abortController.value?.abort()
+  const abort = (sessionId?: string) => {
+    const targetId = sessionId || currentSessionId.value
+    if (targetId) {
+      const cache = getCache(targetId)
+      cache?.abortController?.abort()
+    }
   }
 
   const clearAskUser = () => {
     askUserQuestions.value = null
+    if (currentSessionId.value) {
+      setAskUserQuestions(currentSessionId.value, null)
+    }
   }
 
   const clearMessages = () => {
@@ -175,28 +281,33 @@ export function useChat(options: UseChatOptions = {}) {
 
   /**
    * 获取对话消息历史
-   * @param {string} conversationId 会话id
    */
-  const getHistoryMessages = async (conversationId: string) => {
-    if (skipNextHistoryLoad.value) {
-      skipNextHistoryLoad.value = false
+  const getHistoryMessages = async (sessionId: string) => {
+    if (!sessionId) return
+
+    if (hasCache(sessionId)) {
+      const cache = getCache(sessionId)!
+      messages.value = [...cache.messages]
+      isStreaming.value = cache.isStreaming
+      askUserQuestions.value = cache.askUserQuestions
       return
     }
 
     clearMessages()
     try {
-      if (!conversationId) return []
-      const { data } = await getConversationDetail(conversationId)
+      const { data } = await getConversationDetail(sessionId)
       const historyMsgs = data.messages || []
       if (historyMsgs.length === 0) return
+
+      const loadedMessages: Message[] = []
       for (let msg of historyMsgs) {
-        const historyMsgs: Message = {
+        const historyMsg: Message = {
           id: msg.message_id,
           role: msg.role,
           contents: []
         }
         if (msg.role === MessageRoleType.User) {
-          historyMsgs.contents = [
+          historyMsg.contents = [
             {
               type: ChatSSEEvent.Delta,
               text: msg.content
@@ -210,13 +321,13 @@ export function useChat(options: UseChatOptions = {}) {
               const step = msg.l3_steps[i]
               if (step.role === MessageRoleType.Assistant) {
                 if (step.content) {
-                  historyMsgs.contents.push({
+                  historyMsg.contents.push({
                     type: ChatSSEEvent.Delta,
                     text: step.content
                   })
                 }
                 if (step.tool_args) {
-                  historyMsgs.contents.push({
+                  historyMsg.contents.push({
                     type: ChatSSEEvent.ToolCall,
                     toolCall: {
                       step: step.step_index,
@@ -226,27 +337,41 @@ export function useChat(options: UseChatOptions = {}) {
                       result: {}
                     }
                   })
-                  lastToolStartIndexInContents = historyMsgs.contents.length - 1
+                  lastToolStartIndexInContents = historyMsg.contents.length - 1
                 }
               } else if (step.role === MessageRoleType.Tool) {
-                if (historyMsgs.contents[lastToolStartIndexInContents].toolCall) {
-                  historyMsgs.contents[lastToolStartIndexInContents].toolCall!.status = ToolCallStatus.Success
-                  historyMsgs.contents[lastToolStartIndexInContents].toolCall!.result = JSON.parse(step.content || '{}')
+                if (historyMsg.contents[lastToolStartIndexInContents].toolCall) {
+                  historyMsg.contents[lastToolStartIndexInContents].toolCall!.status = ToolCallStatus.Success
+                  historyMsg.contents[lastToolStartIndexInContents].toolCall!.result = JSON.parse(step.content || '{}')
                 }
               }
             }
           }
-          historyMsgs.contents.push({
+          historyMsg.contents.push({
             type: ChatSSEEvent.Delta,
             text: resultContent
           })
         }
-
-        messages.value.push(historyMsgs)
+        loadedMessages.push(historyMsg)
       }
+
+      setCache(sessionId, {
+        messages: loadedMessages,
+        isStreaming: false,
+        abortController: null,
+        askUserQuestions: null
+      })
+      messages.value = loadedMessages
     } catch (e) {
       console.error(e)
     }
+  }
+
+  /**
+   * 删除对话缓存
+   */
+  const removeConversationCache = (sessionId: string) => {
+    removeCache(sessionId)
   }
 
   onUnmounted(() => {
@@ -256,13 +381,17 @@ export function useChat(options: UseChatOptions = {}) {
   return {
     messages,
     isStreaming,
-    conversationId,
+    currentSessionId,
     sendMessage,
     abort,
     askUserQuestions,
     showAskUser,
     clearAskUser,
     getHistoryMessages,
-    clearMessages
+    clearMessages,
+    switchConversation,
+    removeConversationCache,
+    isConversationStreaming: isCacheStreaming,
+    hasConversationCache
   }
 }

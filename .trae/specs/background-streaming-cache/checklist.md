@@ -1,0 +1,10 @@
+- [x] ConversationCache 接口定义完整，包含 messages、isStreaming、abortController、askUserQuestions 等字段
+- [x] conversationCacheStore 使用 Map 正确存储各对话缓存
+- [x] sendMessage 函数正确将消息存入对应对话缓存
+- [x] 流式事件正确更新对应对话缓存中的消息
+- [x] 切换对话时不中断流式请求，消息正确切换显示
+- [x] 切换回流式中的对话时，继续显示流式回复内容
+- [x] 流式回复完成后切换回对话，显示完整回复
+- [x] 对话删除时正确清理缓存
+- [x] 组件卸载时正确清理缓存
+- [x] 新建对话流式中切换场景正确处理

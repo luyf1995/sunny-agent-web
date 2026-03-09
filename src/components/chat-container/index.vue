@@ -42,7 +42,10 @@ const {
   showAskUser,
   clearAskUser,
   getHistoryMessages,
-  clearMessages
+  clearMessages,
+  switchConversation,
+  removeConversationCache,
+  hasConversationCache
 } = useChat({
   onConversationCreated: conversation => {
     eventBus.emit('conversation:unshift', conversation)
@@ -57,10 +60,14 @@ const currentConversation = computed(() => moduleStore.currentConversation)
 
 watch(
   currentConversation,
-  async value => {
-    if (value) {
-      getHistoryMessages(value.session_id)
-    } else if (!isStreaming.value) {
+  async (value, oldValue) => {
+    const conversationId = value?.session_id || null
+
+    switchConversation(conversationId)
+
+    if (conversationId && !hasConversationCache(conversationId)) {
+      getHistoryMessages(conversationId)
+    } else if (!conversationId) {
       clearMessages()
     }
   },
@@ -69,17 +76,10 @@ watch(
   }
 )
 
-/**
- * 提交用户输入
- */
 const handleSend = async () => {
   await sendMessage(currentConversation.value?.session_id, message.value)
 }
 
-/**
- * 提交用户回答
- * @param {string[]} answers 用户回答数组
- */
 const handleAskUserSubmit = async (answers: string[]) => {
   const responseText = answers
     .map((answer, index) => {
