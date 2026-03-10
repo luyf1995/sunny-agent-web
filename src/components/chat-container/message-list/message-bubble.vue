@@ -45,12 +45,16 @@ const showToolCall = (item: MessageContent) => {
   }
 
   &.user-bubble {
-    justify-content: flex-end;
+    flex-direction: row-reverse;
 
     .message-avatar {
       color: #3b82f6;
       background: #eff6ff;
       border-color: #3b82f6;
+    }
+
+    .message-body {
+      text-align: right;
     }
   }
 

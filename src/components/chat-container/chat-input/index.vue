@@ -29,7 +29,7 @@
           /> -->
         </div>
         <div class="input-toolbar__right">
-          <el-button type="primary" title="发送" class="send-btn" @click="isStreaming ? handleAbort() : handleSend()">
+          <el-button type="primary" title="发送" class="send-btn" @click="handleSend()">
             <component :is="isStreaming ? Pause : Send" :size="18" />
           </el-button>
         </div>
@@ -194,6 +194,11 @@ const handleInput = (e: InputEvent) => {
  * 发送聊天消息
  */
 const handleSend = async () => {
+  if (props.isStreaming) {
+    handleAbort()
+    return
+  }
+
   if (message.value.trim() === '') return
   emits('send', message.value)
   message.value = ''

@@ -119,14 +119,14 @@ const handleDelete = async (item: ProjectInfo, next: () => void) => {
 
 const buildMenus = (data: any) => {
   return [
-    {
-      icon: MessageSquarePlus,
-      label: '新建对话',
-      onClick: (next: () => void) => {
-        console.log('新建对话')
-        next()
-      }
-    },
+    // {
+    //   icon: MessageSquarePlus,
+    //   label: '新建对话',
+    //   onClick: (next: () => void) => {
+    //     console.log('新建对话')
+    //     next()
+    //   }
+    // },
     {
       icon: Pencil,
       label: '重命名',

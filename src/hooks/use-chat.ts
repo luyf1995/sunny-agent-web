@@ -141,6 +141,7 @@ export function useChat(options: UseChatOptions = {}) {
                   abortController: controller,
                   askUserQuestions: oldCache.askUserQuestions
                 })
+                setAbortController(targetSessionId, null)
                 removeCache(targetSessionId)
               }
 
@@ -369,10 +370,6 @@ export function useChat(options: UseChatOptions = {}) {
   const removeSessionCache = (sessionId: string) => {
     removeCache(sessionId)
   }
-
-  onUnmounted(() => {
-    abort()
-  })
 
   return {
     messages,
