@@ -18,7 +18,7 @@ interface ModuleState {
 }
 
 const appStore = defineStore('module', {
-  persist: true,
+  // persist: true,
   state: (): ModuleState => {
     return {
       currentModuleType: ModuleType.Session,
@@ -29,7 +29,7 @@ const appStore = defineStore('module', {
     }
   },
   actions: {
-    setCurrentModuleType(moduleType: ModuleType) {
+    setCurrentModuleType(moduleType: ModuleType | null) {
       this.currentModuleType = moduleType
     },
 

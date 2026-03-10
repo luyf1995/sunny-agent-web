@@ -83,6 +83,7 @@ const selectedList = ref<string[]>([])
 const fetchProjectFiles = async () => {
   try {
     if (props.projectSession) {
+      console.log('props', props.projectSession)
       const { data } = await getProjectFiles(props.projectSession.project_id)
       fileList.value = data.items || []
     }

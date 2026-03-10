@@ -29,6 +29,7 @@ import { useChat } from '@/hooks/use-chat'
 import { moveSessionToProject } from '@/api/project/index'
 import { useModuleStore } from '@/store'
 import { ModuleType } from '@/store/module'
+import eventBus, { EVENT_NAMES } from '@/utils/event-bus'
 
 interface Props {
   project: ProjectDetail
@@ -39,12 +40,16 @@ const props = defineProps<Props>()
 const moduleStore = useModuleStore()
 
 const { sendMessage } = useChat({
-  onSessionCreated: session => {
-    moveSessionToProject(props.project.id, session.session_id)
+  onSessionCreated: async session => {
+    await moveSessionToProject(props.project.id, session.session_id)
+
+    const projectSessions = {
+      ...session,
+      project_id: props.project.id
+    }
+    moduleStore.setCurrentProjectSession(projectSessions)
     moduleStore.setCurrentModuleType(ModuleType.ProjectSession)
-    moduleStore.setCurrentProjectSession(session)
-    console.log('session', session)
-    // eventBus.emit(EVENT_NAMES.SESSION_UNSHIFT, session)
+    eventBus.emit(EVENT_NAMES.PROJECT_SESSION_CREATED, projectSessions)
   }
 })
 

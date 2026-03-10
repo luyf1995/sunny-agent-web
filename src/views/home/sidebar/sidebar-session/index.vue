@@ -34,6 +34,7 @@ import { SessionInfo } from '@/api/session/types'
 import { useModuleStore } from '@/store'
 import { ModuleType } from '@/store/module'
 import eventBus, { EVENT_NAMES } from '@/utils/event-bus'
+import { ProjectSessionInfo } from '@/api/project/types'
 
 const props = defineProps<{
   collapsed: boolean
@@ -56,6 +57,10 @@ getList()
 eventBus.on(EVENT_NAMES.SESSION_UNSHIFT, (session: SessionInfo) => {
   sessionList.value.unshift(session)
   moduleStore.setCurrentSession(session ?? null)
+})
+
+eventBus.on(EVENT_NAMES.PROJECT_SESSION_MOVED, (projectSession: ProjectSessionInfo) => {
+  getList()
 })
 
 const handleAdd = () => {

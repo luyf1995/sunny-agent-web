@@ -18,6 +18,7 @@
     </div>
     <div v-if="!collapsed" class="sidebar-panel__content">
       <project-list
+        ref="projectListRef"
         :list="projectList"
         @add-project="handleAddProject"
         @renamed="handleRenamed"
@@ -53,11 +54,14 @@ const props = defineProps<{
 const moduleStore = useModuleStore()
 
 const projectList = ref<ProjectInfo[]>([])
+const projectListRef = ref()
 
 const fetchProjectList = async () => {
   try {
     const { data } = await getProjectList()
     projectList.value = data?.items ?? []
+    // 刷新树节点
+    // projectListRef.value.reRender()
   } catch (error) {
     console.error(error)
   }
@@ -77,9 +81,18 @@ const handleRenamed = (data: ProjectInfo) => {
   const index = projectList.value.findIndex(item => item.id === data.id)
   if (index !== -1) {
     projectList.value[index] = { ...projectList.value[index], name: data.name }
+
+    // // TODO: 刷新树节点，先这么修改，后续优化
+    // const treeData = projectListRef.value.elTreeRef.getNode(data.id)?.data || {}
+    // console.log(1111, projectListRef.value.elTreeRef.getNode(data.id))
+    // projectListRef.value.elTreeRef.getNode(data.id)?.setData({
+    //   ...treeData,
+    //   name: data.name,
+    //   expanded: false
+    // })
   }
   if (moduleStore.currentProject?.id === data.id) {
-    moduleStore.setCurrentProject({ ...moduleStore.currentProject, name: data.name })
+    // moduleStore.setCurrentProject({ ...moduleStore.currentProject, name: data.name })
   }
 }
 

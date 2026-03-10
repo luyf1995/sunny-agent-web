@@ -1,24 +1,13 @@
 <template>
-  <el-tree
-    v-if="list.length > 0"
-    :data="list"
-    :props="TREE_PROPS"
-    highlight-current
-    :expand-on-click-node="false"
-    :icon="ChevronRight"
-    class="project-list"
-    lazy
-    :load="loadNode"
-  >
-    <template #default="{ node, data }">
-      <project-item
-        :data="data"
-        :type="node.level === 1 ? ModuleType.Project : ModuleType.ProjectSession"
-        @deleted="handleDeleted"
-        @renamed="handleRenamed"
-      ></project-item>
-    </template>
-  </el-tree>
+  <div v-if="list.length > 0" class="project-list">
+    <project-item
+      v-for="item in list"
+      :key="item.id"
+      :data="item"
+      @deleted="handleDeleted"
+      @renamed="handleRenamed"
+    ></project-item>
+  </div>
   <div v-else class="empty">
     <folder-plus :size="24" />
     <span>暂无项目</span>
@@ -34,6 +23,7 @@ import { ProjectInfo, ProjectSessionInfo } from '@/api/project/types'
 import { ModuleType } from '@/store/module'
 import { getProjectSessions } from '@/api/project'
 import type { TreeNodeData } from 'element-plus/es/components/tree/src/tree.type'
+import { nextTick, ref, watch } from 'vue'
 
 interface Props {
   list: ProjectInfo[]
@@ -45,41 +35,6 @@ const emits = defineEmits<{
   (e: 'deleted', id: string): void
   (e: 'renamed', data: ProjectInfo): void
 }>()
-
-const TREE_PROPS = {
-  label: 'name',
-  children: 'children',
-  isLeaf: 'leaf'
-}
-
-const loadNode = async (node: any, resolve: (data: TreeNodeData[]) => void) => {
-  if (node.level === 0) {
-    resolve(props.list.map(item => ({ ...item, leaf: item.session_count === 0 })))
-    return
-  }
-
-  if (node.level === 1) {
-    const projectData = node.data as ProjectInfo
-    if (projectData.session_count === 0) {
-      resolve([])
-      return
-    }
-    try {
-      const { data } = await getProjectSessions(projectData.id)
-      const sessionList = (data?.items || []).map((item: ProjectSessionInfo) => ({
-        ...item,
-        name: item.title,
-        leaf: true
-      }))
-      resolve(sessionList)
-    } catch {
-      resolve([])
-    }
-    return
-  }
-
-  resolve([])
-}
 
 const handleDeleted = (id: string) => {
   emits('deleted', id)

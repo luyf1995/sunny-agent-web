@@ -1,34 +1,10 @@
-.project-item-container {
-  flex: 1;
-  gap: 8px;
-
-  .project-sessions-container {
-    margin-left: 35px;
-  }
-}
-
-.project-item {
+.session-item {
   display: flex;
   align-items: center;
-  padding: 8px 4px;
+  padding: 8px 12px;
   border-radius: 8px;
   gap: 8px;
   cursor: pointer;
-
-   &.is-current {
-    color: #1e293b;
-    background-color: #d6e3f9;
-  }
-
-  &__expend {
-    width: 20px;
-  }
-
-  &:hover {
-    .project-item__menu {
-      opacity: 1;
-    }
-  }
 
   &__label {
     overflow: hidden;
@@ -41,7 +17,6 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-right: 5px;
     margin-left: auto;
     opacity: 0;
     transition: opacity 0.15s;
@@ -49,5 +24,19 @@
     :deep(.lucide) {
       width: 20px;
     }
+  }
+
+  &:hover {
+    color: #1e293b;
+    background-color: #f1f5f9;
+
+    .session-item__menu {
+      opacity: 1;
+    }
+  }
+
+  &.is-current {
+    color: #1e293b;
+    background-color: #d6e3f9;
   }
 }
