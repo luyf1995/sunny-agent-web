@@ -32,6 +32,9 @@ importers:
       markstream-vue:
         specifier: 0.0.8-beta.2
         version: 0.0.8-beta.2(shiki@4.0.1)(stream-markdown@0.0.14(shiki@4.0.1))(stream-monaco@0.0.18(monaco-editor@0.55.1))(vue@3.5.29(typescript@5.3.3))
+      mitt:
+        specifier: ^3.0.1
+        version: 3.0.1
       nprogress:
         specifier: ^0.2.0
         version: 0.2.0

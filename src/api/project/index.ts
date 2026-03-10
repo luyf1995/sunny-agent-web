@@ -49,7 +49,7 @@ export const deleteProject = (projectId: string) => {
     method: 'delete'
   })
 }
-
+// 项目文件上传
 export const buildUpdateFileUrl = (projectId: string) => {
   return `/api/projects/${projectId}/files`
 }
@@ -75,3 +75,14 @@ export const deleteProjectFile = (projectId: string, fileId: string) => {
     method: 'delete'
   })
 }
+
+/**
+ * 获取项目下的会话列表
+ * @param {string} projectId 项目ID
+ * @param {SessionPageParams} params 会话列表查询参数
+ */
+export const getProjectSessions = (projectId: string, params?: SessionPageParams) =>
+  request<ProjectSessionInfo[]>({
+    url: `/api/projects/${projectId}/sessions`,
+    method: 'get'
+  })

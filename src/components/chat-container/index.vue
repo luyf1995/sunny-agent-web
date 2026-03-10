@@ -27,7 +27,7 @@ import AskUserOverlay from './ask-user-overlay.vue'
 
 import { useChat } from '@/hooks/use-chat'
 import { useModuleStore } from '@/store'
-import eventBus from '@/utils/event-bus'
+import eventBus, { EVENT_NAMES } from '@/utils/event-bus'
 
 const {
   messages,
@@ -44,7 +44,7 @@ const {
   hasSessionCache
 } = useChat({
   onSessionCreated: session => {
-    eventBus.emit('session:unshift', session)
+    eventBus.emit(EVENT_NAMES.SESSION_UNSHIFT, session)
   }
 })
 const moduleStore = useModuleStore()

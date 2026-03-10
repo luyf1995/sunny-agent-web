@@ -33,14 +33,10 @@ export function useChat(options: UseChatOptions = {}) {
 
   const onSessionCreated = ref(options.onSessionCreated)
 
-  watch(
-    () => options.onSessionCreated,
-    newC => {
-      onSessionCreated.value = newC
-    },
-    { immediate: true }
-  )
-
+  /**
+   * 切换会话
+   * @param sessionId 会话id
+   */
   const switchSession = (sessionId: string | null) => {
     currentSessionId.value = sessionId
 
@@ -63,10 +59,20 @@ export function useChat(options: UseChatOptions = {}) {
     }
   }
 
+  /**
+   * 检查会话是否有缓存
+   * @param {string} sessionId 会话id
+   * @returns 是否有缓存
+   */
   const hasSessionCache = (sessionId: string): boolean => {
     return hasCache(sessionId)
   }
 
+  /**
+   * 发送消息
+   * @param {string | null | undefined} sessionId 会话id
+   * @param {string} text 消息内容
+   */
   const sendMessage = async (sessionId: string | null | undefined, text: string) => {
     if (!text.trim()) return
 
@@ -116,6 +122,8 @@ export function useChat(options: UseChatOptions = {}) {
 
     let sessionCreatedTriggered = false
     let actualSessionId = targetSessionId
+
+    setStreaming(actualSessionId, true)
 
     try {
       for await (const event of streamChat(sessionId ?? '', text, controller.signal)) {

@@ -68,8 +68,9 @@ const showToolCall = (item: MessageContent) => {
   }
 
   .message-body {
-    flex: 1;
+    margin-top: -10px;
     min-width: 0;
+    flex: 1;
   }
 }
 </style>

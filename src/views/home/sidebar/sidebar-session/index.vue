@@ -33,7 +33,7 @@ import { getSessionList } from '@/api/session'
 import { SessionInfo } from '@/api/session/types'
 import { useModuleStore } from '@/store'
 import { ModuleType } from '@/store/module'
-import eventBus from '@/utils/event-bus'
+import eventBus, { EVENT_NAMES } from '@/utils/event-bus'
 
 const props = defineProps<{
   collapsed: boolean
@@ -53,7 +53,7 @@ const getList = async () => {
 }
 getList()
 
-eventBus.on('session:unshift', (session: SessionInfo) => {
+eventBus.on(EVENT_NAMES.SESSION_UNSHIFT, (session: SessionInfo) => {
   sessionList.value.unshift(session)
   moduleStore.setCurrentSession(session ?? null)
 })

@@ -12,11 +12,19 @@ export interface SessionCache {
 
 const cacheMap = reactive(new Map<string, SessionCache>())
 
+/**
+ * 会话缓存
+ */
 export function useSessionCache() {
   const getCache = (sessionId: string): SessionCache | undefined => {
     return cacheMap.get(sessionId)
   }
 
+  /**
+   * 设置会话缓存
+   * @param {string} sessionId 会话id
+   * @param {Partial<SessionCache>} cache 会话缓存
+   */
   const setCache = (sessionId: string, cache: Partial<SessionCache>): void => {
     const existing = cacheMap.get(sessionId)
     if (existing) {
@@ -33,6 +41,10 @@ export function useSessionCache() {
     }
   }
 
+  /**
+   * 删除会话缓存
+   * @param {string} sessionId 会话id
+   */
   const removeCache = (sessionId: string): void => {
     const cache = cacheMap.get(sessionId)
     if (cache?.abortController) {
@@ -41,10 +53,18 @@ export function useSessionCache() {
     cacheMap.delete(sessionId)
   }
 
+  /**
+   * 检查会话缓存是否存在
+   * @param {string} sessionId 会话id
+   * @returns {boolean} 是否存在
+   */
   const hasCache = (sessionId: string): boolean => {
     return cacheMap.has(sessionId)
   }
 
+  /**
+   * 清除所有会话缓存
+   */
   const clearAllCache = (): void => {
     cacheMap.forEach(cache => {
       cache.abortController?.abort()
@@ -52,18 +72,47 @@ export function useSessionCache() {
     cacheMap.clear()
   }
 
+  /**
+   * 检查会话是否正在流式传输
+   * @param {string} sessionId 会话id
+   * @returns {boolean} 是否正在流式传输
+   */
   const isStreaming = (sessionId: string): boolean => {
     return cacheMap.get(sessionId)?.isStreaming || false
   }
 
+  /**
+   * 设置会话是否正在流式传输
+   * @param {string} sessionId 会话id
+   * @param {boolean} streaming 是否正在流式传输
+   */
+  const setStreaming = (sessionId: string, streaming: boolean): void => {
+    setCache(sessionId, { isStreaming: streaming })
+  }
+
+  /**
+   * 获取会话消息
+   * @param {string} sessionId 会话id
+   * @returns {Message[]} 消息列表
+   */
   const getMessages = (sessionId: string): Message[] => {
     return cacheMap.get(sessionId)?.messages || []
   }
 
+  /**
+   * 设置会话消息
+   * @param {string} sessionId 会话id
+   * @param {Message[]} messages 消息列表
+   */
   const setMessages = (sessionId: string, messages: Message[]): void => {
     setCache(sessionId, { messages })
   }
 
+  /**
+   * 添加会话消息
+   * @param {string} sessionId 会话id
+   * @param {Message} message 消息
+   */
   const addMessage = (sessionId: string, message: Message): void => {
     const cache = cacheMap.get(sessionId)
     if (cache) {
@@ -73,6 +122,12 @@ export function useSessionCache() {
     }
   }
 
+  /**
+   * 更新会话消息
+   * @param {string} sessionId 会话id
+   * @param {string} messageId 消息id
+   * @param {function} updater 更新函数
+   */
   const updateMessage = (sessionId: string, messageId: string, updater: (msg: Message) => void): void => {
     const cache = cacheMap.get(sessionId)
     if (cache) {
@@ -83,14 +138,20 @@ export function useSessionCache() {
     }
   }
 
-  const setStreaming = (sessionId: string, streaming: boolean): void => {
-    setCache(sessionId, { isStreaming: streaming })
-  }
-
+  /**
+   * 设置会话取消控制器
+   * @param {string} sessionId 会话id
+   * @param {AbortController | null} controller 取消控制器
+   */
   const setAbortController = (sessionId: string, controller: AbortController | null): void => {
     setCache(sessionId, { abortController: controller })
   }
 
+  /**
+   * 设置会话需要用户确认的问题
+   * @param {string} sessionId 会话id
+   * @param {QuestionItem[] | null} questions 问题列表
+   */
   const setAskUserQuestions = (sessionId: string, questions: QuestionItem[] | null): void => {
     setCache(sessionId, { askUserQuestions: questions })
   }
