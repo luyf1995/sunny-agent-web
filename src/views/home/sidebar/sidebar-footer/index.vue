@@ -1,17 +1,22 @@
 <template>
-  <div v-memo="[collapsed]" class="sidebar-footer">
-    <button-icon v-if="!collapsed" title="系统管理" class="sidebar-footer__btn" @click="adminManageVisible = true">
+  <div class="sidebar-footer">
+    <button-icon
+      v-if="!collapsed && isAdmin"
+      title="系统管理"
+      class="sidebar-footer__btn"
+      @click="adminManageVisible = true"
+    >
       <settings :size="20" />
     </button-icon>
     <el-popover placement="top" :width="180" trigger="click" popper-class="user-info-popover">
       <div class="user-info">
         <div class="user-item">
           <span class="user-item__label">用户类型</span>
-          <span class="user-item__value">管理员</span>
+          <span class="user-item__value">{{ userInfo?.role }}</span>
         </div>
         <div class="user-item">
           <span class="user-item__label">用户名</span>
-          <span class="user-item__value">admin</span>
+          <span class="user-item__value">{{ userInfo?.username }}</span>
         </div>
       </div>
       <button-icon class="logout-btn" @click="userStore.logout">
@@ -28,13 +33,14 @@
   <admin-manage v-model="adminManageVisible" />
 </template>
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { Settings, User, LogOut } from 'lucide-vue-next'
 
 import ButtonIcon from '@/components/button-icon/index.vue'
 import AdminManage from '@/components/admin-manage/index.vue'
 
 import { useUserStore } from '@/store'
+import { UserRoleType } from '@/api/user/types'
 
 const userStore = useUserStore()
 
@@ -43,6 +49,10 @@ const props = defineProps<{
 }>()
 
 const adminManageVisible = ref(false)
+
+const userInfo = computed(() => userStore.userInfo)
+
+const isAdmin = computed(() => userInfo.value?.role === UserRoleType.Admin)
 </script>
 <style scoped lang="scss">
 .sidebar-footer {

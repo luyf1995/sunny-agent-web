@@ -1,0 +1,38 @@
+<template>
+  <el-popover :visible="visible" placement="right-start" :width="200">
+    <div v-click-outside="close" class="popover-panel">
+      <div class="popover-panel__header">
+        <div>对话列表</div>
+        <button-icon>
+          <x :size="16" />
+        </button-icon>
+      </div>
+      <div class="popover-panel__body">
+        <session-item v-for="item in list" :key="item.session_id" :data="item" :show-menu="false"> </session-item>
+      </div>
+    </div>
+    <template #reference>
+      <slot name="reference" :show="show" />
+    </template>
+  </el-popover>
+</template>
+<script setup lang="ts">
+import { ref } from 'vue'
+import { ClickOutside as vClickOutside } from 'element-plus'
+import { X } from 'lucide-vue-next'
+
+import ButtonIcon from '@/components/button-icon/index.vue'
+import SessionItem from '../session-item/index.vue'
+import { SessionInfo } from '@/api/session/types'
+
+const props = defineProps<{
+  list: SessionInfo[]
+}>()
+
+const visible = ref(false)
+const show = () => (visible.value = true)
+const close = () => (visible.value = false)
+</script>
+<style scoped lang="scss">
+@use './index';
+</style>

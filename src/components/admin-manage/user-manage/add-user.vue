@@ -14,10 +14,10 @@
     <div class="user-dialog__body">
       <el-form ref="addFormRef" :model="addForm" :rules="rules" label-position="top">
         <el-form-item label="工号" prop="usernumb">
-          <el-input v-model="addForm.usernumb" placeholder="请输入工号"></el-input>
+          <el-input v-model="addForm.usernumb" placeholder="请输入工号" :maxlength="64" clearable></el-input>
         </el-form-item>
         <el-form-item label="姓名" prop="username">
-          <el-input v-model="addForm.username" placeholder="请输入姓名"></el-input>
+          <el-input v-model="addForm.username" placeholder="请输入姓名" :maxlength="64" clearable></el-input>
         </el-form-item>
         <!-- <el-form-item label="密码" prop="password">
           <el-input v-model="addForm.password" placeholder="请输入密码"></el-input>

@@ -15,18 +15,18 @@
         <file-card></file-card>
         <skill-card></skill-card>
       </div>
-      <div class="project-home-conversations">
-        <h2 class="conversations-title">会话</h2>
-        <div class="conversations-list">
-          <div class="conversation-item">
+      <div class="project-home-sessions">
+        <h2 class="sessions-title">会话</h2>
+        <div class="sessions-list">
+          <div class="session-item">
             <message-square :size="16" />
-            <span class="conversation-item__title">New Conversation</span>
-            <span class="conversation-item__time">2小时前</span>
+            <span class="session-item__title">New Session</span>
+            <span class="session-item__time">2小时前</span>
           </div>
-          <div class="conversation-item">
+          <div class="session-item">
             <message-square :size="16" />
-            <span class="conversation-item__title">New Conversation</span>
-            <span class="conversation-item__time">5小时前</span>
+            <span class="session-item__title">New Session</span>
+            <span class="session-item__time">5小时前</span>
           </div>
         </div>
       </div>

@@ -1,28 +1,35 @@
+import { SessionDetail, SessionInfo } from '@/api/session/types'
 import { defineStore } from 'pinia'
 
 export enum ModuleType {
-  Project = 'project', // 项目
-  Conversation = 'conversation', // 独立对话
-  ProjectConversation = 'project_conversation' // 项目中的对话
+  Project = 'project',
+  Session = 'session',
+  ProjectSession = 'project_session'
 }
 
 interface ModuleState {
   currentModuleType: ModuleType | null
   currentModule: any
+
+  currentSession: SessionInfo | null
 }
 
 const appStore = defineStore('module', {
   persist: true,
   state: (): ModuleState => {
     return {
-      currentModuleType: null,
-      currentModule: null
+      currentModuleType: ModuleType.Session,
+      currentModule: null,
+      currentSession: null
     }
   },
   actions: {
-    setCurrentModule(moduleType: ModuleType, module: any) {
+    setCurrentModuleType(moduleType: ModuleType) {
       this.currentModuleType = moduleType
-      this.currentModule = module
+    },
+
+    setCurrentSession(session: SessionInfo | null) {
+      this.currentSession = session
     }
   }
 })

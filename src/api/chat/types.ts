@@ -1,72 +1,27 @@
-// types.ts
-export type DisplayScenario = 'quick' | 'agent' | 'planning'
+import { PageQuery } from '../common/types'
+import { ChatSSEEvent } from './event'
+import { ToolCall } from './tool-call'
 
-export interface ThinkingStep {
-  content: string
-  type: string
-  timestamp: number
+// 消息角色类型
+export enum MessageRoleType {
+  User = 'user', // 用户
+  Assistant = 'assistant', // 助手
+  Tool = 'tool' // 工具
 }
-
-export interface ThinkingState {
-  steps: ThinkingStep[]
-  isThinking: boolean
-  startTime: number
-  durationSeconds: number
-}
-
-export interface ToolCall {
-  id: string
-  name: string
-  args: Record<string, any>
-  status: 'running' | 'done' | 'error'
-  output?: string
-}
-
-export interface SpawnedTask {
-  task_id: string
-  subagent_type: string
-  description: string
-  status: 'pending' | 'running' | 'completed' | 'failed'
-  toolCalls: ToolCall[]
-  todos?: string[]
-  output?: string
-  duration_ms?: number
-}
-
-export interface UploadedFile {
-  file_id: string
-  filename: string
-  size: number
-  content_type: string
-  source: string
-  download_url: string
-}
-
-export interface Message {
-  id: string
-  role: 'user' | 'assistant'
-  content: string
-  files?: UploadedFile[]
-  toolCalls?: ToolCall[]
-  thinking?: ThinkingState
-  displayScenario?: DisplayScenario
-  spawnedTasks?: SpawnedTask[]
-  todos?: string[]
-}
-
+// SSE 事件类型
 export interface SSEEvent {
   event: string
   data: any
 }
 
-export interface Agent {
+// SSE消息类型
+export interface Message {
   id: string
-  name: string
-  description?: string
+  role: string
+  contents: MessageContent[]
 }
-
-export interface Skill {
-  id: string
-  name: string
-  description?: string
+export interface MessageContent {
+  type: ChatSSEEvent
+  text?: string // 文本内容
+  toolCall?: ToolCall // 工具调用
 }

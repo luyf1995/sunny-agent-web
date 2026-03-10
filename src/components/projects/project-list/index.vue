@@ -9,7 +9,7 @@
     class="project-list"
   >
     <template #default="{ node, data }">
-      <project-item :data="data" :type="node.level === 1 ? 'project' : 'conversation'"></project-item>
+      <project-item :data="data" :type="node.level === 1 ? 'project' : 'session'"></project-item>
     </template>
   </el-tree>
   <div v-else class="empty">
@@ -23,9 +23,11 @@ import { ChevronRight, FolderPlus } from 'lucide-vue-next'
 
 import ProjectItem from '../project-item/index.vue'
 import ButtonLink from '@/components/button-link/index.vue'
+import { ProjectInfo } from '@/api/project/types'
+import { watch } from 'vue'
 
 interface Props {
-  list: Array<any>
+  list: ProjectInfo[]
 }
 
 const props = defineProps<Props>()
@@ -36,6 +38,13 @@ const TREE_PROPS = {
   children: 'children',
   isLeaf: 'leaf'
 }
+
+watch(
+  () => props.list,
+  newVal => {
+    console.log(newVal)
+  }
+)
 </script>
 <style scoped lang="scss">
 @use './index';

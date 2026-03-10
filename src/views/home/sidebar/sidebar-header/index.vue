@@ -1,12 +1,12 @@
 <template>
-  <div v-memo="[collapsed]" class="sidebar-header" :class="{ collapsed }">
+  <div class="sidebar-header" :class="{ collapsed }">
     <div class="sidebar-logo" @click="handleLogoClick">
       <logo :width="24" :height="24" />
       <h1 v-if="!collapsed" class="sidebar-title">Sunny Agent</h1>
     </div>
-    <button-icon v-if="!collapsed" title="收起" class="collapse-btn" @click="handleToggleCollapse">
+    <!-- <button-icon v-if="!collapsed" title="收起" class="collapse-btn" @click="handleToggleCollapse">
       <panel-left-close :size="18" />
-    </button-icon>
+    </button-icon> -->
   </div>
 </template>
 <script setup lang="ts">

@@ -1,34 +1,125 @@
 <template>
-  <div class="message-list">
-    <message-bubble v-for="item in messageList" :key="item.id" :message="item" />
+  <div ref="containerRef" class="message-list">
+    <message-bubble v-for="item in messages" :key="item.id" :message="item" :is-streaming="isStreaming" />
+
+    <div v-if="isStreaming" class="streaming-indicator">
+      <span class="dot" />
+      <span class="dot" />
+      <span class="dot" />
+    </div>
+
+    <div ref="footerRef"></div>
   </div>
 </template>
 <script setup lang="ts">
-import { ref } from 'vue'
-import MessageBubble from './message-bubble/index.vue'
+import { ref, watch, nextTick, onMounted, onUnmounted } from 'vue'
+import MessageBubble from './message-bubble.vue'
 
-const messageList = ref([
-  {
-    id: 'msg-1',
-    role: 'user',
-    content: '11'
+import { Message } from '@/api/chat/types'
+
+interface Props {
+  messages: Message[]
+  isStreaming: boolean
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  messages: () => [],
+  isStreaming: false
+})
+
+const containerRef = ref<HTMLDivElement>()
+const footerRef = ref<HTMLDivElement>()
+const autoScrollEnabled = ref(true)
+
+const scrollToBottom = (smooth = false) => {
+  nextTick(() => {
+    footerRef.value?.scrollIntoView({ behavior: smooth ? 'smooth' : 'instant' })
+  })
+}
+
+const handleWheel = (e: WheelEvent) => {
+  if (props.isStreaming && e.deltaY < 0) {
+    autoScrollEnabled.value = false
+  }
+}
+
+onMounted(() => {
+  containerRef.value?.addEventListener('wheel', handleWheel, { passive: true })
+})
+
+onUnmounted(() => {
+  containerRef.value?.removeEventListener('wheel', handleWheel)
+})
+
+watch(
+  () => props.messages,
+  () => {
+    if (!containerRef.value) return
+
+    if (props.isStreaming) {
+      if (autoScrollEnabled.value) {
+        scrollToBottom(false)
+      }
+      return
+    }
+
+    const threshold = 150
+    const isNearBottom =
+      containerRef.value.scrollHeight - containerRef.value.scrollTop - containerRef.value.clientHeight < threshold
+
+    if (isNearBottom) {
+      scrollToBottom(true)
+    }
   },
   {
-    id: 'msg-2',
-    role: 'assistant',
-    content:
-      '抱歉，生成回复时出错：litellm.APIConnectionError: AnthropicException - b\'{\\n  "error": {\\n    "type": "forbidden",\\n    "message": "Request not allowed"\\n  }\\n}\'',
-    toolCalls: [],
-    thinking: {
-      steps: [],
-      isThinking: false,
-      startTime: 1772675899527,
-      durationSeconds: 1
-    },
-    displayScenario: 'agent',
-    spawnedTasks: [],
-    todos: []
+    deep: true
   }
-])
+)
+
+watch(
+  () => props.isStreaming,
+  isStreaming => {
+    if (isStreaming) {
+      autoScrollEnabled.value = true
+      scrollToBottom(false)
+    }
+  }
+)
 </script>
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+.streaming-indicator {
+  display: flex;
+  gap: 4px;
+  padding: 8px 0 8px 44px;
+}
+
+.streaming-indicator .dot {
+  width: 6px;
+  height: 6px;
+  background: #94a3b8;
+  border-radius: 50%;
+  animation: pulse 1.4s infinite ease-in-out;
+}
+
+.streaming-indicator .dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.streaming-indicator .dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes pulse {
+  0%,
+  80%,
+  100% {
+    opacity: 0.3;
+    transform: scale(0.8);
+  }
+
+  40% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+</style>

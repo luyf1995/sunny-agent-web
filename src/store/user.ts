@@ -1,11 +1,11 @@
 import { defineStore } from 'pinia'
 import { loginBySSO, logout, logoutBySSO, verifySSOTicket } from '@/api/auth'
-import { UserInfo } from '@/api/user/types'
+import { CurrentUserInfo, UserInfo } from '@/api/user/types'
 
 interface UserState {
   accessToken: string
   refreshToken: string
-  userInfo: UserInfo | null
+  userInfo: CurrentUserInfo | null
 }
 
 const userStore = defineStore('user', {
@@ -70,9 +70,9 @@ const userStore = defineStore('user', {
 
     /**
      * 设置用户信息
-     * @param {UserInfo | null} userInfo
+     * @param {CurrentUserInfo | null} userInfo
      */
-    setUserInfo(userInfo: UserInfo | null) {
+    setUserInfo(userInfo: CurrentUserInfo | null) {
       this.userInfo = userInfo
     },
     /**

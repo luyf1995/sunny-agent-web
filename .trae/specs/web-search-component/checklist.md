@@ -1,0 +1,6 @@
+- [x] web-search.vue 组件正确创建，包含完整的模板、脚本和样式
+- [x] 组件能正确展示搜索状态（running 显示加载动画，success 显示结果，error 显示错误）
+- [x] 搜索结果列表正确展示，包含标题、链接和摘要
+- [x] 组件样式与现有工具组件风格一致
+- [x] tool-call/index.vue 中正确注册 WebSearch 组件
+- [x] COMPONENT_MAP 中正确添加 WebSearch 映射

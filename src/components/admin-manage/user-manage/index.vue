@@ -54,7 +54,7 @@ const columns = ref([
       return (
         <div class="user-info">
           <Shield size={18} class="user-info__icon" />
-          <div class="user-info__name">{row.username}</div>
+          <div class="user-info__name">{row.usernumb}</div>
           {userInfo.value?.usernumb === row.usernumb ? <div class="user-info__tag">(你)</div> : ''}
         </div>
       )

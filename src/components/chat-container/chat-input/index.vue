@@ -1,6 +1,6 @@
 <template>
   <div class="chat-input">
-    <div class="agent-list">
+    <!-- <div class="agent-list">
       <div class="agent-item">
         <search :size="16" />
         <span class="agent-item__name">深度研究</span>
@@ -9,7 +9,7 @@
         <database :size="16" />
         <span class="agent-item__name">数据库</span>
       </div>
-    </div>
+    </div> -->
     <div class="input-container">
       <textarea
         v-model="message"
@@ -21,16 +21,16 @@
       ></textarea>
       <div class="input-toolbar">
         <div class="input-toolbar__left">
-          <file-upload />
+          <!-- <file-upload />
           <skill-selector
             v-model="selectedSkills"
             :list="skillList"
             @selected="({ command }) => handleSkillSelected(command)"
-          />
+          /> -->
         </div>
         <div class="input-toolbar__right">
-          <el-button type="primary" title="发送" class="send-btn" @click="handleSend">
-            <send :size="18" />
+          <el-button type="primary" title="发送" class="send-btn" @click="isStreaming ? handleAbort() : handleSend()">
+            <component :is="isStreaming ? Pause : Send" :size="18" />
           </el-button>
         </div>
       </div>
@@ -46,23 +46,26 @@
 </template>
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
-import { Search, Database, Send } from 'lucide-vue-next'
+import { Search, Database, Send, Pause } from 'lucide-vue-next'
 
 import FileUpload from './file-upload/index.vue'
 import SkillSelector from './skill-selector/index.vue'
 import SkillSuggestion from './skill-suggestion/index.vue'
 
-import { useChat } from '@/hooks/use-chat'
-
 const COMMAND_SYMBOL = '/'
 
-const { messages, isStreaming, threadId, sendMessage, cancel, newThread, loadThread } = useChat({
-  onConversationCreated: () => {
-    console.log('New conversation created!')
-  }
+interface Props {
+  isStreaming: boolean
+}
+
+const props = defineProps<Props>()
+
+const message = defineModel('modelValue', {
+  type: String,
+  default: ''
 })
 
-const message = ref('')
+const emits = defineEmits(['send', 'abort'])
 
 const skillList = ref([
   {
@@ -135,10 +138,8 @@ watch(message, value => {
   // 提取消息中的skill命令
   const matches = value.match(/\/([a-zA-Z0-9_-]+)/g) || []
   const skillNames = matches.map(m => m.slice(1))
-  console.log('skillNames', value)
   // 过滤出已选中的skill
   selectedSkills.value = skillNames.filter(name => selectedSkills.value.includes(name))
-  console.log(1111, selectedSkills.value)
 })
 
 /**
@@ -173,10 +174,10 @@ const handleKeyDown = (e: KeyboardEvent) => {
     }
   }
 
-  // if (e.key === 'Enter' && !e.shiftKey) {
-  //   e.preventDefault()
-  //   handleSubmit()
-  // }
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault()
+    handleSend()
+  }
 }
 
 /**
@@ -192,8 +193,16 @@ const handleInput = (e: InputEvent) => {
 /**
  * 发送聊天消息
  */
-const handleSend = () => {
+const handleSend = async () => {
   if (message.value.trim() === '') return
+  emits('send', message.value)
+  message.value = ''
+}
+/**
+ * 取消发送
+ */
+const handleAbort = () => {
+  emits('abort')
 }
 </script>
 <style scoped lang="scss">

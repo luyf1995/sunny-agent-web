@@ -5,8 +5,8 @@ import { RoleInfo } from './types'
 /**
  * 获取用户列表
  */
-export const getRoleList = (): AxiosPromise<{ items: RoleInfo[] }> =>
-  request({
+export const getRoleList = () =>
+  request<{ items: RoleInfo[] }>({
     method: 'get',
     url: '/api/roles'
   })
