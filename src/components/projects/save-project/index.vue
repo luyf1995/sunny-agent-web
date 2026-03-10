@@ -1,6 +1,6 @@
 <template>
-  <sy-dialog v-model="visible" width="400px" title="新建项目">
-    <el-form ref="saveFormRef" :model="saveForm" label-position="top" :rules="rules">
+  <sy-dialog v-model="visible" width="400px" title="新建项目" @keyup.enter="handleSubmit">
+    <el-form ref="saveFormRef" :model="saveForm" label-position="top" :rules="rules" @submit.prevent>
       <el-form-item label="项目名称" prop="name">
         <el-input v-model="saveForm.name" placeholder="输入项目名称" clearable :maxlength="64"></el-input>
       </el-form-item>
@@ -8,12 +8,7 @@
     <template #footer>
       <div class="dialog-footer">
         <el-button @click="visible = false">取消</el-button>
-        <sy-button
-          type="primary"
-          :disabled="!saveForm.name"
-          @click="dialogType === DialogTypeEnum.ADD ? handleAdd() : handleEdit()"
-          >创建项目</sy-button
-        >
+        <sy-button type="primary" :disabled="!saveForm.name" @click="handleSubmit">确定</sy-button>
       </div>
     </template>
   </sy-dialog>
@@ -25,13 +20,13 @@ import { ElForm, ElMessage } from 'element-plus'
 import SyButton from '@/components/sy-button/index.vue'
 import SyDialog from '@/components/sy-dialog/index.vue'
 
-import { SaveProjectParams } from '@/api/project/types'
+import { ProjectInfo, SaveProjectParams } from '@/api/project/types'
 import { createProject, updateProject } from '@/api/project'
 import { DialogTypeEnum } from '@/api/common/types'
 
 interface Props {
   dialogType: DialogTypeEnum
-  data?: SaveProjectParams // 编辑数据
+  data?: ProjectInfo // 编辑数据
 }
 
 const props = defineProps<Props>()
@@ -45,7 +40,7 @@ const visible = defineModel('modelValue', {
   default: false
 })
 const emits = defineEmits<{
-  (e: 'success'): void
+  (e: 'success', data?: ProjectInfo): void
 }>()
 
 watch(visible, (value: boolean) => {
@@ -85,6 +80,10 @@ const doValidate = (callback: (params: SaveProjectParams) => void) => {
   })
 }
 
+const handleSubmit = () => {
+  props.dialogType === DialogTypeEnum.ADD ? handleAdd() : handleEdit()
+}
+
 /**
  * 新增
  */
@@ -113,7 +112,14 @@ const handleEdit = () => {
       return
     }
     updateProject(params.id, params).then(() => {
-      emits('success')
+      emits('success', {
+        ...props.data!,
+        name: params.name
+      })
+      console.log(1111, {
+        ...props.data!,
+        name: params.name
+      })
       ElMessage({
         type: 'success',
         message: '编辑成功'

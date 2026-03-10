@@ -12,6 +12,8 @@ export interface ProjectInfo {
   update_time: string // 更新时间
 }
 
+export interface ProjectDetail extends ProjectInfo {}
+
 export interface ProjectPageParams extends PageQuery {
   // name?: string
 }

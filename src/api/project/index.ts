@@ -1,5 +1,5 @@
 import request from '@/utils/request'
-import { ProjectInfo, SaveProjectParams, FileInfo, ProjectPageParams } from './types'
+import { ProjectInfo, SaveProjectParams, FileInfo, ProjectPageParams, ProjectDetail } from './types'
 import { PageResult } from '../common/types'
 
 /**
@@ -11,6 +11,17 @@ export const getProjectList = (params?: ProjectPageParams) => {
     url: `/api/projects`,
     method: 'get',
     params
+  })
+}
+
+/**
+ * 获取项目详情
+ * @param {string} projectId 项目ID
+ */
+export const getProjectDetail = (projectId: string) => {
+  return request<ProjectDetail>({
+    url: `/api/projects/${projectId}`,
+    method: 'get'
   })
 }
 

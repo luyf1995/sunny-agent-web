@@ -1,3 +1,4 @@
+import { ProjectInfo } from '@/api/project/types'
 import { SessionDetail, SessionInfo } from '@/api/session/types'
 import { defineStore } from 'pinia'
 
@@ -12,6 +13,8 @@ interface ModuleState {
   currentModule: any
 
   currentSession: SessionInfo | null
+  currentProject: ProjectInfo | null
+  currentProjectSession: ProjectSession | null
 }
 
 const appStore = defineStore('module', {
@@ -20,7 +23,9 @@ const appStore = defineStore('module', {
     return {
       currentModuleType: ModuleType.Session,
       currentModule: null,
-      currentSession: null
+      currentSession: null,
+      currentProject: null,
+      currentProjectSession: null
     }
   },
   actions: {
@@ -30,6 +35,14 @@ const appStore = defineStore('module', {
 
     setCurrentSession(session: SessionInfo | null) {
       this.currentSession = session
+    },
+
+    setCurrentProject(project: ProjectInfo | null) {
+      this.currentProject = project
+    },
+
+    setCurrentProjectSession(projectSession: ProjectSession | null) {
+      this.currentProjectSession = projectSession
     }
   }
 })

@@ -9,7 +9,12 @@
     class="project-list"
   >
     <template #default="{ node, data }">
-      <project-item :data="data" :type="node.level === 1 ? 'project' : 'session'"></project-item>
+      <project-item
+        :data="data"
+        :type="node.level === 1 ? ModuleType.Project : ModuleType.ProjectSession"
+        @deleted="handleDeleted"
+        @renamed="handleRenamed"
+      ></project-item>
     </template>
   </el-tree>
   <div v-else class="empty">
@@ -24,14 +29,18 @@ import { ChevronRight, FolderPlus } from 'lucide-vue-next'
 import ProjectItem from '../project-item/index.vue'
 import ButtonLink from '@/components/button-link/index.vue'
 import { ProjectInfo } from '@/api/project/types'
-import { watch } from 'vue'
+import { ModuleType } from '@/store/module'
 
 interface Props {
   list: ProjectInfo[]
 }
 
 const props = defineProps<Props>()
-const emits = defineEmits(['addProject'])
+const emits = defineEmits<{
+  (e: 'addProject'): void
+  (e: 'deleted', id: string): void
+  (e: 'renamed', data: ProjectInfo): void
+}>()
 
 const TREE_PROPS = {
   label: 'name',
@@ -39,12 +48,13 @@ const TREE_PROPS = {
   isLeaf: 'leaf'
 }
 
-watch(
-  () => props.list,
-  newVal => {
-    console.log(newVal)
-  }
-)
+const handleDeleted = (id: string) => {
+  emits('deleted', id)
+}
+
+const handleRenamed = (data: ProjectInfo) => {
+  emits('renamed', data)
+}
 </script>
 <style scoped lang="scss">
 @use './index';

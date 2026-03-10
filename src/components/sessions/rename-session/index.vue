@@ -1,6 +1,6 @@
 <template>
   <sy-dialog v-model="visible" width="400px" title="重命名对话">
-    <el-form ref="renameFormRef" :model="renameForm" label-position="top" :rules="rules">
+    <el-form ref="renameFormRef" :model="renameForm" label-position="top" :rules="rules" @submit.prevent>
       <el-form-item label="对话名称" prop="title">
         <el-input v-model="renameForm.title" placeholder="输入对话名称" clearable :maxlength="64"></el-input>
       </el-form-item>
@@ -35,7 +35,7 @@ const visible = defineModel('modelValue', {
 })
 
 const emits = defineEmits<{
-  (e: 'success', data: SessionInfo): void
+  (e: 'success', data?: SessionInfo): void
 }>()
 
 watch(visible, (value: boolean) => {
@@ -82,11 +82,10 @@ const handleRename = () => {
       return
     }
     editSession(params).then(() => {
-      const updatedData: SessionInfo = {
+      emits('success', {
         ...props.data!,
         title: params.title
-      }
-      emits('success', updatedData)
+      })
       ElMessage({
         type: 'success',
         message: '重命名成功'

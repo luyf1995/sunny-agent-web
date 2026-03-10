@@ -38,6 +38,59 @@ import { Folder, MessageSquare } from 'lucide-vue-next'
 import ChatInput from './chat-input.vue'
 import FileCard from './file-card.vue'
 import SkillCard from './skill-card.vue'
+
+import { useModuleStore } from '@/store'
+import { computed, ref, watch } from 'vue'
+import { ProjectDetail } from '@/api/project/types'
+import { getProjectDetail, getProjectFiles, getProjectSessions } from '@/api/project'
+
+const moduleStore = useModuleStore()
+
+const currentProject = computed(() => moduleStore.currentProject)
+
+const projectDetail = ref<ProjectDetail>()
+const projectFiles = ref<FileInfo[]>()
+const projectSessions = ref<SessionInfo[]>()
+
+const init = async () => {
+  await fetchProjectDetail()
+  if (projectDetail.value?.file_count) {
+    fetchProjectFiles()
+  }
+  if (projectDetail.value?.session_count) {
+    fetchProjectSessions()
+  }
+}
+const fetchProjectDetail = async () => {
+  if (currentProject.value) {
+    const { data } = await getProjectDetail(currentProject.value.id)
+    projectDetail.value = data
+  }
+}
+
+const fetchProjectFiles = async () => {
+  if (currentProject.value) {
+    const { data } = await getProjectFiles(currentProject.value.id)
+  }
+}
+
+const fetchProjectSessions = async () => {
+  if (currentProject.value) {
+    const { data } = await getProjectSessions(currentProject.value.id)
+  }
+}
+
+watch(
+  currentProject,
+  () => {
+    if (currentProject.value) {
+      init()
+    }
+  },
+  {
+    immediate: true
+  }
+)
 </script>
 <style scoped lang="scss">
 @use './index';

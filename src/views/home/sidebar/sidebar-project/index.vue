@@ -17,7 +17,12 @@
       </template>
     </div>
     <div v-if="!collapsed" class="sidebar-panel__content">
-      <project-list :list="projectList" @add-project="handleAddProject"></project-list>
+      <project-list
+        :list="projectList"
+        @add-project="handleAddProject"
+        @renamed="handleRenamed"
+        @deleted="handleDeleted"
+      ></project-list>
     </div>
   </div>
   <save-project
@@ -36,24 +41,23 @@ import SaveProject from '@/components/projects/save-project/index.vue'
 import ProjectList from '@/components/projects/project-list/index.vue'
 import ProjectPopover from '@/components/projects/project-popover/index.vue'
 
-import { getProjectList, deleteProject } from '@/api/project'
+import { getProjectList } from '@/api/project'
 import { ProjectInfo } from '@/api/project/types'
 import { DialogTypeEnum } from '@/api/common/types'
+import { useModuleStore } from '@/store'
 
 const props = defineProps<{
   collapsed: boolean
 }>()
 
+const moduleStore = useModuleStore()
+
 const projectList = ref<ProjectInfo[]>([])
 
-/**
- * 获取项目列表
- */
 const fetchProjectList = async () => {
   try {
     const { data } = await getProjectList()
     projectList.value = data?.items ?? []
-    console.log('projectList', projectList.value)
   } catch (error) {
     console.error(error)
   }
@@ -64,22 +68,26 @@ const saveDialogVisible = ref(false)
 const saveDialogData = ref()
 const saveDialogType = ref(DialogTypeEnum.ADD)
 
-/**
- * 新增项目
- */
 const handleAddProject = () => {
   saveDialogType.value = DialogTypeEnum.ADD
   saveDialogVisible.value = true
 }
 
-/**
- * 编辑项目
- * @param {ProjectInfo} project 项目信息
- */
-const handleEditProject = (project: ProjectInfo) => {
-  saveDialogData.value = project
-  saveDialogType.value = DialogTypeEnum.EDIT
-  saveDialogVisible.value = true
+const handleRenamed = (data: ProjectInfo) => {
+  const index = projectList.value.findIndex(item => item.id === data.id)
+  if (index !== -1) {
+    projectList.value[index] = { ...projectList.value[index], name: data.name }
+  }
+  if (moduleStore.currentProject?.id === data.id) {
+    moduleStore.setCurrentProject({ ...moduleStore.currentProject, name: data.name })
+  }
+}
+
+const handleDeleted = (id: string) => {
+  if (moduleStore.currentProject?.id === id) {
+    moduleStore.setCurrentProject(null)
+  }
+  fetchProjectList()
 }
 </script>
 <style scoped lang="scss">

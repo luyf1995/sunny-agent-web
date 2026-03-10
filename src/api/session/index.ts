@@ -34,3 +34,17 @@ export const deleteSession = (sessionId: string) => request.delete(`/api/session
  *
  */
 export const editSession = (params: EditSessionParams) => request.patch(`/api/sessions/${params.session_id}`, params)
+
+/**
+ * 移动会话到项目
+ * @param {string} sessionId 会话id
+ * @param {string} projectId 项目id
+ */
+export const moveSessionToProject = (sessionId: string, projectId: string) =>
+  request.post(`/api/sessions/${sessionId}/project`, { project_id: projectId })
+
+/**
+ * 从项目移除会话
+ * @param {string} sessionId 会话id
+ */
+export const removeSessionFromProject = (sessionId: string) => request.delete(`/api/sessions/${sessionId}/project`)

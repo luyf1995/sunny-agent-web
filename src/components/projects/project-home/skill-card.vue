@@ -4,7 +4,7 @@
       <span>技能</span>
     </div>
     <div class="card-body">
-      <span class="tips">系统中7个可用技能</span>
+      <span class="tips">系统中0个可用技能</span>
     </div>
   </div>
 </template>

@@ -2,9 +2,10 @@
   <div class="chat-input">
     <textarea v-model="message" class="chat-input__textarea" placeholder="输入问题开始新的对话" rows="3" />
     <div class="chat-input__actions">
-      <button-icon class="action-btn upload-btn">
+      <!-- <button-icon class="action-btn upload-btn">
         <plus />
-      </button-icon>
+      </button-icon> -->
+      <div></div>
       <el-button type="primary" class="action-btn submit-btn" :disabled="!message.trim()">
         <arrow-up />
       </el-button>
