@@ -32,7 +32,6 @@ import { UploadFilled } from '@element-plus/icons-vue'
 import SyDialog from '@/components/sy-dialog/index.vue'
 import FileUpload from '@/components/file-upload/index.vue'
 
-import { ProjectDetail } from '@/api/project/types'
 import { uploadProjectFiles } from '@/api/project'
 
 // 允许上传的文件后缀
@@ -41,7 +40,7 @@ const ACCEPT_SUFFIXS = ['txt', 'md', 'pdf', 'xlsx', 'docx']
 const ACCEPT_MAX_COUNT = 5
 
 interface Props {
-  project: ProjectDetail
+  projectId: string
   maxCount?: number
   name?: string
 }
@@ -80,7 +79,7 @@ let startLoading = ref(false)
  * 确认上传
  */
 const handleSubmitUpload = () => {
-  if (!props.project?.id) {
+  if (!props.projectId) {
     ElMessage({
       type: 'warning',
       message: `项目信息不能为空`,
@@ -103,7 +102,7 @@ const handleSubmitUpload = () => {
     formData.append(props.name, item.raw as Blob)
   }
 
-  uploadProjectFiles(props.project.id, formData, progressEvent => {
+  uploadProjectFiles(props.projectId, formData, progressEvent => {
     uploadPercent.value = Math.round((progressEvent.loaded / (progressEvent.total || 0)) * 100)
   })
     .then(() => {

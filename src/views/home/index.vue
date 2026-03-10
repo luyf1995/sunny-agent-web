@@ -10,7 +10,7 @@
 import Sidebar from './sidebar/index.vue'
 import ProjectHome from '@/components/projects/project-home/index.vue'
 import ProjectWorkspace from '@/components/projects/project-workspace/index.vue'
-import ChatContainer from '@/components/chat-container/index.vue'
+import SessionContainer from '@/components/sessions/session-home/index.vue'
 
 import { useModuleStore } from '@/store'
 import { computed } from 'vue'
@@ -18,7 +18,6 @@ import { ModuleType } from '@/store/module'
 
 const moduleStore = useModuleStore()
 
-const currentModule = computed(() => moduleStore.currentModule)
 const currentModuleType = computed(() => moduleStore.currentModuleType)
 
 const currentModuleComponent = computed(() => {
@@ -28,7 +27,7 @@ const currentModuleComponent = computed(() => {
     case ModuleType.ProjectSession:
       return ProjectWorkspace
     case ModuleType.Session:
-      return ChatContainer
+      return SessionContainer
     default:
       return null
   }

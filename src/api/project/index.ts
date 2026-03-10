@@ -1,5 +1,13 @@
 import request from '@/utils/request'
-import { ProjectInfo, SaveProjectParams, ProjectFileInfo, ProjectPageParams, ProjectDetail } from './types'
+import {
+  ProjectInfo,
+  SaveProjectParams,
+  ProjectFileInfo,
+  ProjectPageParams,
+  ProjectDetail,
+  SessionPageParams,
+  ProjectSessionInfo
+} from './types'
 import { PageQuery, PageResult } from '../common/types'
 import { AxiosProgressEvent } from 'axios'
 
@@ -115,7 +123,24 @@ export const deleteProjectFile = (projectId: string, fileId: string) => {
  * @param {SessionPageParams} params 会话列表查询参数
  */
 export const getProjectSessions = (projectId: string, params?: SessionPageParams) =>
-  request<ProjectSessionInfo[]>({
+  request<PageResult<ProjectSessionInfo[]>>({
     url: `/projects/${projectId}/sessions`,
-    method: 'get'
+    method: 'get',
+    params
   })
+
+/**
+ * 移动会话到项目
+ * @param {string} projectId 项目id
+ * @param {string} sessionId 会话id
+ */
+export const moveSessionToProject = (projectId: string, sessionId: string) =>
+  request.post(`/projects/${projectId}/sessions/${sessionId}`)
+
+/**
+ * 从项目移除会话
+ * @param {string} projectId 项目id
+ * @param {string} sessionId 会话id
+ */
+export const removeSessionFromProject = (projectId: string, sessionId: string) =>
+  request.delete(`/projects/${projectId}/sessions/${sessionId}`)

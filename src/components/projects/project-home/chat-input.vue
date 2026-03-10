@@ -1,12 +1,18 @@
 <template>
   <div class="chat-input">
-    <textarea v-model="message" class="chat-input__textarea" placeholder="输入问题开始新的对话" rows="3" />
+    <textarea
+      v-model="message"
+      class="chat-input__textarea"
+      placeholder="输入问题开始新的对话"
+      rows="3"
+      @keyup.enter="handleSendMessage"
+    />
     <div class="chat-input__actions">
       <!-- <button-icon class="action-btn upload-btn">
         <plus />
       </button-icon> -->
       <div></div>
-      <el-button type="primary" class="action-btn submit-btn" :disabled="!message.trim()">
+      <el-button type="primary" class="action-btn submit-btn" :disabled="!message.trim()" @click="handleSendMessage">
         <arrow-up />
       </el-button>
     </div>
@@ -18,7 +24,37 @@ import { Plus, ArrowUp } from 'lucide-vue-next'
 
 import ButtonIcon from '@/components/button-icon/index.vue'
 
+import { ProjectDetail } from '@/api/project/types'
+import { useChat } from '@/hooks/use-chat'
+import { moveSessionToProject } from '@/api/project/index'
+import { useModuleStore } from '@/store'
+import { ModuleType } from '@/store/module'
+
+interface Props {
+  project: ProjectDetail
+}
+
+const props = defineProps<Props>()
+
+const moduleStore = useModuleStore()
+
+const { sendMessage } = useChat({
+  onSessionCreated: session => {
+    moveSessionToProject(props.project.id, session.session_id)
+    moduleStore.setCurrentModuleType(ModuleType.ProjectSession)
+    moduleStore.setCurrentProjectSession(session)
+    console.log('session', session)
+    // eventBus.emit(EVENT_NAMES.SESSION_UNSHIFT, session)
+  }
+})
+
 const message = ref('')
+
+const handleSendMessage = () => {
+  if (!message.value.trim()) return
+  sendMessage(null, message.value)
+  message.value = ''
+}
 </script>
 <style scoped lang="scss">
 .chat-input {

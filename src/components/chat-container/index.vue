@@ -1,7 +1,7 @@
 <template>
   <div class="chat-container">
     <div class="chat-main">
-      <div v-if="!currentSession && messages.length === 0" class="chat-empty">有什么我能帮你的吗？</div>
+      <div v-if="!session && messages.length === 0" class="chat-empty">有什么我能帮你的吗？</div>
       <div v-else class="chat-message">
         <message-list :messages="messages" :is-streaming="isStreaming" />
       </div>
@@ -26,8 +26,14 @@ import MessageList from './message-list/index.vue'
 import AskUserOverlay from './ask-user-overlay.vue'
 
 import { useChat } from '@/hooks/use-chat'
-import { useModuleStore } from '@/store'
 import eventBus, { EVENT_NAMES } from '@/utils/event-bus'
+import { SessionInfo } from '@/api/session/types'
+import { ProjectSessionInfo } from '@/api/project/types'
+
+interface Props {
+  session: ProjectSessionInfo | SessionInfo
+}
+const props = defineProps<Props>()
 
 const {
   messages,
@@ -47,15 +53,13 @@ const {
     eventBus.emit(EVENT_NAMES.SESSION_UNSHIFT, session)
   }
 })
-const moduleStore = useModuleStore()
 
 provide('sendMessage', sendMessage)
 
 const message = ref('')
-const currentSession = computed(() => moduleStore.currentSession)
 
 watch(
-  currentSession,
+  () => props.session,
   async (value, oldValue) => {
     const sessionId = value?.session_id || null
 
@@ -73,7 +77,7 @@ watch(
 )
 
 const handleSend = async () => {
-  await sendMessage(currentSession.value?.session_id, message.value)
+  await sendMessage(props.session?.session_id, message.value)
 }
 
 const handleAskUserSubmit = async (answers: string[]) => {
@@ -85,7 +89,7 @@ const handleAskUserSubmit = async (answers: string[]) => {
     .join('\n\n')
 
   clearAskUser()
-  await sendMessage(currentSession.value?.session_id, responseText)
+  await sendMessage(props.session?.session_id, responseText)
 }
 </script>
 <style scoped lang="scss">
@@ -95,9 +99,7 @@ const handleAskUserSubmit = async (answers: string[]) => {
 
   .chat-main {
     display: flex;
-    margin: 0 auto;
     width: 100%;
-    max-width: 800px;
     height: 100%;
     flex-direction: column;
   }

@@ -65,9 +65,10 @@ const loadNode = async (node: any, resolve: (data: TreeNodeData[]) => void) => {
       return
     }
     try {
-      const sessions = await getProjectSessions(projectData.id)
-      const sessionList = (sessions.data || []).map((item: ProjectSessionInfo) => ({
+      const { data } = await getProjectSessions(projectData.id)
+      const sessionList = (data?.items || []).map((item: ProjectSessionInfo) => ({
         ...item,
+        name: item.title,
         leaf: true
       }))
       resolve(sessionList)

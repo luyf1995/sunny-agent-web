@@ -1,5 +1,5 @@
-import { ProjectInfo } from '@/api/project/types'
-import { SessionDetail, SessionInfo } from '@/api/session/types'
+import { ProjectInfo, ProjectSessionInfo } from '@/api/project/types'
+import { SessionInfo } from '@/api/session/types'
 import { defineStore } from 'pinia'
 
 export enum ModuleType {
@@ -14,7 +14,7 @@ interface ModuleState {
 
   currentSession: SessionInfo | null
   currentProject: ProjectInfo | null
-  currentProjectSession: ProjectSession | null
+  currentProjectSession: ProjectSessionInfo | null
 }
 
 const appStore = defineStore('module', {
@@ -42,11 +42,12 @@ const appStore = defineStore('module', {
     setCurrentProject(project: ProjectInfo | null) {
       this.currentProject = project
       this.currentSession = null
-      this.currentProjectSession = null
+      // this.currentProjectSession = null
     },
 
     setCurrentProjectSession(projectSession: ProjectSessionInfo | null) {
       this.currentProjectSession = projectSession
+      this.currentSession = null
     }
   }
 })

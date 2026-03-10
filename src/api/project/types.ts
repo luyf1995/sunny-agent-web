@@ -16,8 +16,8 @@ export interface ProjectInfo {
   file_count: number // 文件数量
   session_count: number // 会话数量
   owner_id: string // 所有者ID
-  create_at: string // 创建时间
-  update_at: string // 更新时间
+  created_at: string // 创建时间
+  updated_at: string // 更新时间
 }
 
 export interface ProjectDetail extends ProjectInfo {}
@@ -39,10 +39,11 @@ export interface SessionPageParams extends PageQuery {
 
 export interface ProjectSessionInfo {
   id: string
-  name: string
-  file_count: number // 文件数量
-  session_count: number // 会话数量
-  owner_id: string // 所有者ID
-  create_time: string // 创建时间
-  update_time: string // 更新时间
+  title: string
+  project_id: string
+  session_id: string
+  user_id: string
+  status: string
+  created_at: string // 创建时间
+  updated_at: string // 更新时间
 }

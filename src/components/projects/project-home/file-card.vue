@@ -14,7 +14,12 @@
       <div class="tips">{{ projectFiles?.length ?? 0 }} 个文件</div>
     </div>
   </div>
-  <upload-file v-model="uploadFileDialogVisible" :project="project" @success="handleUploadSuccess"></upload-file>
+  <upload-file
+    v-if="project"
+    v-model="uploadFileDialogVisible"
+    :project-id="project.id"
+    @success="handleUploadSuccess"
+  ></upload-file>
 </template>
 <script setup lang="ts">
 import { ref, watch } from 'vue'
