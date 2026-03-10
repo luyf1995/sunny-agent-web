@@ -8,5 +8,5 @@ import { RoleInfo } from './types'
 export const getRoleList = () =>
   request<{ items: RoleInfo[] }>({
     method: 'get',
-    url: '/api/roles'
+    url: '/roles'
   })

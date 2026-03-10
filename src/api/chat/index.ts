@@ -4,10 +4,10 @@ import type { SSEEvent } from './types'
 
 import useAppConfig from '@/hooks/use-app-config'
 
-const { apiUrl } = useAppConfig()
+const { apiUrl, apiUrlPrefix } = useAppConfig()
 const userStore = useUserStore()
 
-export const STREAM_CHAT_URL = apiUrl + '/api/chat/stream'
+export const STREAM_CHAT_URL = apiUrl + apiUrlPrefix + '/chat/stream'
 
 let msgCounter = 0
 export function nextId() {

@@ -10,7 +10,7 @@ import { QueryUserParams } from './types'
 export const getCurrentUserInfo = () =>
   request<CurrentUserInfo>({
     method: 'get',
-    url: '/api/users/me'
+    url: '/users/me'
   })
 
 /**
@@ -20,7 +20,7 @@ export const getCurrentUserInfo = () =>
 export const getUserList = (params: QueryUserParams) =>
   request<PageResult<UserInfo[]>>({
     method: 'get',
-    url: '/api/users',
+    url: '/users',
     params
   })
 
@@ -30,7 +30,7 @@ export const getUserList = (params: QueryUserParams) =>
 export const createUser = (params: CreateUserParams) =>
   request<void>({
     method: 'post',
-    url: '/api/users',
+    url: '/users',
     data: params
   })
 
@@ -41,5 +41,5 @@ export const createUser = (params: CreateUserParams) =>
 export const deleteUser = (id: number) =>
   request<void>({
     method: 'delete',
-    url: `/api/users/${id}`
+    url: `/users/${id}`
   })

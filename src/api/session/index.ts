@@ -9,7 +9,7 @@ import { SessionDetail, SessionInfo, SessionPageParams, EditSessionParams } from
  * @returns 会话列表
  */
 export const getSessionList = (params?: SessionPageParams) =>
-  request.get<PageResult<SessionInfo[]>>('/api/sessions', {
+  request.get<PageResult<SessionInfo[]>>('/sessions', {
     params
   })
 
@@ -18,14 +18,14 @@ export const getSessionList = (params?: SessionPageParams) =>
  * @param {string} sessionId 会话id
  * @returns 会话详情
  */
-export const getSessionDetail = (sessionId: string) => request.get<SessionDetail>(`/api/sessions/${sessionId}/messages`)
+export const getSessionDetail = (sessionId: string) => request.get<SessionDetail>(`/sessions/${sessionId}/messages`)
 
 /**
  * 删除会话
  * @param {string} sessionId 会话id
  * @returns 会话详情
  */
-export const deleteSession = (sessionId: string) => request.delete(`/api/sessions/${sessionId}`)
+export const deleteSession = (sessionId: string) => request.delete(`/sessions/${sessionId}`)
 
 /**
  * 编辑会话
@@ -33,7 +33,7 @@ export const deleteSession = (sessionId: string) => request.delete(`/api/session
  * @returns 会话详情
  *
  */
-export const editSession = (params: EditSessionParams) => request.patch(`/api/sessions/${params.session_id}`, params)
+export const editSession = (params: EditSessionParams) => request.patch(`/sessions/${params.session_id}`, params)
 
 /**
  * 移动会话到项目
@@ -41,10 +41,10 @@ export const editSession = (params: EditSessionParams) => request.patch(`/api/se
  * @param {string} projectId 项目id
  */
 export const moveSessionToProject = (sessionId: string, projectId: string) =>
-  request.post(`/api/sessions/${sessionId}/project`, { project_id: projectId })
+  request.post(`/sessions/${sessionId}/project`, { project_id: projectId })
 
 /**
  * 从项目移除会话
  * @param {string} sessionId 会话id
  */
-export const removeSessionFromProject = (sessionId: string) => request.delete(`/api/sessions/${sessionId}/project`)
+export const removeSessionFromProject = (sessionId: string) => request.delete(`/sessions/${sessionId}/project`)

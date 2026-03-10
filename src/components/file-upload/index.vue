@@ -41,7 +41,7 @@ import {
 } from 'element-plus'
 import { Upload } from '@element-plus/icons-vue'
 import { Awaitable } from 'element-plus/es/utils/typescript'
-import { Code } from '@/utils/request'
+import { HttpCode } from '@/utils/request'
 import { ref } from 'vue'
 
 interface Props {
@@ -52,7 +52,7 @@ interface Props {
   accept?: string[] // 支持的文件后缀 eg: json、pcd、doc、docx、xlsx ...
   autoUpload?: boolean // 自动上传
 
-  data?: Record<string, any> // 额外参数
+  data?: any // 额外参数
 
   beforeUpload?: (rawFile: UploadRawFile) => Awaitable<void | undefined | null | boolean | File | Blob> // 文件上传前的回调
   onExceed?: (files: File[], uploadFiles: UploadUserFile[]) => void // 超出限制时的回调
@@ -152,7 +152,7 @@ const handleSuccess = (response: any, uploadFile: UploadFile, uploadFiles: Uploa
   if (!props.autoUpload) return
 
   const { code, message, data } = response
-  if (code === Code.ERROR) {
+  if (code === HttpCode.ERROR) {
     props.onError && props.onError(response, uploadFile, uploadFiles)
     // 失败
     ElMessage({

@@ -1,6 +1,7 @@
 import request from '@/utils/request'
 import { ProjectInfo, SaveProjectParams, FileInfo, ProjectPageParams, ProjectDetail } from './types'
 import { PageResult } from '../common/types'
+import { AxiosProgressEvent } from 'axios'
 
 /**
  * 获取项目列表
@@ -8,7 +9,7 @@ import { PageResult } from '../common/types'
  */
 export const getProjectList = (params?: ProjectPageParams) => {
   return request<PageResult<ProjectInfo[]>>({
-    url: `/api/projects`,
+    url: `/projects`,
     method: 'get',
     params
   })
@@ -20,7 +21,7 @@ export const getProjectList = (params?: ProjectPageParams) => {
  */
 export const getProjectDetail = (projectId: string) => {
   return request<ProjectDetail>({
-    url: `/api/projects/${projectId}`,
+    url: `/projects/${projectId}`,
     method: 'get'
   })
 }
@@ -31,7 +32,7 @@ export const getProjectDetail = (projectId: string) => {
  */
 export const createProject = (params: SaveProjectParams) => {
   return request({
-    url: `/api/projects`,
+    url: `/projects`,
     method: 'post',
     data: params
   })
@@ -44,7 +45,7 @@ export const createProject = (params: SaveProjectParams) => {
  */
 export const updateProject = (projectId: string, params: SaveProjectParams) => {
   return request({
-    url: `/api/projects/${projectId}`,
+    url: `/projects/${projectId}`,
     method: 'put',
     data: params
   })
@@ -56,14 +57,33 @@ export const updateProject = (projectId: string, params: SaveProjectParams) => {
  */
 export const deleteProject = (projectId: string) => {
   return request({
-    url: `/api/projects/${projectId}`,
+    url: `/projects/${projectId}`,
     method: 'delete'
   })
 }
-// 项目文件上传
-export const buildUpdateFileUrl = (projectId: string) => {
-  return `/api/projects/${projectId}/files`
-}
+// // 项目文件上传
+// export const buildUpdateFileUrl = (projectId: string) => {
+//   return `/projects/${projectId}/files`
+// }
+
+/**
+ * 上传文件
+ * @param {string} projectId 项目ID
+ * @param {FormData} formData 上传文件表单数据
+ * @param {Object} onUploadProgress 上传进度回调
+ */
+export const uploadProjectFiles = (
+  projectId: string,
+  formData: FormData,
+  onUploadProgress?: (progressEvent: AxiosProgressEvent) => void
+) =>
+  request({
+    method: 'post',
+    url: `/projects/${projectId}/files`,
+    data: formData,
+    onUploadProgress,
+    noLoading: true
+  })
 
 /**
  * 获取项目文件列表
@@ -71,7 +91,7 @@ export const buildUpdateFileUrl = (projectId: string) => {
  */
 export const getProjectFiles = (projectId: string) => {
   return request<FileInfo[]>({
-    url: `/api/projects/${projectId}/files`,
+    url: `/projects/${projectId}/files`,
     method: 'get'
   })
 }
@@ -82,7 +102,7 @@ export const getProjectFiles = (projectId: string) => {
  */
 export const deleteProjectFile = (projectId: string, fileId: string) => {
   return request<FileInfo[]>({
-    url: `/api/projects/${projectId}/files/${fileId}`,
+    url: `/projects/${projectId}/files/${fileId}`,
     method: 'delete'
   })
 }
@@ -94,6 +114,6 @@ export const deleteProjectFile = (projectId: string, fileId: string) => {
  */
 export const getProjectSessions = (projectId: string, params?: SessionPageParams) =>
   request<ProjectSessionInfo[]>({
-    url: `/api/projects/${projectId}/sessions`,
+    url: `/projects/${projectId}/sessions`,
     method: 'get'
   })

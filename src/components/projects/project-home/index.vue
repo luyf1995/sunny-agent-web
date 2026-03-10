@@ -12,7 +12,7 @@
         <chat-input></chat-input>
       </div>
       <div class="project-home-cards">
-        <file-card></file-card>
+        <file-card :project="currentProject"></file-card>
         <skill-card></skill-card>
       </div>
       <div class="project-home-sessions">
@@ -42,21 +42,17 @@ import SkillCard from './skill-card.vue'
 import { useModuleStore } from '@/store'
 import { computed, ref, watch } from 'vue'
 import { ProjectDetail } from '@/api/project/types'
-import { getProjectDetail, getProjectFiles, getProjectSessions } from '@/api/project'
+import { getProjectDetail, getProjectSessions } from '@/api/project'
 
 const moduleStore = useModuleStore()
 
-const currentProject = computed(() => moduleStore.currentProject)
+const currentProject = computed<ProjectDetail>(() => moduleStore.currentProject as ProjectDetail)
 
 const projectDetail = ref<ProjectDetail>()
-const projectFiles = ref<FileInfo[]>()
 const projectSessions = ref<SessionInfo[]>()
 
 const init = async () => {
   await fetchProjectDetail()
-  if (projectDetail.value?.file_count) {
-    fetchProjectFiles()
-  }
   if (projectDetail.value?.session_count) {
     fetchProjectSessions()
   }
@@ -65,12 +61,6 @@ const fetchProjectDetail = async () => {
   if (currentProject.value) {
     const { data } = await getProjectDetail(currentProject.value.id)
     projectDetail.value = data
-  }
-}
-
-const fetchProjectFiles = async () => {
-  if (currentProject.value) {
-    const { data } = await getProjectFiles(currentProject.value.id)
   }
 }
 
