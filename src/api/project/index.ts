@@ -1,6 +1,6 @@
 import request from '@/utils/request'
-import { ProjectInfo, SaveProjectParams, FileInfo, ProjectPageParams, ProjectDetail } from './types'
-import { PageResult } from '../common/types'
+import { ProjectInfo, SaveProjectParams, ProjectFileInfo, ProjectPageParams, ProjectDetail } from './types'
+import { PageQuery, PageResult } from '../common/types'
 import { AxiosProgressEvent } from 'axios'
 
 /**
@@ -88,11 +88,13 @@ export const uploadProjectFiles = (
 /**
  * 获取项目文件列表
  * @param {string} projectId 项目ID
+ * @param {PageQuery} params 分页查询参数
  */
-export const getProjectFiles = (projectId: string) => {
-  return request<FileInfo[]>({
+export const getProjectFiles = (projectId: string, params?: PageQuery) => {
+  return request<PageResult<ProjectFileInfo[]>>({
     url: `/projects/${projectId}/files`,
-    method: 'get'
+    method: 'get',
+    params
   })
 }
 /**
@@ -101,7 +103,7 @@ export const getProjectFiles = (projectId: string) => {
  * @param {string} fileId 文件ID
  */
 export const deleteProjectFile = (projectId: string, fileId: string) => {
-  return request<FileInfo[]>({
+  return request<ProjectFileInfo[]>({
     url: `/projects/${projectId}/files/${fileId}`,
     method: 'delete'
   })

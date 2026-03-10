@@ -10,7 +10,7 @@ export enum ModuleType {
 
 interface ModuleState {
   currentModuleType: ModuleType | null
-  currentModule: any
+  // currentModule: any
 
   currentSession: SessionInfo | null
   currentProject: ProjectInfo | null
@@ -22,7 +22,7 @@ const appStore = defineStore('module', {
   state: (): ModuleState => {
     return {
       currentModuleType: ModuleType.Session,
-      currentModule: null,
+      // currentModule: null,
       currentSession: null,
       currentProject: null,
       currentProjectSession: null
@@ -35,13 +35,17 @@ const appStore = defineStore('module', {
 
     setCurrentSession(session: SessionInfo | null) {
       this.currentSession = session
+      this.currentProject = null
+      this.currentProjectSession = null
     },
 
     setCurrentProject(project: ProjectInfo | null) {
       this.currentProject = project
+      this.currentSession = null
+      this.currentProjectSession = null
     },
 
-    setCurrentProjectSession(projectSession: ProjectSession | null) {
+    setCurrentProjectSession(projectSession: ProjectSessionInfo | null) {
       this.currentProjectSession = projectSession
     }
   }

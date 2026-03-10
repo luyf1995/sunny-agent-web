@@ -5,8 +5,8 @@
         <div class="project-home-icon">
           <folder :size="48" />
         </div>
-        <h1 class="project-home-title">123</h1>
-        <p class="project-home-meta">由 admin 创建 · 3月2日 更新</p>
+        <h1 class="project-home-title">{{ currentProject?.name }}</h1>
+        <p class="project-home-meta">{{ dayjs(currentProject?.updated_at).format('YYYY-MM-DD HH:mm:ss') }} 更新</p>
       </div>
       <div class="project-home-chat">
         <chat-input></chat-input>
@@ -35,6 +35,8 @@
 </template>
 <script setup lang="ts">
 import { Folder, MessageSquare } from 'lucide-vue-next'
+import dayjs from 'dayjs'
+
 import ChatInput from './chat-input.vue'
 import FileCard from './file-card.vue'
 import SkillCard from './skill-card.vue'

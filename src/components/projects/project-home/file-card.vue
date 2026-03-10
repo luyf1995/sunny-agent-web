@@ -9,12 +9,12 @@
     <div class="card-body">
       <div class="file-info">
         <file-text :size="16" />
-        <span>测试文件.txt</span>
+        <span>{{ projectFiles?.[0]?.file_name || '暂无文件' }}</span>
       </div>
       <div class="tips">{{ projectFiles?.length ?? 0 }} 个文件</div>
     </div>
   </div>
-  <upload-file v-model="uploadFileDialogVisible" :project="project"></upload-file>
+  <upload-file v-model="uploadFileDialogVisible" :project="project" @success="handleUploadSuccess"></upload-file>
 </template>
 <script setup lang="ts">
 import { ref, watch } from 'vue'
@@ -22,7 +22,7 @@ import { Plus, FileText } from 'lucide-vue-next'
 
 import UploadFile from '../upload-file/index.vue'
 
-import { ProjectDetail } from '@/api/project/types'
+import { ProjectDetail, ProjectFileInfo } from '@/api/project/types'
 import { getProjectFiles } from '@/api/project'
 
 interface Props {
@@ -35,19 +35,27 @@ const emits = defineEmits(['upload'])
 
 const uploadFileDialogVisible = ref(false)
 
-const projectFiles = ref<FileInfo[]>()
+const projectFiles = ref<ProjectFileInfo[]>()
+
 /**
  * 获取项目文件列表
  */
 const fetchProjectFiles = async () => {
   try {
-    if (props.project && props.project.file_count) {
+    if (props.project?.id) {
       const { data } = await getProjectFiles(props.project.id)
-      console.log('data', data)
+      projectFiles.value = data?.items || []
     }
   } catch (error) {
     console.error(error)
   }
+}
+
+/**
+ * 文件上传成功回调
+ */
+const handleUploadSuccess = () => {
+  fetchProjectFiles()
 }
 
 watch(
