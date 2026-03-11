@@ -64,7 +64,7 @@ const handleUploadSuccess = () => {
 }
 
 watch(
-  () => props.project,
+  () => props.project?.id,
   () => fetchProjectFiles(),
   {
     immediate: true

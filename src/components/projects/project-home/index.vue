@@ -68,7 +68,7 @@ const fetchProjectSessions = async () => {
 }
 
 watch(
-  currentProject,
+  () => currentProject.value?.id,
   () => {
     if (currentProject.value) {
       init()

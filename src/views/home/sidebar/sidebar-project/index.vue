@@ -92,7 +92,7 @@ const handleRenamed = (data: ProjectInfo) => {
     // })
   }
   if (moduleStore.currentProject?.id === data.id) {
-    // moduleStore.setCurrentProject({ ...moduleStore.currentProject, name: data.name })
+    moduleStore.setCurrentProject({ ...moduleStore.currentProject, name: data.name })
   }
 }
 
