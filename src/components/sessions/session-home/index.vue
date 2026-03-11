@@ -18,9 +18,6 @@ const currentSession = computed(() => moduleStore.currentSession as SessionInfo)
 <style scoped lang="scss">
 .session-home {
   display: flex;
-  margin: 0 auto;
-  width: 100%;
-  max-width: 800px;
   height: 100%;
   flex-direction: column;
 }

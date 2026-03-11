@@ -95,6 +95,9 @@ const handleAskUserSubmit = async (answers: string[]) => {
 <style scoped lang="scss">
 .chat-container {
   overflow: auto;
+  margin: 0 auto;
+  width: 100%;
+  max-width: 800px;
   height: 100%;
 
   .chat-main {

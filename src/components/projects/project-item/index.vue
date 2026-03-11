@@ -36,7 +36,7 @@
     :dialog-type="DialogTypeEnum.EDIT"
     :data="saveProjectData"
     @click.stop
-    @success="handleSaveSuccess"
+    @success="handleRenameSuccess"
   />
 </template>
 <script setup lang="ts">
@@ -97,7 +97,7 @@ const handleSave = (data: ProjectInfo, next: () => void) => {
   next()
 }
 
-const handleSaveSuccess = (data: ProjectInfo) => {
+const handleRenameSuccess = (data: ProjectInfo) => {
   emit('renamed', data)
 }
 
