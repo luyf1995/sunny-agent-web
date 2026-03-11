@@ -4,45 +4,52 @@
       v-for="item in list"
       :key="item.id"
       :data="item"
-      @deleted="handleDeleted"
-      @renamed="handleRenamed"
+      :selected="selected"
+      :on-select="onSelect"
+      :on-edit="onEdit"
+      :on-delete="onDelete"
+      :get-sessions-from-map="getSessionsFromMap"
+      :fetch-sessions="fetchSessions"
+      :selected-session="selectedSession"
+      :on-session-select="onSessionSelect"
+      :on-session-edit="onSessionEdit"
+      :on-session-delete="onSessionDelete"
+      :on-session-remove="onSessionRemove"
     ></project-item>
   </div>
   <div v-else class="empty">
     <folder-plus :size="24" />
     <span>暂无项目</span>
-    <button-link @click="emits('addProject')">创建第一个项目</button-link>
+    <button-link @click="emits('to-add')">创建第一个项目</button-link>
   </div>
 </template>
 <script setup lang="ts">
-import { ChevronRight, FolderPlus } from 'lucide-vue-next'
+import { FolderPlus } from 'lucide-vue-next'
 
 import ProjectItem from '../project-item/index.vue'
 import ButtonLink from '@/components/button-link/index.vue'
-import { ProjectInfo, ProjectSessionInfo } from '@/api/project/types'
-import { ModuleType } from '@/store/module'
-import { getProjectSessions } from '@/api/project'
-import type { TreeNodeData } from 'element-plus/es/components/tree/src/tree.type'
-import { nextTick, ref, watch } from 'vue'
+import { ProjectInfo, ProjectSessionInfo, SaveProjectParams } from '@/api/project/types'
+import { EditSessionParams } from '@/api/session/types'
 
 interface Props {
   list: ProjectInfo[]
+  selected: ProjectInfo | null
+  onSelect: (project: ProjectInfo) => void
+  onEdit: (projectId: string, project: SaveProjectParams) => void
+  onDelete: (projectId: string) => void
+  getSessionsFromMap: (projectId: string) => ProjectSessionInfo[]
+  fetchSessions: (projectId: string) => void
+  selectedSession: ProjectSessionInfo | null
+  onSessionSelect: (session: ProjectSessionInfo) => void
+  onSessionEdit: (projectId: string, sessionId: string, session: EditSessionParams) => void
+  onSessionDelete: (projectId: string, sessionId: string) => void
+  onSessionRemove: (projectId: string, sessionId: string) => void
 }
 
 const props = defineProps<Props>()
 const emits = defineEmits<{
-  (e: 'addProject'): void
-  (e: 'deleted', id: string): void
-  (e: 'renamed', data: ProjectInfo): void
+  (e: 'to-add'): void
 }>()
-
-const handleDeleted = (id: string) => {
-  emits('deleted', id)
-}
-
-const handleRenamed = (data: ProjectInfo) => {
-  emits('renamed', data)
-}
 </script>
 <style scoped lang="scss">
 @use './index';

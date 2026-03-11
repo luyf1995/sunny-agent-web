@@ -3,9 +3,9 @@
     <div
       class="project-item"
       :class="{
-        'is-current': currentModuleType === ModuleType.Project && currentProject?.id === data.id
+        'is-current': currentModuleType === ModuleType.Project && selected?.id === data.id
       }"
-      @click="handleSelect"
+      @click="onSelect(data)"
     >
       <div class="project-item__expend" @click.stop="data.session_count > 0 ? handleToggle() : null">
         <template v-if="data.session_count > 0">
@@ -22,12 +22,14 @@
     </div>
     <div v-if="isExpended" class="project-sessions-container">
       <project-session-item
-        v-for="item in projectSessions"
+        v-for="item in getSessionsFromMap(data.id)"
         :key="item.id"
         :data="item"
-        @renamed="handleSessionRenamed"
-        @moved="handleSessionMoved"
-        @deleted="handleSessionDeleted"
+        :selected="selectedSession"
+        :on-select="onSessionSelect"
+        :on-edit="onSessionEdit"
+        :on-delete="onSessionDelete"
+        :on-remove="onSessionRemove"
       />
     </div>
   </div>
@@ -35,24 +37,13 @@
     v-model="saveProjectVisible"
     :dialog-type="DialogTypeEnum.EDIT"
     :data="saveProjectData"
-    @click.stop
-    @success="handleRenameSuccess"
+    :on-edit="onEdit"
   />
 </template>
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { ElMessageBox } from 'element-plus'
-import {
-  Folder,
-  FolderMinus,
-  FolderOpen,
-  MessageSquare,
-  MessageSquarePlus,
-  Pencil,
-  Trash2,
-  ChevronRight,
-  ChevronDown
-} from 'lucide-vue-next'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { Folder, Pencil, Trash2, ChevronRight, ChevronDown } from 'lucide-vue-next'
 import { useModuleStore } from '@/store'
 
 import MenuPopover from '@/components/menu-popover/index.vue'
@@ -62,45 +53,51 @@ import eventBus, { EVENT_NAMES } from '@/utils/event-bus'
 
 import { ModuleType } from '@/store/module'
 import { DialogTypeEnum } from '@/api/common/types'
-import { deleteProject, getProjectSessions } from '@/api/project'
-import { ProjectInfo, ProjectSessionInfo } from '@/api/project/types'
+import { ProjectInfo, ProjectSessionInfo, SaveProjectParams } from '@/api/project/types'
+import { EditSessionParams } from '@/api/session/types'
 
-const props = withDefaults(
-  defineProps<{
-    data: ProjectInfo
-    showMenu?: boolean
-  }>(),
-  {
-    showMenu: true
-  }
-)
+interface Props {
+  data: ProjectInfo
+  showMenu?: boolean
+  selected: ProjectInfo | null
+  onSelect: (project: ProjectInfo) => void
+  onEdit: (projectId: string, project: SaveProjectParams) => void
+  onDelete: (projectId: string) => void
+  getSessionsFromMap: (projectId: string) => ProjectSessionInfo[]
+  fetchSessions: (projectId: string) => void
+  selectedSession: ProjectSessionInfo | null
+  onSessionSelect: (session: ProjectSessionInfo) => void
+  onSessionEdit: (projectId: string, sessionId: string, session: EditSessionParams) => void
+  onSessionDelete: (projectId: string, sessionId: string) => void
+  onSessionRemove: (projectId: string, sessionId: string) => void
+}
 
-const emit = defineEmits<{
-  (e: 'deleted', id: string): void
-  (e: 'renamed', data: ProjectInfo): void
-}>()
+const props = withDefaults(defineProps<Props>(), {
+  showMenu: true
+})
 
 const moduleStore = useModuleStore()
-const currentProject = computed(() => moduleStore.currentProject)
 const currentModuleType = computed(() => moduleStore.currentModuleType)
 
 const saveProjectVisible = ref(false)
 const saveProjectData = ref<ProjectInfo>()
 
-const handleSelect = () => {
-  moduleStore.setCurrentModuleType(ModuleType.Project)
-  moduleStore.setCurrentProject(props.data)
-}
+/**
+ * 保存项目
+ * @param {ProjectInfo} data 项目信息
+ * @param {() => void} next 回调函数
+ */
 const handleSave = (data: ProjectInfo, next: () => void) => {
   saveProjectData.value = { ...data }
   saveProjectVisible.value = true
   next()
 }
 
-const handleRenameSuccess = (data: ProjectInfo) => {
-  emit('renamed', data)
-}
-
+/**
+ * 删除项目
+ * @param {ProjectInfo} item 项目信息
+ * @param {() => void} next 回调函数
+ */
 const handleDelete = async (item: ProjectInfo, next: () => void) => {
   try {
     await ElMessageBox.confirm('确定要删除该项目吗？', '提示', {
@@ -108,9 +105,8 @@ const handleDelete = async (item: ProjectInfo, next: () => void) => {
       cancelButtonText: '取消',
       type: 'warning'
     })
-
-    await deleteProject(item.id)
-    emit('deleted', item.id)
+    await props.onDelete(item.id)
+    ElMessage.success('删除成功！')
     next()
   } catch (error) {
     console.log(error)
@@ -119,14 +115,6 @@ const handleDelete = async (item: ProjectInfo, next: () => void) => {
 
 const buildMenus = (data: any) => {
   return [
-    // {
-    //   icon: MessageSquarePlus,
-    //   label: '新建对话',
-    //   onClick: (next: () => void) => {
-    //     console.log('新建对话')
-    //     next()
-    //   }
-    // },
     {
       icon: Pencil,
       label: '重命名',
@@ -148,72 +136,17 @@ const projectSessions = ref<ProjectSessionInfo[]>([])
 const handleToggle = () => {
   isExpended.value = !isExpended.value
   if (projectSessions.value.length === 0) {
-    fetchProjectSessions(props.data.id)
-  }
-}
-
-/**
- * 获取项目会话
- */
-const fetchProjectSessions = async (projectId: string) => {
-  try {
-    isLoading.value = true
-    const { data } = await getProjectSessions(projectId)
-    projectSessions.value = data.items ?? []
-
-    props.data.session_count = projectSessions.value.length
-  } catch (error) {
-    console.log(error)
-  } finally {
-    isLoading.value = false
+    props.fetchSessions(props.data.id)
   }
 }
 
 eventBus.on(EVENT_NAMES.PROJECT_SESSION_CREATED, (data: ProjectSessionInfo) => {
-  // if (data.project_id === props.data.id) {
-  //   projectSessions.value.push(data)
-  // }
-
   if (props.data.id !== data.project_id) return
-
   if (!isExpended.value) {
     isExpended.value = true
   }
-
-  fetchProjectSessions(data.project_id)
+  props.fetchSessions(data.project_id)
 })
-
-/**
- * 会话重命名
- * @param {ProjectSessionInfo} data 会话信息
- */
-const handleSessionRenamed = (data: ProjectSessionInfo) => {
-  const index = projectSessions.value.findIndex(item => item.id === data.id)
-  if (index !== -1) {
-    projectSessions.value[index] = data
-  }
-}
-/**
- * 会话移出项目
- *  @param {ProjectSessionInfo} data 会话信息
- */
-const handleSessionMoved = (data: ProjectSessionInfo) => {
-  projectSessions.value = projectSessions.value.filter(item => item.session_id !== data.session_id)
-
-  // TODO: 不合法的修改，后续优化
-  props.data.session_count = projectSessions.value.length
-
-  eventBus.emit(EVENT_NAMES.PROJECT_SESSION_MOVED, data)
-}
-/**
- * 会话删除
- *  @param {ProjectSessionInfo} data 会话信息
- */
-const handleSessionDeleted = (data: ProjectSessionInfo) => {
-  // TODO: 不合法的修改，后续优化
-  projectSessions.value = projectSessions.value.filter(item => item.session_id !== data.session_id)
-  props.data.session_count = projectSessions.value.length
-}
 </script>
 <style scoped lang="scss">
 @use './index';

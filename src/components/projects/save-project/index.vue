@@ -21,12 +21,13 @@ import SyButton from '@/components/sy-button/index.vue'
 import SyDialog from '@/components/sy-dialog/index.vue'
 
 import { ProjectInfo, SaveProjectParams } from '@/api/project/types'
-import { createProject, updateProject } from '@/api/project'
 import { DialogTypeEnum } from '@/api/common/types'
 
 interface Props {
   dialogType: DialogTypeEnum
   data?: ProjectInfo // 编辑数据
+  onCreate?: (params: SaveProjectParams) => void // 新增回调
+  onEdit?: (projectId: string, params: SaveProjectParams) => void // 编辑回调
 }
 
 const props = defineProps<Props>()
@@ -88,33 +89,27 @@ const handleSubmit = () => {
  * 新增
  */
 const handleAdd = () => {
-  doValidate((params: SaveProjectParams) => {
-    createProject(params).then(() => {
-      emits('success')
-      ElMessage({
-        type: 'success',
-        message: '新增成功'
-      })
-      visible.value = false
+  doValidate(async (params: SaveProjectParams) => {
+    props.onCreate?.(params)
+    ElMessage({
+      type: 'success',
+      message: '新增成功'
     })
+    visible.value = false
   })
 }
 /**
  * 编辑
  */
 const handleEdit = () => {
-  doValidate((params: SaveProjectParams) => {
-    updateProject(props.data!.id, params).then(() => {
-      emits('success', {
-        ...props.data!,
-        name: params.name
-      })
-      ElMessage({
-        type: 'success',
-        message: '编辑成功'
-      })
-      visible.value = false
+  doValidate(async (params: SaveProjectParams) => {
+    await props.onEdit?.(props.data!.id, params)
+
+    ElMessage({
+      type: 'success',
+      message: '编辑成功'
     })
+    visible.value = false
   })
 }
 </script>

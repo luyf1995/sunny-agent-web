@@ -1,54 +1,36 @@
 <template>
-  <div
-    class="session-item"
-    :class="{ 'is-current': currentSession?.session_id === data.session_id }"
-    @click="handleSelect"
-  >
+  <div class="session-item" :class="{ 'is-current': selected?.session_id === data.session_id }" @click="onSelect(data)">
     <message-square :size="13" />
     <div class="session-item__label">{{ data.title }}</div>
     <div v-if="showMenu" class="session-item__menu">
       <menu-popover :menus="buildPopperMenus(data)"> </menu-popover>
     </div>
   </div>
-  <rename-session v-model="renameVisible" :data="data" @success="handleRenameSuccess" />
+  <rename-session v-model="renameVisible" :data="data" :on-edit="onEdit" />
 </template>
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { ref } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 
 import MenuPopover from '@/components/menu-popover/index.vue'
 import RenameSession from '../rename-session/index.vue'
 import { MessageSquare, FolderPlus, Pencil, Trash2 } from 'lucide-vue-next'
+import { EditSessionParams, SessionInfo } from '@/api/session/types'
 
-import { useModuleStore } from '@/store'
-import { ModuleType } from '@/store/module'
-import { SessionInfo } from '@/api/session/types'
-import { deleteSession } from '@/api/session'
-
-const props = withDefaults(
-  defineProps<{
-    showMenu?: boolean
-    data: SessionInfo
-  }>(),
-  {
-    showMenu: true
-  }
-)
-
-const emit = defineEmits<{
-  (e: 'deleted', id: string): void
-  (e: 'renamed', data: SessionInfo): void
-}>()
-
-const moduleStore = useModuleStore()
-const renameVisible = ref(false)
-
-const currentSession = computed(() => moduleStore.currentSession)
-
-const handleSelect = () => {
-  moduleStore.setCurrentModuleType(ModuleType.Session)
-  moduleStore.setCurrentSession(props.data)
+interface Props {
+  showMenu?: boolean
+  data: SessionInfo
+  selected: SessionInfo | null
+  onSelect: (session: SessionInfo) => void
+  onDelete: (sessionId: string) => void
+  onEdit: (sessionId: string, session: EditSessionParams) => void
 }
+
+const props = withDefaults(defineProps<Props>(), {
+  showMenu: true
+})
+
+const renameVisible = ref(false)
 
 const handleDelete = async (item: SessionInfo, next: () => void) => {
   try {
@@ -57,9 +39,8 @@ const handleDelete = async (item: SessionInfo, next: () => void) => {
       cancelButtonText: '取消',
       type: 'warning'
     })
-
-    await deleteSession(item.session_id)
-    emit('deleted', item.session_id)
+    await props.onDelete(item.session_id)
+    ElMessage.success('删除成功！')
     next()
   } catch (error) {
     console.log(error)
@@ -69,10 +50,6 @@ const handleDelete = async (item: SessionInfo, next: () => void) => {
 const handleRename = (next: () => void) => {
   renameVisible.value = true
   next()
-}
-
-const handleRenameSuccess = (data: SessionInfo) => {
-  emit('renamed', data)
 }
 
 const buildPopperMenus = (item: SessionInfo) => {

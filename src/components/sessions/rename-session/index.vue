@@ -21,10 +21,10 @@ import SyButton from '@/components/sy-button/index.vue'
 import SyDialog from '@/components/sy-dialog/index.vue'
 
 import { EditSessionParams, SessionInfo } from '@/api/session/types'
-import { editSession } from '@/api/session'
 
 interface Props {
-  data?: SessionInfo
+  data: SessionInfo
+  onEdit: (sessionId: string, params: EditSessionParams) => void
 }
 
 const props = defineProps<Props>()
@@ -33,10 +33,6 @@ const visible = defineModel('modelValue', {
   type: Boolean,
   default: false
 })
-
-const emits = defineEmits<{
-  (e: 'success', data?: SessionInfo): void
-}>()
 
 watch(visible, (value: boolean) => {
   if (value) {
@@ -73,25 +69,13 @@ const doValidate = (callback: (params: EditSessionParams) => void) => {
 }
 
 const handleRename = () => {
-  doValidate((params: EditSessionParams) => {
-    if (!params.session_id) {
-      ElMessage({
-        type: 'error',
-        message: '会话ID不能为空'
-      })
-      return
-    }
-    editSession(params).then(() => {
-      emits('success', {
-        ...props.data!,
-        title: params.title
-      })
-      ElMessage({
-        type: 'success',
-        message: '重命名成功'
-      })
-      visible.value = false
+  doValidate(async (params: EditSessionParams) => {
+    await props.onEdit(props.data.session_id, params)
+    ElMessage({
+      type: 'success',
+      message: '重命名成功'
     })
+    visible.value = false
   })
 }
 </script>

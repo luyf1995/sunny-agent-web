@@ -20,9 +20,18 @@
       <project-list
         ref="projectListRef"
         :list="projectList"
-        @add-project="handleAddProject"
-        @renamed="handleRenamed"
-        @deleted="handleDeleted"
+        :selected="selectedProject"
+        :on-select="selectProject"
+        :on-edit="doEditProject"
+        :on-delete="doDeleteProject"
+        :get-sessions-from-map="getProjectSessionsFromMap"
+        :fetch-sessions="fetchProjectSessions"
+        :selected-session="selectedProjectSession"
+        :on-session-select="selectProjectSession"
+        :on-session-edit="doEditProjectSession"
+        :on-session-delete="doDeleteProjectSession"
+        :on-session-remove="doRemoveSessionFromProject"
+        @to-add="handleAddProject"
       ></project-list>
     </div>
   </div>
@@ -30,7 +39,7 @@
     v-model="saveDialogVisible"
     :dialog-type="saveDialogType"
     :data="saveDialogData"
-    @success="fetchProjectList"
+    :on-create="doCreateProject"
   ></save-project>
 </template>
 <script setup lang="ts">
@@ -42,65 +51,44 @@ import SaveProject from '@/components/projects/save-project/index.vue'
 import ProjectList from '@/components/projects/project-list/index.vue'
 import ProjectPopover from '@/components/projects/project-popover/index.vue'
 
-import { getProjectList } from '@/api/project'
-import { ProjectInfo } from '@/api/project/types'
+import useProject from './use-project'
 import { DialogTypeEnum } from '@/api/common/types'
-import { useModuleStore } from '@/store'
 
 const props = defineProps<{
   collapsed: boolean
 }>()
 
-const moduleStore = useModuleStore()
-
-const projectList = ref<ProjectInfo[]>([])
-const projectListRef = ref()
-
-const fetchProjectList = async () => {
-  try {
-    const { data } = await getProjectList()
-    projectList.value = data?.items ?? []
-    // 刷新树节点
-    // projectListRef.value.reRender()
-  } catch (error) {
-    console.error(error)
-  }
-}
-fetchProjectList()
+const {
+  projectList,
+  selectedProject,
+  refreshProjectList,
+  doCreateProject,
+  doEditProject,
+  doDeleteProject,
+  selectProject,
+  setSelectedProject,
+  projectSessionsMap,
+  selectedProjectSession,
+  getProjectSessionsFromMap,
+  fetchProjectSessions,
+  selectProjectSession,
+  setSelectedProjectSession,
+  doEditProjectSession,
+  doDeleteProjectSession,
+  doRemoveSessionFromProject
+} = useProject()
+refreshProjectList()
 
 const saveDialogVisible = ref(false)
 const saveDialogData = ref()
 const saveDialogType = ref(DialogTypeEnum.ADD)
 
+/**
+ * 新建项目
+ */
 const handleAddProject = () => {
   saveDialogType.value = DialogTypeEnum.ADD
   saveDialogVisible.value = true
-}
-
-const handleRenamed = (data: ProjectInfo) => {
-  const index = projectList.value.findIndex(item => item.id === data.id)
-  if (index !== -1) {
-    projectList.value[index] = { ...projectList.value[index], name: data.name }
-
-    // // TODO: 刷新树节点，先这么修改，后续优化
-    // const treeData = projectListRef.value.elTreeRef.getNode(data.id)?.data || {}
-    // console.log(1111, projectListRef.value.elTreeRef.getNode(data.id))
-    // projectListRef.value.elTreeRef.getNode(data.id)?.setData({
-    //   ...treeData,
-    //   name: data.name,
-    //   expanded: false
-    // })
-  }
-  if (moduleStore.currentProject?.id === data.id) {
-    moduleStore.setCurrentProject({ ...moduleStore.currentProject, name: data.name })
-  }
-}
-
-const handleDeleted = (id: string) => {
-  if (moduleStore.currentProject?.id === id) {
-    moduleStore.setCurrentProject(null)
-  }
-  fetchProjectList()
 }
 </script>
 <style scoped lang="scss">

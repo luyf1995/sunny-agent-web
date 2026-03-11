@@ -29,8 +29,10 @@ export const deleteSession = (sessionId: string) => request.delete(`/sessions/${
 
 /**
  * 编辑会话
+ * @param {string} sessionId 会话id
  * @param {EditSessionParams} params 编辑会话参数
  * @returns 会话详情
  *
  */
-export const editSession = (params: EditSessionParams) => request.patch(`/sessions/${params.session_id}`, params)
+export const editSession = (sessionId: string, params: EditSessionParams) =>
+  request.patch(`/sessions/${sessionId}`, params)

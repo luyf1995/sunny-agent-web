@@ -51,7 +51,7 @@ export const createProject = (params: SaveProjectParams) => {
  * @param {string} projectId 项目ID
  * @param {SaveProjectParams} params 修改项目参数
  */
-export const updateProject = (projectId: string, params: SaveProjectParams) => {
+export const editProject = (projectId: string, params: SaveProjectParams) => {
   return request({
     url: `/projects/${projectId}`,
     method: 'put',
