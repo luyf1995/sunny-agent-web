@@ -18,7 +18,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { Users, Settings } from 'lucide-vue-next'
+import { Users, Settings, Clock } from 'lucide-vue-next'
 import { AdminSidebarItem, AdminSidebarItemKey } from '../types'
 
 const NAV_LIST = [
@@ -31,6 +31,11 @@ const NAV_LIST = [
     key: AdminSidebarItemKey.System,
     title: '系统设置',
     icon: Settings
+  },
+  {
+    key: AdminSidebarItemKey.ScheduledTask,
+    title: '定时任务',
+    icon: Clock
   }
 ]
 

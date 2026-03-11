@@ -1,17 +1,6 @@
 <template>
-  <sy-dialog v-model="visible" append-to-body modal-class="user-dialog" body-class="user-dialog__body">
-    <template #header>
-      <div class="user-dialog__header">
-        <h3>
-          <user-plus :size="20" />
-          创建新用户
-        </h3>
-        <button-icon class="close-btn" @click="visible = false">
-          <x :size="18" />
-        </button-icon>
-      </div>
-    </template>
-    <div class="user-dialog__body">
+  <sy-dialog v-model="visible" title="添加新用户" width="400px" append-to-body>
+    <div v-if="visible" class="user-dialog__body">
       <el-form ref="addFormRef" :model="addForm" :rules="rules" label-position="top">
         <el-form-item label="工号" prop="usernumb">
           <el-input v-model="addForm.usernumb" placeholder="请输入工号" :maxlength="64" clearable></el-input>
@@ -83,7 +72,6 @@ const rules = ref({
  */
 const init = () => {
   addForm.value = cloneDeep(DEFAULT_FORM)
-  addFormRef.value?.resetFields()
   fetchRoleList()
 }
 
@@ -122,49 +110,41 @@ const handleSubmit = async () => {
 </script>
 <style scoped lang="scss"></style>
 <style lang="scss">
-.user-dialog {
-  .el-dialog {
-    padding: 0;
-    width: 100%;
-    max-width: 400px;
-  }
+// .user-dialog {
+//   .el-dialog {
+//     padding: 0;
+//     width: 100%;
+//     max-width: 400px;
+//   }
 
-  // .el-dialog__header,
-  // .el-dialog__footer {
-  //   padding: 0;
-  // }
+//   .user-dialog__header {
+//     display: flex;
+//     justify-content: space-between;
+//     align-items: center;
+//     padding: 20px 24px;
+//     border-bottom: var(--border);
 
-  // .el-dialog__body {
-  //   height: 100%;
-  // }
-  .user-dialog__header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 20px 24px;
-    border-bottom: var(--border);
+//     h3 {
+//       display: flex;
+//       align-items: center;
+//       gap: 10px;
+//       margin: 0;
+//       font-size: 18px;
+//       font-weight: 600;
+//       color: #1e293b;
+//     }
 
-    h3 {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin: 0;
-      font-size: 18px;
-      font-weight: 600;
-      color: #1e293b;
-    }
+//     .close-btn {
+//       color: #64748b;
+//     }
+//   }
 
-    .close-btn {
-      color: #64748b;
-    }
-  }
+//   .user-dialog__body {
+//     padding: 20px;
+//   }
 
-  .user-dialog__body {
-    padding: 20px;
-  }
-
-  .user-dialog__footer {
-    padding: 0 20px 20px;
-  }
-}
+//   .user-dialog__footer {
+//     padding: 0 20px 20px;
+//   }
+// }
 </style>

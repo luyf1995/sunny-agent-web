@@ -59,9 +59,9 @@ provide('sendMessage', sendMessage)
 const message = ref('')
 
 watch(
-  () => props.session,
+  () => props.session?.session_id,
   async (value, oldValue) => {
-    const sessionId = value?.session_id || null
+    const sessionId = value || null
 
     switchSession(sessionId)
 

@@ -104,19 +104,8 @@ const handleAdd = () => {
  */
 const handleEdit = () => {
   doValidate((params: SaveProjectParams) => {
-    if (!params.id) {
-      ElMessage({
-        type: 'error',
-        message: '项目ID不能为空'
-      })
-      return
-    }
-    updateProject(params.id, params).then(() => {
+    updateProject(props.data!.id, params).then(() => {
       emits('success', {
-        ...props.data!,
-        name: params.name
-      })
-      console.log(1111, {
         ...props.data!,
         name: params.name
       })

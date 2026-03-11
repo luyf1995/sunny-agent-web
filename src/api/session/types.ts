@@ -11,6 +11,10 @@ export enum SessionStatus {
   Arvhived = 'arvhived',
   All = 'all'
 }
+export enum SessionSource {
+  Chat = 'chat',
+  Task = 'task'
+}
 
 export interface SessionInfo {
   session_id: string
@@ -19,6 +23,7 @@ export interface SessionInfo {
   status: SessionStatus
   create_at: string
   last_active_at: string
+  source: SessionSource
 }
 
 export interface SessionDetail {

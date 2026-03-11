@@ -46,10 +46,8 @@
 </template>
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
-import { Search, Database, Send, Pause } from 'lucide-vue-next'
+import { Send, Pause } from 'lucide-vue-next'
 
-import FileUpload from './file-upload/index.vue'
-import SkillSelector from './skill-selector/index.vue'
 import SkillSuggestion from './skill-suggestion/index.vue'
 
 const COMMAND_SYMBOL = '/'

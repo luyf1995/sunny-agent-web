@@ -36,9 +36,9 @@ export const createUser = (params: CreateUserParams) =>
 
 /**
  * 删除用户
- * @param {number} id 用户id
+ * @param {string} id 用户id
  */
-export const deleteUser = (id: number) =>
+export const deleteUser = (id: string) =>
   request<void>({
     method: 'delete',
     url: `/users/${id}`

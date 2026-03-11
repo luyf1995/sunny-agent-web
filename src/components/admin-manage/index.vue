@@ -30,18 +30,21 @@
 import { ref, markRaw, computed } from 'vue'
 import { X } from 'lucide-vue-next'
 
+import { AdminSidebarItemKey } from './types'
+
 import SyDialog from '@/components/sy-dialog/index.vue'
 import ButtonIcon from '@/components/button-icon/index.vue'
 import AdminSidebar from '@/components/admin-manage/admin-sidebar/index.vue'
 import UserManage from '@/components/admin-manage/user-manage/index.vue'
-import { AdminSidebarItemKey } from './types'
+import ScheduledTask from '@/components/admin-manage/scheduled-task/index.vue'
 
 const visible = defineModel('modelValue', {
   type: Boolean,
   default: false
 })
 const COMPONENT_MAP = {
-  [AdminSidebarItemKey.User]: markRaw(UserManage)
+  [AdminSidebarItemKey.User]: markRaw(UserManage),
+  [AdminSidebarItemKey.ScheduledTask]: markRaw(ScheduledTask)
 }
 const currentNav = ref()
 const currentComponent = computed(() => {

@@ -9,7 +9,7 @@
     <div class="user-table">
       <sy-table
         v-model:page="searchForm.page"
-        v-model:page-size="searchForm.page_size"
+        v-model:size="searchForm.page_size"
         :columns="columns"
         :data="tableData"
         :pagination="true"
@@ -154,9 +154,9 @@ const handleAddUser = () => {
 
 /**
  * 删除
- * @param {any} row
+ * @param {UserInfo} row
  */
-const handleDelete = async (row: any) => {
+const handleDelete = async (row: UserInfo) => {
   ElMessageBox.confirm('是否确认删除', '警告', { type: 'warning' })
     .then(async () => {
       try {

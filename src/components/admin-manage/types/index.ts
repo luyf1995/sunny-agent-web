@@ -2,7 +2,8 @@ import { Component } from 'vue'
 
 export enum AdminSidebarItemKey {
   User = 'user',
-  System = 'system'
+  System = 'system',
+  ScheduledTask = 'scheduledTask'
 }
 
 export interface AdminSidebarItem {
