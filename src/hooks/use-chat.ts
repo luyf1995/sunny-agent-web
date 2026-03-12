@@ -1,4 +1,4 @@
-import { ref, onUnmounted, watch, computed } from 'vue'
+import { ref, computed } from 'vue'
 import { Message, MessageRoleType } from '@/api/chat/types'
 import { ToolCallName, ToolCallStatus, QuestionItem } from '@/api/chat/tool-call'
 import { streamChat, nextId } from '@/api/chat/index'
@@ -293,6 +293,7 @@ export function useChat(options: UseChatOptions = {}) {
     try {
       const { data } = await getSessionDetail(sessionId)
       const historyMsgs = data.messages || []
+
       if (historyMsgs.length === 0) return
 
       const loadedMessages: Message[] = []

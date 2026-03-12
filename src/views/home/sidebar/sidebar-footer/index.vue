@@ -2,6 +2,23 @@
   <div class="sidebar-footer">
     <button-icon
       v-if="!collapsed && isAdmin"
+      title="插件管理"
+      class="sidebar-footer__btn"
+      @click="pluginManageVisible = true"
+    >
+      <toy-brick :size="20" />
+    </button-icon>
+    <button-icon
+      v-if="!collapsed && isAdmin"
+      title="技能管理"
+      class="sidebar-footer__btn"
+      @click="skillManageVisible = true"
+    >
+      <puzzle :size="20" />
+    </button-icon>
+
+    <button-icon
+      v-if="!collapsed && isAdmin"
       title="系统管理"
       class="sidebar-footer__btn"
       @click="adminManageVisible = true"
@@ -31,13 +48,17 @@
     </el-popover>
   </div>
   <admin-manage v-model="adminManageVisible" />
+  <plugin-manage v-model="pluginManageVisible" />
+  <skill-manage v-model="skillManageVisible" />
 </template>
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { Settings, User, LogOut } from 'lucide-vue-next'
+import { Settings, User, LogOut, Puzzle, ToyBrick } from 'lucide-vue-next'
 
 import ButtonIcon from '@/components/button-icon/index.vue'
 import AdminManage from '@/components/admin-manage/index.vue'
+import PluginManage from '@/components/plugin-manage/index.vue'
+import SkillManage from '@/components/skill-manage/index.vue'
 
 import { useUserStore } from '@/store'
 import { UserRoleType } from '@/api/user/types'
@@ -49,6 +70,8 @@ const props = defineProps<{
 }>()
 
 const adminManageVisible = ref(false)
+const pluginManageVisible = ref(false)
+const skillManageVisible = ref(false)
 
 const userInfo = computed(() => userStore.userInfo)
 

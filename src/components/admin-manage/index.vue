@@ -101,15 +101,15 @@ const currentComponent = computed(() => {
     max-width: 900px;
     height: 80vh;
     max-height: 700px;
-  }
 
-  .el-dialog__header,
-  .el-dialog__footer {
-    padding: 0;
-  }
+    .el-dialog__header,
+    .el-dialog__footer {
+      padding: 0;
+    }
 
-  .el-dialog__body {
-    height: 100%;
+    .el-dialog__body {
+      height: 100%;
+    }
   }
 }
 </style>

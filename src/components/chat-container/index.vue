@@ -60,9 +60,7 @@ const message = ref('')
 
 watch(
   () => props.session?.session_id,
-  async (value, oldValue) => {
-    const sessionId = value || null
-    // debugger
+  async sessionId => {
     switchSession(sessionId)
 
     if (sessionId && !hasSessionCache(sessionId)) {
