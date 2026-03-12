@@ -21,9 +21,10 @@ import SyButton from '@/components/sy-button/index.vue'
 import SyDialog from '@/components/sy-dialog/index.vue'
 
 import { EditSessionParams, SessionInfo } from '@/api/session/types'
+import { ProjectSessionInfo } from '@/api/project/types'
 
 interface Props {
-  data: SessionInfo
+  data: SessionInfo | ProjectSessionInfo
   onEdit: (sessionId: string, params: EditSessionParams) => void
 }
 

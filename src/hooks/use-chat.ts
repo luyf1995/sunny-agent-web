@@ -254,6 +254,7 @@ export function useChat(options: UseChatOptions = {}) {
     } catch (err: unknown) {
       console.error(err)
     } finally {
+      // debugger
       setStreaming(actualSessionId, false)
       setAbortController(actualSessionId, null)
 

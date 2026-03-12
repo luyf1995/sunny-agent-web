@@ -1,6 +1,6 @@
 export enum TaskTabType {
   Scheduled = 'scheduled',
-  Done = 'done'
+  Executed = 'executed'
 }
 
 export const TASK_TAB_TYPES = [
@@ -10,7 +10,7 @@ export const TASK_TAB_TYPES = [
   },
   {
     label: '已完成',
-    value: TaskTabType.Done
+    value: TaskTabType.Executed
   }
 ]
 

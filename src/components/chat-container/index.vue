@@ -62,7 +62,7 @@ watch(
   () => props.session?.session_id,
   async (value, oldValue) => {
     const sessionId = value || null
-
+    // debugger
     switchSession(sessionId)
 
     if (sessionId && !hasSessionCache(sessionId)) {

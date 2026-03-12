@@ -64,8 +64,11 @@ const moduleStore = useModuleStore()
 const { data } = useEventSource(buildNotifySseUrl())
 watch(data, newData => {
   if (newData) {
-    console.log(newData)
-    sessionList.value.unshift(...newData)
+    try {
+      refreshSessionList()
+    } catch (error) {
+      console.error('解析通知失败', error)
+    }
   }
 })
 

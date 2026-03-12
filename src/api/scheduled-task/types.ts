@@ -11,9 +11,8 @@ export interface ScheduledTaskInfo {
   created_at: string
   updated_at: string
 }
-
+// 查询定时任务列表参数
 export interface QueryScheduledTaskParams extends PageQuery {}
-
 export interface SaveScheduledTaskParams {
   name: string
   description: string
@@ -21,4 +20,19 @@ export interface SaveScheduledTaskParams {
   cron_expr: string
   input_text: string // 提示词
   expires_at: string
+}
+
+// 查询已完成任务列表参数
+export interface QueryExecutedTaskParams extends PageQuery {}
+
+export interface ExecutedTaskInfo {
+  id: string
+  name: string
+  description: string
+  input_text: string
+  expires_at: string
+  cron_job_id: string
+  completed_at: string
+  started_at: string
+  status: string
 }

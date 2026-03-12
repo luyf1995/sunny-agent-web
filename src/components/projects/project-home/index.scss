@@ -1,14 +1,18 @@
 .project-home {
   display: flex;
   align-items: center;
-  overflow-y: auto;
+  overflow: hidden;
   padding: 48px 24px;
   height: 100%;
   flex-direction: column;
 
   .project-home-content {
+    display: flex;
+    overflow:hidden;
     width: 100%;
     max-width: 700px;
+    flex-direction: column;
+    flex: 1;
 
     .project-home-header {
       margin-bottom: 32px;
@@ -52,6 +56,8 @@
     }
 
     .project-home-sessions {
+      flex: 1;
+      overflow: auto;
       margin-top: 24px;
 
       .sessions-title {

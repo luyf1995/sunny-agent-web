@@ -8,8 +8,7 @@
         </button-icon>
       </div>
       <div class="popover-panel__body">
-        <project-item v-for="item in list" :key="item.name" :data="item" type="project" :show-menu="false">
-        </project-item>
+        <project-item v-for="item in list" :key="item.name" :data="item" :show-menu="false"> </project-item>
       </div>
     </div>
     <template #reference>

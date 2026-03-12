@@ -12,8 +12,8 @@ export enum SessionStatus {
   All = 'all'
 }
 export enum SessionSource {
-  Chat = 'chat',
-  Task = 'task'
+  Chat = 'chat', // 普通会话
+  Cron = 'cron' // 定时任务
 }
 
 export interface SessionInfo {
@@ -24,6 +24,8 @@ export interface SessionInfo {
   create_at: string
   last_active_at: string
   source: SessionSource
+
+  unread: boolean | null // 前端判断是否有未读
 }
 
 export interface SessionDetail {

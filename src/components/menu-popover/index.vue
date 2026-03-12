@@ -54,6 +54,7 @@ const handleShow = (e: MouseEvent) => {
  */
 const handleClickItem = (item: MenuItem) => {
   item.onClick(() => {
+    ;(document.activeElement as HTMLElement)?.blur?.()
     visible.value = false
   })
 }

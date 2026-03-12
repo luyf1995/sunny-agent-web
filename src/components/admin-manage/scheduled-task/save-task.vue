@@ -156,7 +156,8 @@ const saveForm = ref<SaveForm>(cloneDeep(DEFAULT_FORM))
 const rules = ref({
   name: [{ required: true, message: '请输入标题', trigger: 'blur' }],
   input_text: [{ required: true, message: '请输入提示词', trigger: 'blur' }],
-  planType: [{ required: true, message: '请选择计划', trigger: 'change' }]
+  planType: [{ required: true, message: '请选择计划', trigger: 'change' }],
+  expires_at: [{ required: true, message: '请选择到期日期', trigger: 'change' }]
 })
 
 /**
@@ -166,11 +167,9 @@ const init = () => {
   if (props.dialogType === DialogTypeEnum.EDIT) {
     const plan = cronToPlan(props.data!.cron_expr)
     saveForm.value = {
-      ...saveForm.value,
-      ...plan,
-      name: props.data!.name,
-      description: props.data!.description || '',
-      input_text: props.data!.input_text || ''
+      ...DEFAULT_FORM,
+      ...props.data!,
+      ...plan
     }
   } else {
     saveForm.value = cloneDeep(DEFAULT_FORM)

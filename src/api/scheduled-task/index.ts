@@ -1,5 +1,5 @@
 import request from '@/utils/request'
-import { SaveScheduledTaskParams, ScheduledTaskInfo } from './types'
+import { QueryExecutedTaskParams, SaveScheduledTaskParams, ScheduledTaskInfo } from './types'
 import { PageResult } from '../common/types'
 import { QueryScheduledTaskParams } from './types'
 
@@ -13,7 +13,16 @@ export const getScheduledTaskList = (params: QueryScheduledTaskParams) =>
     url: '/cron-jobs',
     params
   })
-
+/**
+ * 获取已完成任务列表
+ * @param {QueryExecutedTaskParams} params
+ */
+export const getExecutedTaskList = (params: QueryExecutedTaskParams) =>
+  request<PageResult<ScheduledTaskInfo[]>>({
+    method: 'get',
+    url: '/cron-jobs/executions',
+    params
+  })
 /**
  * 创建定时任务
  * @param {SaveScheduledTaskParams} params

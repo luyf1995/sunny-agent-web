@@ -1,6 +1,7 @@
-import { DialogTypeEnum } from '@/api/common/types'
+import { getNotifyList, readNotify } from '@/api/notify'
+import { NotifyInfo } from '@/api/notify/types'
 import { deleteSession, editSession, getSessionList } from '@/api/session'
-import { EditSessionParams, SessionInfo } from '@/api/session/types'
+import { EditSessionParams, SessionInfo, SessionSource } from '@/api/session/types'
 import { useModuleStore } from '@/store'
 import { ModuleType } from '@/store/module'
 import { ref } from 'vue'
@@ -18,6 +19,10 @@ export default () => {
   const selectSession = (session: SessionInfo) => {
     setSelectedSession(session)
     moduleStore.setCurrentModuleType(ModuleType.Session)
+
+    if (session.source === SessionSource.Cron && session.unread) {
+      readNotifyBySessionId(session.session_id)
+    }
   }
   /**
    * 设置选中会话
@@ -33,11 +38,26 @@ export default () => {
    */
   const refreshSessionList = async () => {
     try {
-      const { data } = await getSessionList()
-      sessionList.value = data?.items ?? []
+      const [notifyRes, sessionRes] = await Promise.all([fetchNotifyList(), getSessionList()])
+      sessionList.value = sessionRes?.data?.items ?? []
+
+      buildUnreadTag()
     } catch (error) {
       console.error('刷新会话列表失败', error)
     }
+  }
+
+  const buildUnreadTag = () => {
+    const unreadIds: string[] = []
+    unreadNotifyList.value.forEach(item => {
+      if (!item.is_read) {
+        unreadIds.push(item.session_id)
+      }
+    })
+
+    sessionList.value.forEach(item => {
+      item.unread = unreadIds.includes(item.session_id)
+    })
   }
 
   /**
@@ -50,7 +70,10 @@ export default () => {
       const { data } = await editSession(sessionId, params)
       const index = sessionList.value.findIndex(item => item.session_id === sessionId)
       if (index !== -1) {
-        sessionList.value[index] = data ?? {}
+        sessionList.value[index] = {
+          ...sessionList.value[index],
+          ...data
+        }
       }
       if (selectedSession.value?.session_id === sessionId) {
         setSelectedSession(data ?? null)
@@ -76,6 +99,39 @@ export default () => {
     }
   }
 
+  const unreadNotifyList = ref<NotifyInfo[]>([])
+
+  /**
+   * 获取消息列表
+   */
+  const fetchNotifyList = async () => {
+    try {
+      const { data } = await getNotifyList()
+      unreadNotifyList.value = (data?.items || []).filter(item => item.is_read === false)
+    } catch (error) {
+      console.error('获取消息列表失败', error)
+    }
+  }
+
+  /**
+   * 读取消息
+   * @param {string} sessionId 会话ID
+   */
+  const readNotifyBySessionId = async (sessionId: string) => {
+    try {
+      const index = unreadNotifyList.value.findIndex(item => item.session_id === sessionId)
+      if (index === -1) {
+        return
+      }
+      const notify = unreadNotifyList.value[index]
+      await readNotify(notify.id)
+      unreadNotifyList.value.splice(index, 1)
+      buildUnreadTag()
+    } catch (error) {
+      console.error('读取消息失败', error)
+    }
+  }
+
   return {
     sessionList,
     selectedSession,
@@ -83,6 +139,8 @@ export default () => {
     doEditSession,
     doDeleteSession,
     selectSession,
-    setSelectedSession
+    setSelectedSession,
+    fetchNotifyList,
+    readNotifyBySessionId
   }
 }
