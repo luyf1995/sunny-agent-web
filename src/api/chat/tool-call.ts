@@ -6,6 +6,7 @@ export enum ToolCallName {
   TodoRead = 'todo_read', // 读代办
   BashTool = 'bash_tool', // Bash调用
   WebSearch = 'web_search', // 网络搜索
+  WebFetch = 'web_fetch', // 网络获取
   SkillCall = 'skill_call', // 技能调用
   AskUser = 'ask_user' // 询问用户
 }
@@ -115,6 +116,20 @@ export interface ToolCallWebSearchResultItem {
   title: string
   url: string
   snippet: string
+}
+/** end **/
+
+/**  tool_call -> web_fetch **/
+export interface ToolCallWebFetchArgs {
+  url: string
+}
+export interface ToolCallWebFetchResult {
+  status: ToolCallStatus
+  error?: string
+  url: string
+  content: string
+  content_type: string
+  truncated: false
 }
 /** end **/
 

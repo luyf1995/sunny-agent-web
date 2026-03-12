@@ -11,6 +11,7 @@ import WriteFile from './write-file.vue'
 import ReadFile from './read-file.vue'
 import BashTool from './bash-tool.vue'
 import WebSearch from './web-search.vue'
+import WebFetch from './web-fetch.vue'
 import SkillCall from './skill-call.vue'
 
 import { ToolCall, ToolCallName } from '@/api/chat/tool-call'
@@ -27,6 +28,7 @@ const COMPONENT_MAP = {
   [ToolCallName.TodoRead]: markRaw(TodoList),
   [ToolCallName.BashTool]: markRaw(BashTool),
   [ToolCallName.WebSearch]: markRaw(WebSearch),
+  [ToolCallName.WebFetch]: markRaw(WebFetch),
   [ToolCallName.SkillCall]: markRaw(SkillCall)
 }
 </script>

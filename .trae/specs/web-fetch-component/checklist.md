@@ -1,0 +1,4 @@
+- [x] web-fetch.vue 组件正确展示 running 状态的 loading 动画
+- [x] web-fetch.vue 组件正确展示 success 状态的完成提示
+- [x] web-fetch.vue 组件正确展示 error 状态的错误信息
+- [x] tool-call/index.vue 中正确注册 WebFetch 组件映射

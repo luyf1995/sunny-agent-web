@@ -53,6 +53,9 @@ const init = async () => {
   fetchProjectDetail()
   fetchProjectSessions()
 }
+/**
+ * 获取项目详情
+ */
 const fetchProjectDetail = async () => {
   if (currentProject.value) {
     const { data } = await getProjectDetail(currentProject.value.id)
@@ -60,6 +63,9 @@ const fetchProjectDetail = async () => {
   }
 }
 
+/**
+ * 获取项目会话列表
+ */
 const fetchProjectSessions = async () => {
   if (currentProject.value) {
     const { data } = await getProjectSessions(currentProject.value.id)
