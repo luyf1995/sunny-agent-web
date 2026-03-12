@@ -26,8 +26,12 @@ export function useChat(options: UseChatOptions = {}) {
 
   const currentSessionId = ref<string | null>(null)
   const messages = ref<Message[]>([])
-  const isStreaming = ref(false)
   const askUserQuestions = ref<QuestionItem[] | null>(null)
+
+  const isStreaming = computed(() => {
+    if (!currentSessionId.value) return false
+    return isCacheStreaming(currentSessionId.value)
+  })
 
   const showAskUser = computed(() => askUserQuestions.value !== null && askUserQuestions.value.length > 0)
 
@@ -42,7 +46,6 @@ export function useChat(options: UseChatOptions = {}) {
 
     if (!sessionId) {
       messages.value = []
-      isStreaming.value = false
       askUserQuestions.value = null
       return
     }
@@ -50,11 +53,9 @@ export function useChat(options: UseChatOptions = {}) {
     const cache = getCache(sessionId)
     if (cache) {
       messages.value = [...cache.messages]
-      isStreaming.value = cache.isStreaming
       askUserQuestions.value = cache.askUserQuestions
     } else {
       messages.value = []
-      isStreaming.value = false
       askUserQuestions.value = null
     }
   }
@@ -113,7 +114,6 @@ export function useChat(options: UseChatOptions = {}) {
       const cache = getCache(targetSessionId)
       if (cache) {
         messages.value = [...cache.messages]
-        isStreaming.value = true
       }
     }
 
@@ -256,10 +256,6 @@ export function useChat(options: UseChatOptions = {}) {
     } finally {
       setStreaming(actualSessionId, false)
       setAbortController(actualSessionId, null)
-
-      if (actualSessionId === currentSessionId.value) {
-        isStreaming.value = false
-      }
     }
   }
 
@@ -288,7 +284,6 @@ export function useChat(options: UseChatOptions = {}) {
     if (hasCache(sessionId)) {
       const cache = getCache(sessionId)!
       messages.value = [...cache.messages]
-      isStreaming.value = cache.isStreaming
       askUserQuestions.value = cache.askUserQuestions
       return
     }
