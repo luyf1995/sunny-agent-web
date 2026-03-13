@@ -13,6 +13,7 @@ import BashTool from './bash-tool.vue'
 import WebSearch from './web-search.vue'
 import WebFetch from './web-fetch.vue'
 import SkillCall from './skill-call.vue'
+import CronCreate from './cron-create.vue'
 
 import { ToolCall, ToolCallName } from '@/api/chat/tool-call'
 
@@ -29,7 +30,8 @@ const COMPONENT_MAP = {
   [ToolCallName.BashTool]: markRaw(BashTool),
   [ToolCallName.WebSearch]: markRaw(WebSearch),
   [ToolCallName.WebFetch]: markRaw(WebFetch),
-  [ToolCallName.SkillCall]: markRaw(SkillCall)
+  [ToolCallName.SkillCall]: markRaw(SkillCall),
+  [ToolCallName.CronCreate]: markRaw(CronCreate)
 }
 </script>
 

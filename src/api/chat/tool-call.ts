@@ -8,7 +8,8 @@ export enum ToolCallName {
   WebSearch = 'web_search', // 网络搜索
   WebFetch = 'web_fetch', // 网络获取
   SkillCall = 'skill_call', // 技能调用
-  AskUser = 'ask_user' // 询问用户
+  AskUser = 'ask_user', // 询问用户
+  CronCreate = 'cron_create' // 创建定时任务
 }
 
 export type ToolCallArgs =
@@ -158,5 +159,27 @@ export interface ToolCallAskUserResult {
   type: string
   question: QuestionItem
   instruction: string
+}
+/** end **/
+
+/**  tool_call -> cron_create **/
+
+export interface ToolCallCronCreateArgs {
+  name: string
+  description: string
+  cron_expr: string
+  input_text: string
+}
+export interface ToolCallCronCreateResult {
+  status: ToolCallStatus
+  error?: string
+  name: string
+  description: string
+  cron_expr: string
+  input_text: string
+  job_id: string
+  next_run_at: string
+  expires_at: string
+  enabled: boolean
 }
 /** end **/

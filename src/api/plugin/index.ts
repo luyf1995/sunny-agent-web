@@ -66,3 +66,13 @@ export const getPluginFiles = (pluginName: string) => {
     method: 'get'
   })
 }
+
+/**
+ * 获取可执行命令列表
+ */
+export const getAllPluginCommands = () => {
+  return request<PluginInfo>({
+    url: `/plugins/commands`,
+    method: 'get'
+  })
+}
