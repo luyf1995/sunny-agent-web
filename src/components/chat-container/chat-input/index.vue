@@ -1,33 +1,18 @@
 <template>
   <div class="chat-input">
-    <!-- <div class="agent-list">
-      <div class="agent-item">
-        <search :size="16" />
-        <span class="agent-item__name">深度研究</span>
-      </div>
-      <div class="agent-item">
-        <database :size="16" />
-        <span class="agent-item__name">数据库</span>
-      </div>
-    </div> -->
     <div class="input-container">
-      <textarea
-        v-model="message"
+      <div
+        ref="inputRef"
         class="input-textarea"
-        placeholder="输入问题..."
-        rows="1"
+        :class="{ 'is-empty': isEmpty }"
+        contenteditable="true"
         @keydown="handleKeyDown"
         @input="handleInput"
-      ></textarea>
+        @blur="handleBlur"
+        @paste="handlePaste"
+      ></div>
       <div class="input-toolbar">
-        <div class="input-toolbar__left">
-          <!-- <file-upload />
-          <command-selector
-            v-model="comandList"
-            :list="comandList"
-            @selected="({ command }) => handleCommandSelected(command)"
-          /> -->
-        </div>
+        <div class="input-toolbar__left"></div>
         <div class="input-toolbar__right">
           <el-button type="primary" title="发送" class="send-btn" @click="handleSend()">
             <component :is="isStreaming ? Pause : Send" :size="18" />
@@ -45,7 +30,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, ref, watch, nextTick, onMounted } from 'vue'
 import { Send, Pause } from 'lucide-vue-next'
 import { cloneDeep } from 'lodash-es'
 
@@ -85,47 +70,95 @@ watch(
   }
 )
 
-// 过滤后的command列表
+const inputRef = ref<HTMLDivElement | null>(null)
+const isEmpty = ref(true)
+const currentInputText = ref('')
+
 const filteredCommandList = computed(() => {
-  if (!message.value.startsWith(COMMAND_SYMBOL)) return []
-  const query = message.value.slice(1).toLowerCase()
+  if (!currentInputText.value.startsWith(COMMAND_SYMBOL)) return []
+  const query = currentInputText.value.slice(1).toLowerCase()
   if (!query) return comandList.value
   return comandList.value.filter(
     item => item.command_name.toLowerCase().includes(query) || item.command_description.toLowerCase().includes(query)
   )
 })
-// 技能建议
+
 const commandSuggestionsVisible = ref(false)
 const commandSuggestionIndex = ref(0)
-/**
- * 技能选择回调
- * @param {CommandInfo} command 选中的技能
- * @param {boolean} pre 是否前置添加空格
- */
-const handleCommandSelected = (command: CommandInfo, pre: boolean = true) => {
-  message.value += (pre ? ' ' : '') + command.full_command.slice(1) + ' '
-}
-/**
- * 技能建议选择回调
- */
-const handleCommandSuggestionSelected = ({ index, command }: { index: number; command: CommandInfo }) => {
-  handleCommandSelected(command, false)
+
+const getTextContent = (): string => {
+  if (!inputRef.value) return ''
+  const clone = inputRef.value.cloneNode(true) as HTMLDivElement
+  const chips = clone.querySelectorAll('.command-chip')
+  chips.forEach(chip => {
+    chip.replaceWith(chip.textContent || '')
+  })
+  return clone.textContent || ''
 }
 
-watch(message, value => {
-  // command 建议显隐控制
-  if (value.startsWith(COMMAND_SYMBOL) && filteredCommandList.value.length > 0) {
-    commandSuggestionsVisible.value = true
-    commandSuggestionIndex.value = 0
-  } else {
-    commandSuggestionsVisible.value = false
+const updateIsEmpty = () => {
+  const text = getTextContent()
+  isEmpty.value = text.trim() === ''
+}
+
+const resetCursor = () => {
+  if (!inputRef.value) return
+
+  inputRef.value.innerHTML = ''
+  const selection = window.getSelection()
+  if (!selection) return
+
+  const range = document.createRange()
+  range.setStart(inputRef.value, 0)
+  range.collapse(true)
+  selection.removeAllRanges()
+  selection.addRange(range)
+}
+
+const handleCommandSelected = (command: CommandInfo) => {
+  if (!inputRef.value) return
+
+  const selection = window.getSelection()
+  if (!selection) return
+
+  const range = selection.getRangeAt(0)
+  const textNode = range.startContainer
+
+  if (textNode.nodeType === Node.TEXT_NODE) {
+    const text = textNode.textContent || ''
+    const slashIndex = text.lastIndexOf(COMMAND_SYMBOL)
+    if (slashIndex !== -1) {
+      range.setStart(textNode, slashIndex)
+      range.setEnd(textNode, text.length)
+      range.deleteContents()
+    }
   }
-})
 
-/**
- * 键盘按下回调
- * @param {KeyboardEvent} e 键盘事件
- */
+  const chip = document.createElement('span')
+  chip.className = 'command-chip'
+  chip.contentEditable = 'false'
+  chip.textContent = command.command_name
+  chip.setAttribute('data-command', command.full_command)
+
+  range.insertNode(chip)
+
+  const space = document.createTextNode('\u00A0')
+  range.setStartAfter(chip)
+  range.insertNode(space)
+
+  range.setStartAfter(space)
+  range.collapse(true)
+  selection.removeAllRanges()
+  selection.addRange(range)
+
+  commandSuggestionsVisible.value = false
+  updateIsEmpty()
+}
+
+const handleCommandSuggestionSelected = ({ command }: { index: number; command: CommandInfo }) => {
+  handleCommandSelected(command)
+}
+
 const handleKeyDown = (e: KeyboardEvent) => {
   if (e.isComposing) {
     return
@@ -157,70 +190,118 @@ const handleKeyDown = (e: KeyboardEvent) => {
     }
   }
 
+  if (e.key === 'Backspace') {
+    const selection = window.getSelection()
+    if (!selection || selection.rangeCount === 0) return
+
+    const range = selection.getRangeAt(0)
+    if (range.collapsed && range.startOffset === 0) {
+      const container = range.startContainer
+      if (container.nodeType === Node.TEXT_NODE) {
+        const prev = container.previousSibling
+        if (prev && prev.nodeType === Node.ELEMENT_NODE && (prev as Element).classList?.contains('command-chip')) {
+          e.preventDefault()
+          ;(prev as Element).remove()
+          updateIsEmpty()
+          return
+        }
+      }
+    }
+  }
+
   if (e.key === 'Enter' && !e.shiftKey) {
     e.preventDefault()
     handleSend()
   }
 }
 
-/**
- * 输入回调
- * @param {InputEvent} e 输入
- */
 const handleInput = (e: InputEvent) => {
-  const target = e.target as HTMLTextAreaElement
+  if (!inputRef.value) return
+
+  const target = e.target as HTMLDivElement
   target.style.height = 'auto'
   target.style.height = Math.min(target.scrollHeight, 200) + 'px'
+
+  updateIsEmpty()
+
+  if (isEmpty.value) {
+    resetCursor()
+    return
+  }
+
+  const selection = window.getSelection()
+  if (!selection || selection.rangeCount === 0) return
+
+  const range = selection.getRangeAt(0)
+  const textNode = range.startContainer
+
+  if (textNode.nodeType === Node.TEXT_NODE) {
+    const text = textNode.textContent || ''
+    const cursorPos = range.startOffset
+    let startPos = cursorPos
+    while (startPos > 0 && text[startPos - 1] !== COMMAND_SYMBOL && text[startPos - 1] !== ' ') {
+      startPos--
+    }
+    if (startPos > 0 && text[startPos - 1] === COMMAND_SYMBOL) {
+      currentInputText.value = text.substring(startPos - 1, cursorPos)
+    } else {
+      currentInputText.value = ''
+    }
+  } else {
+    currentInputText.value = ''
+  }
+
+  if (currentInputText.value.startsWith(COMMAND_SYMBOL) && filteredCommandList.value.length > 0) {
+    commandSuggestionsVisible.value = true
+    commandSuggestionIndex.value = 0
+  } else {
+    commandSuggestionsVisible.value = false
+  }
 }
 
-/**
- * 发送聊天消息
- */
+const handleBlur = () => {
+  setTimeout(() => {
+    commandSuggestionsVisible.value = false
+  }, 200)
+}
+
+const handlePaste = (e: ClipboardEvent) => {
+  e.preventDefault()
+  const text = e.clipboardData?.getData('text/plain') || ''
+  document.execCommand('insertText', false, text)
+}
+
 const handleSend = async () => {
   if (props.isStreaming) {
     handleAbort()
     return
   }
 
-  if (message.value.trim() === '') return
-  emits('send', message.value)
-  message.value = ''
+  const text = getTextContent()
+  message.value = text
+  if (text.trim() === '') return
+  emits('send', text)
+
+  if (inputRef.value) {
+    inputRef.value.innerHTML = ''
+    inputRef.value.style.height = 'auto'
+  }
+  isEmpty.value = true
+  currentInputText.value = ''
 }
-/**
- * 取消发送
- */
+
 const handleAbort = () => {
   emits('abort')
 }
+
+onMounted(() => {
+  if (inputRef.value) {
+    inputRef.value.focus()
+  }
+})
 </script>
 <style scoped lang="scss">
 .chat-input {
-  .agent-list {
-    display: flex;
-    justify-content: flex-start;
-    padding: 12px 16px;
-    flex-wrap: wrap;
-    gap: 8px;
-
-    .agent-item {
-      display: flex;
-      align-items: center;
-      padding: 8px 14px;
-      font-size: 13px;
-      background-color: #f8fafc;
-      border: var(--border);
-      border-radius: 20px;
-      transition: all 0.15s;
-      gap: 6px;
-      cursor: pointer;
-
-      &:hover {
-        background-color: #f1f5f9;
-        border-color: var(--primary-color);
-      }
-    }
-  }
-
   .input-container {
     position: relative;
     margin: 0 16px 16px;
@@ -233,12 +314,38 @@ const handleAbort = () => {
     }
 
     .input-textarea {
+      overflow-y: auto;
       padding: 12px 16px;
       width: 100%;
       min-height: 56px;
       max-height: 200px;
       font-size: 14px;
+      white-space: pre-wrap;
+      outline: none;
       line-height: 1.5;
+      overflow-wrap: break-word;
+
+      &.is-empty::before {
+        content: '输入问题...';
+        color: #94a3b8;
+        pointer-events: none;
+      }
+
+      :deep(.command-chip) {
+        display: inline-block;
+        padding: 2px 8px;
+        margin: 0 2px;
+        font-weight: 600;
+        color: #2563eb;
+        background-color: #dbeafe;
+        border-radius: 4px;
+        user-select: all;
+        cursor: pointer;
+
+        &:hover {
+          background-color: #bfdbfe;
+        }
+      }
     }
 
     .input-toolbar {

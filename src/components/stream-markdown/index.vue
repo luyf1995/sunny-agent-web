@@ -2,8 +2,10 @@
   <markdown-renderer :content="content" v-bind="markdownProps"> </markdown-renderer>
 </template>
 <script setup lang="tsx">
-import MarkdownRenderer, { getUseMonaco, setCustomComponents } from 'markstream-vue'
+import MarkdownRenderer, { getUseMonaco, setCustomComponents, enableMermaid } from 'markstream-vue'
 import 'markstream-vue/index.css'
+
+enableMermaid()
 
 interface Props {
   content?: string
