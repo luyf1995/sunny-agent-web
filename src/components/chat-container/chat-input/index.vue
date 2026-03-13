@@ -91,7 +91,7 @@ const getTextContent = (): string => {
   const clone = inputRef.value.cloneNode(true) as HTMLDivElement
   const chips = clone.querySelectorAll('.command-chip')
   chips.forEach(chip => {
-    chip.replaceWith(chip.textContent || '')
+    chip.replaceWith(chip.getAttribute('data-command') || '')
   })
   return clone.textContent || ''
 }
@@ -118,10 +118,23 @@ const resetCursor = () => {
 const handleCommandSelected = (command: CommandInfo) => {
   if (!inputRef.value) return
 
+  inputRef.value.focus()
+
   const selection = window.getSelection()
   if (!selection) return
 
-  const range = selection.getRangeAt(0)
+  let range: Range
+
+  if (selection.rangeCount > 0 && inputRef.value.contains(selection.getRangeAt(0).commonAncestorContainer)) {
+    range = selection.getRangeAt(0)
+  } else {
+    range = document.createRange()
+    range.selectNodeContents(inputRef.value)
+    range.collapse(false)
+    selection.removeAllRanges()
+    selection.addRange(range)
+  }
+
   const textNode = range.startContainer
 
   if (textNode.nodeType === Node.TEXT_NODE) {

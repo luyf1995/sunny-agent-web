@@ -9,7 +9,8 @@ export enum ToolCallName {
   WebFetch = 'web_fetch', // 网络获取
   SkillCall = 'skill_call', // 技能调用
   AskUser = 'ask_user', // 询问用户
-  CronCreate = 'cron_create' // 创建定时任务
+  CronCreate = 'cron_create', // 创建定时任务
+  PresentFiles = 'present_files' // 展示文件
 }
 
 export type ToolCallArgs =
@@ -21,6 +22,7 @@ export type ToolCallArgs =
   | ToolCallWebSearchArgs
   | ToolCallSkillCallArgs
   | ToolCallAskUserArgs
+  | ToolCallPresentFilesArgs
 export type ToolCallResult =
   | Record<string, any>
   | ToolCallTodoResult
@@ -30,6 +32,8 @@ export type ToolCallResult =
   | ToolCallWebSearchResult
   | ToolCallSkillCallResult
   | ToolCallAskUserResult
+  | ToolCallCronCreateResult
+  | ToolCallPresentFilesResult
 export interface ToolCall {
   step: number // 步骤
   name: ToolCallName // 工具类型
@@ -163,7 +167,6 @@ export interface ToolCallAskUserResult {
 /** end **/
 
 /**  tool_call -> cron_create **/
-
 export interface ToolCallCronCreateArgs {
   name: string
   description: string
@@ -181,5 +184,22 @@ export interface ToolCallCronCreateResult {
   next_run_at: string
   expires_at: string
   enabled: boolean
+}
+/** end **/
+
+/**  tool_call -> present_files **/
+export interface ToolCallPresentFilesArgs {
+  paths: string
+}
+export interface ToolCallPresentFilesResult {
+  status: ToolCallStatus
+  error?: string
+  message: string
+  files: ToolCallPresentFilesResultFile[]
+}
+export interface ToolCallPresentFilesResultFile {
+  name: string
+  path: string
+  download_url: string
 }
 /** end **/

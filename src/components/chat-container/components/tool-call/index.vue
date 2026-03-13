@@ -14,6 +14,7 @@ import WebSearch from './web-search.vue'
 import WebFetch from './web-fetch.vue'
 import SkillCall from './skill-call.vue'
 import CronCreate from './cron-create.vue'
+import PresentFiles from './present-files.vue'
 
 import { ToolCall, ToolCallName } from '@/api/chat/tool-call'
 
@@ -31,7 +32,8 @@ const COMPONENT_MAP = {
   [ToolCallName.WebSearch]: markRaw(WebSearch),
   [ToolCallName.WebFetch]: markRaw(WebFetch),
   [ToolCallName.SkillCall]: markRaw(SkillCall),
-  [ToolCallName.CronCreate]: markRaw(CronCreate)
+  [ToolCallName.CronCreate]: markRaw(CronCreate),
+  [ToolCallName.PresentFiles]: markRaw(PresentFiles)
 }
 </script>
 
