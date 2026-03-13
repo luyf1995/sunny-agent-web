@@ -11,3 +11,15 @@ export interface SkillListRes {
   skills: SkillInfo[]
   total: number
 }
+
+export interface SkillInfoDetail {
+  name: string
+  description: string
+  version: string
+  files: SkillDetailFile[]
+}
+export interface SkillDetailFile {
+  type: string
+  path: string
+  content: string
+}

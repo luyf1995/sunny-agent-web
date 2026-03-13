@@ -30,6 +30,7 @@ import { moveSessionToProject } from '@/api/project/index'
 import { useModuleStore } from '@/store'
 import { ModuleType } from '@/store/module'
 import eventBus, { EVENT_NAMES } from '@/utils/event-bus'
+import { ElMessage } from 'element-plus'
 
 interface Props {
   project: ProjectDetail
@@ -50,6 +51,9 @@ const { sendMessage } = useChat({
     moduleStore.setCurrentProjectSession(projectSessions)
     moduleStore.setCurrentModuleType(ModuleType.ProjectSession)
     eventBus.emit(EVENT_NAMES.PROJECT_SESSION_CREATED, projectSessions)
+  },
+  onMessageErrored: message => {
+    ElMessage.error(message)
   }
 })
 

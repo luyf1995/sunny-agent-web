@@ -105,7 +105,7 @@ import SyDialog from '@/components/sy-dialog/index.vue'
 import ButtonIcon from '@/components/button-icon/index.vue'
 import UploadSkill from './upload-skill.vue'
 
-import { getSkillList, deleteSkill, enableSkill } from '@/api/skill'
+import { getSkillList, deleteSkill, enableSkill, getSkillDetail } from '@/api/skill'
 import { SkillInfo } from '@/api/skill/types'
 
 const visible = defineModel('modelValue', {
@@ -148,6 +148,22 @@ const fetchSkillList = async () => {
     } else {
       selectedSkill.value = null
     }
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+const selectSkill = (skill: SkillInfo) => {
+  selectedSkill.value = skill
+}
+
+/**
+ * 查询技能详情
+ * @param {SkillInfo} skill 技能
+ */
+const fetchSkillDetail = async (skill: SkillInfo) => {
+  try {
+    const { data } = await getSkillDetail(skill.name)
   } catch (error) {
     console.log(error)
   }

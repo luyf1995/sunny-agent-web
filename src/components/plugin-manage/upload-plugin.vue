@@ -19,7 +19,7 @@
       :show-file-list="false"
       :auto-upload="true"
       :accept="ACCEPT_SUFFIXS"
-      :action="UPLOAD_SKILL_URL"
+      :action="UPLOAD_PLUGIN_URL"
       :headers="{ Authorization: `Bearer ${token}` }"
       :before-upload="handleBeforeUpload"
       :on-progress="handleProgress"
@@ -34,7 +34,7 @@
         <p>支持 {{ ACCEPT_SUFFIXS.join('、') }} 类型文件</p>
       </div>
     </file-upload>
-    <el-progress v-if="uploading" :percentage="uploadPercent" :status="uploadStatus" />
+    <!-- <el-progress v-if="uploading" :percentage="uploadPercent" :status="uploadStatus" /> -->
   </sy-dialog>
 </template>
 
@@ -46,7 +46,7 @@ import { UploadFilled } from '@element-plus/icons-vue'
 import SyDialog from '@/components/sy-dialog/index.vue'
 import FileUpload from '@/components/file-upload/index.vue'
 
-import { UPLOAD_SKILL_URL } from '@/api/skill'
+import { UPLOAD_PLUGIN_URL } from '@/api/plugin'
 import { useUserStore } from '@/store'
 
 enum Status {
@@ -107,7 +107,7 @@ const handleError = (error: any) => {
   uploading.value = false
   uploadStatus.value = Status.Exception
   fileList.value = []
-  ElMessage.error(error?.message || '上传失败')
+  ElMessage.error(error?.message || error || '上传失败')
 }
 </script>
 <style scoped lang="scss"></style>

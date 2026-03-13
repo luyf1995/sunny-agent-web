@@ -99,10 +99,14 @@ const httpRequest = (options: UploadRequestOptions) => {
     }
   }
 
-  props.action(formData).then(data => {
-    // 成功
-    props.onSuccess && props.onSuccess(data)
-  })
+  props
+    .action(formData)
+    .then(data => {
+      options.onSuccess?.(data)
+    })
+    .catch(error => {
+      options.onError?.(error)
+    })
 }
 
 /**
@@ -182,13 +186,16 @@ const handleSuccess = (response: any, uploadFile: UploadFile, uploadFiles: Uploa
  */
 const handleError = (error: Error, uploadFile: UploadFile, uploadFiles: UploadFiles) => {
   if (!props.autoUpload) return
-
-  props.onError && props.onError(error, uploadFile, uploadFiles)
-  ElMessage({
-    type: 'error',
-    message: error.message,
-    showClose: true
-  })
+  let message
+  try {
+    message = error.message && JSON.parse(error.message)
+  } catch (error) {
+    message = error.message
+    // console.log('file-upload error', error)
+  } finally {
+    console.log('message', message)
+    props.onError && props.onError(message, uploadFile, uploadFiles)
+  }
 }
 
 /**

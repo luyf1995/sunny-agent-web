@@ -29,6 +29,7 @@ import { useChat } from '@/hooks/use-chat'
 import eventBus, { EVENT_NAMES } from '@/utils/event-bus'
 import { SessionInfo } from '@/api/session/types'
 import { ProjectSessionInfo } from '@/api/project/types'
+import { ElMessage } from 'element-plus'
 
 interface Props {
   session: ProjectSessionInfo | SessionInfo
@@ -51,6 +52,9 @@ const {
 } = useChat({
   onSessionCreated: session => {
     eventBus.emit(EVENT_NAMES.SESSION_UNSHIFT, session)
+  },
+  onMessageErrored: message => {
+    ElMessage.error(message)
   }
 })
 

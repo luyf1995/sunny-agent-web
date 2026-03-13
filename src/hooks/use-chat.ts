@@ -8,6 +8,7 @@ import { useSessionCache } from './use-session-cache'
 
 interface UseChatOptions {
   onSessionCreated?: (...args: any[]) => void
+  onMessageErrored?: (...args: any[]) => void
 }
 
 export function useChat(options: UseChatOptions = {}) {
@@ -35,7 +36,10 @@ export function useChat(options: UseChatOptions = {}) {
 
   const showAskUser = computed(() => askUserQuestions.value !== null && askUserQuestions.value.length > 0)
 
+  let sessionCreatedTriggered = false
   const onSessionCreated = ref(options.onSessionCreated)
+  let messageErroredTriggered = false
+  const onMessageErrored = ref(options.onMessageErrored)
 
   /**
    * 切换会话
@@ -120,7 +124,6 @@ export function useChat(options: UseChatOptions = {}) {
     const controller = new AbortController()
     setAbortController(targetSessionId, controller)
 
-    let sessionCreatedTriggered = false
     let actualSessionId = targetSessionId
 
     setStreaming(actualSessionId, true)
@@ -231,6 +234,10 @@ export function useChat(options: UseChatOptions = {}) {
           }
 
           case ChatSSEEvent.Error: {
+            if (onMessageErrored.value && !messageErroredTriggered) {
+              messageErroredTriggered = true
+              onMessageErrored.value(event.data.message)
+            }
             updateMessage(actualSessionId, assistantId, msg => {
               msg.contents?.push({
                 type: ChatSSEEvent.Error,

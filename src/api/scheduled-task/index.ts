@@ -54,3 +54,13 @@ export const deleteScheduledTask = (id: string) =>
     method: 'delete',
     url: `/cron-jobs/${id}`
   })
+
+/**
+ * 执行定时任务
+ * @param {string} id 定时任务id
+ */
+export const executeScheduledTask = (id: string) =>
+  request<void>({
+    method: 'post',
+    url: `/cron-jobs/${id}/run`
+  })

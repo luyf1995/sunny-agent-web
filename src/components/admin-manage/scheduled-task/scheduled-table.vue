@@ -29,7 +29,12 @@ import ButtonIcon from '@/components/button-icon/index.vue'
 import SyTable from '@/components/sy-table/index.vue'
 import SaveTask from './save-task.vue'
 
-import { getScheduledTaskList, deleteScheduledTask, editScheduledTask } from '@/api/scheduled-task'
+import {
+  getScheduledTaskList,
+  deleteScheduledTask,
+  editScheduledTask,
+  executeScheduledTask
+} from '@/api/scheduled-task'
 import useTableHeight from '@/hooks/use-table-height'
 import { ScheduledTaskInfo } from '@/api/scheduled-task/types'
 import { DialogTypeEnum } from '@/api/common/types'
@@ -79,7 +84,13 @@ const columns = ref([
     slot: (h: () => VNode, { row }: { row: ScheduledTaskInfo }) => {
       return (
         <div class="table-action">
-          <ButtonIcon class="action-btn" title="立即执行" onClick={() => {}}>
+          <ButtonIcon
+            class="action-btn"
+            title="立即执行"
+            onClick={() => {
+              handleExecute(row)
+            }}
+          >
             <CirclePlay size={18} />
           </ButtonIcon>
           <ButtonIcon
@@ -178,6 +189,19 @@ const handleStatusChange = async (row: ScheduledTaskInfo) => {
     fetchList()
   } catch (error) {
     row.enabled = !row.enabled
+    console.error(error)
+  }
+}
+/**
+ * 立即执行
+ * @param {ScheduledTaskInfo} row
+ */
+const handleExecute = async (row: ScheduledTaskInfo) => {
+  try {
+    await executeScheduledTask(row.id)
+    ElMessage.success('执行成功！请等待任务完成后查看页面左侧会话列表！')
+    fetchList()
+  } catch (error) {
     console.error(error)
   }
 }
