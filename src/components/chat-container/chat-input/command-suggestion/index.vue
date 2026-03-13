@@ -2,19 +2,26 @@
   <div class="skill-suggestion">
     <div
       v-for="(item, index) in list"
-      :key="item.id"
+      :key="item.full_command"
       class="skill-item"
       :class="{ 'is-selected': index === selectedIndex }"
       @click="handleSelect(index, item)"
     >
-      <span class="skill-item__name">{{ item.name }}</span>
-      <span class="skill-item__desc">{{ item.desc }}</span>
+      <div class="skill-item__title">
+        <square-terminal class="skill-item__icon" :size="14" />
+        <span class="skill-item__name">{{ item.full_command }}</span>
+      </div>
+      <span class="skill-item__desc">{{ item.command_description }}</span>
     </div>
   </div>
 </template>
 <script setup lang="ts">
+import { SquareTerminal } from 'lucide-vue-next'
+
+import { CommandInfo } from '@/api/plugin/types'
+
 const props = defineProps<{
-  list: any[]
+  list: CommandInfo[]
 }>()
 
 const selectedIndex = defineModel('selectedIndex', {
@@ -26,12 +33,12 @@ const emit = defineEmits(['selected'])
 /**
  * 选择回调
  * @param {number} index 选中的索引
- * @param {any} item
+ * @param {CommandInfo} command 选中的命令项
  */
-const handleSelect = (index: number, item: any) => {
+const handleSelect = (index: number, command: CommandInfo) => {
   emit('selected', {
     index,
-    command: item.command
+    command
   })
 }
 </script>
@@ -47,10 +54,16 @@ const handleSelect = (index: number, item: any) => {
     background-color: #f1f5f9;
   }
 
+  &__title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #2563eb;
+  }
+
   &__name {
     font-size: 14px;
     font-weight: 500;
-    color: #2563eb;
   }
 
   &__desc {

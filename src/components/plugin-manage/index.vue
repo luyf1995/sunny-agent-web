@@ -93,7 +93,7 @@
         </template>
       </div>
     </div>
-    <upload-plugin v-model="uploadDialogVisible" @success="fetchPluginList" />
+    <upload-plugin v-model="uploadDialogVisible" @success="handleUploadSuccess" />
   </sy-dialog>
 </template>
 <script setup lang="ts">
@@ -107,6 +107,7 @@ import UploadPlugin from './upload-plugin.vue'
 
 import { getPluginList, deletePlugin, enablePlugin, getPluginFiles } from '@/api/plugin'
 import { PluginInfo } from '@/api/plugin/types'
+import { useCommandStore } from '@/store'
 
 const visible = defineModel('modelValue', {
   default: false,
@@ -118,6 +119,7 @@ watch(visible, () => {
     fetchPluginList()
   }
 })
+const commandStore = useCommandStore()
 
 const pluginList = ref<PluginInfo[]>([])
 const selectedPlugin = ref<PluginInfo | null>(null)
@@ -188,6 +190,7 @@ const handleDelete = async (plugin: PluginInfo) => {
     await deletePlugin(plugin.name)
     ElMessage.success('删除成功')
     fetchPluginList()
+    refreshCommandList()
     if (selectedPlugin.value?.name === plugin.name) {
       selectedPlugin.value = pluginList.value[0] || null
     }
@@ -207,6 +210,18 @@ const fetchPluginFiles = async (pluginName: string) => {
   } catch (error) {
     console.log(error)
   }
+}
+
+/**
+ * 上传插件成功回调
+ */
+const handleUploadSuccess = () => {
+  fetchPluginList()
+  refreshCommandList()
+}
+
+const refreshCommandList = () => {
+  commandStore.fetchCommands()
 }
 </script>
 <style scoped lang="scss">

@@ -1,7 +1,7 @@
 import { request } from '@/utils/request'
 import { AxiosProgressEvent } from 'axios'
 import useAppConfig from '@/hooks/use-app-config'
-import { PluginInfo, PluginListRes } from './types'
+import { CommandListRes, PluginInfo, PluginListRes } from './types'
 
 const { apiUrl, apiUrlPrefix } = useAppConfig()
 
@@ -70,8 +70,8 @@ export const getPluginFiles = (pluginName: string) => {
 /**
  * 获取可执行命令列表
  */
-export const getAllPluginCommands = () => {
-  return request<PluginInfo>({
+export const getPluginCommandList = () => {
+  return request<CommandListRes>({
     url: `/plugins/commands`,
     method: 'get'
   })

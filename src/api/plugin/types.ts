@@ -26,3 +26,16 @@ export interface PluginDetailFile {
   path: string
   content: string
 }
+
+export interface CommandListRes {
+  commands: CommandInfo[]
+  total: number
+}
+export interface CommandInfo {
+  command_name: string
+  command_description: string
+  full_command: string
+  plugin_name: string
+  plugin_description: string
+  argument_hint: string
+}

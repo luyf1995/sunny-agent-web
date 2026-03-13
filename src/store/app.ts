@@ -1,21 +1,12 @@
-import { getAllPluginCommands } from '@/api/plugin'
 import { defineStore } from 'pinia'
 
-interface CommandState {}
+interface AppState {}
 
 const appStore = defineStore('app', {
-  state: (): CommandState => {
-    return {
-      commands: []
-    }
+  state: (): AppState => {
+    return {}
   },
-  actions: {
-    fetchCommands() {
-      getAllPluginCommands().then(res => {
-        this.commands = res.data
-      })
-    }
-  }
+  actions: {}
 })
 
 export default appStore

@@ -22,10 +22,10 @@
       <div class="input-toolbar">
         <div class="input-toolbar__left">
           <!-- <file-upload />
-          <skill-selector
-            v-model="selectedSkills"
-            :list="skillList"
-            @selected="({ command }) => handleSkillSelected(command)"
+          <command-selector
+            v-model="comandList"
+            :list="comandList"
+            @selected="({ command }) => handleCommandSelected(command)"
           /> -->
         </div>
         <div class="input-toolbar__right">
@@ -34,11 +34,11 @@
           </el-button>
         </div>
       </div>
-      <div v-if="skillSuggestionsVisible" class="skill-suggestion-container">
-        <skill-suggestion
-          v-model:selected-index="skillSuggestionIndex"
-          :list="filteredSkills"
-          @selected="({ command }) => handleSkillSuggestionSelected(command)"
+      <div v-if="commandSuggestionsVisible" class="command-suggestion-container">
+        <command-suggestion
+          v-model:selected-index="commandSuggestionIndex"
+          :list="filteredCommandList"
+          @selected="handleCommandSuggestionSelected"
         />
       </div>
     </div>
@@ -47,8 +47,12 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { Send, Pause } from 'lucide-vue-next'
+import { cloneDeep } from 'lodash-es'
 
-import SkillSuggestion from './skill-suggestion/index.vue'
+import CommandSuggestion from './command-suggestion/index.vue'
+
+import { useCommandStore } from '@/store'
+import { CommandInfo } from '@/api/plugin/types'
 
 const COMMAND_SYMBOL = '/'
 
@@ -65,79 +69,57 @@ const message = defineModel('modelValue', {
 
 const emits = defineEmits(['send', 'abort'])
 
-const skillList = ref([
-  {
-    id: 1,
-    name: 'skill1',
-    desc: '这是一个技能描述',
-    command: '/skill1'
+const commandStore = useCommandStore()
+const storeCommandList = computed(() => commandStore.commands)
+
+const comandList = ref<CommandInfo[]>([])
+
+commandStore.fetchCommands()
+watch(
+  storeCommandList,
+  value => {
+    comandList.value = cloneDeep(value) ?? []
   },
   {
-    id: 2,
-    name: 'skill2',
-    desc: '这是另一个技能描述',
-    command: '/skill2'
-  },
-  {
-    id: 3,
-    name: 'skill3',
-    desc: '这是另一个技能描述',
-    command: '/skill2'
-  },
-  {
-    id: 4,
-    name: 'skill4',
-    desc: '这是另一个技能描述',
-    command: '/skill2'
+    immediate: true
   }
-])
+)
 
-// 已选中skill列表
-const selectedSkills = ref<string[]>([])
-
-// 过滤后的skill列表
-const filteredSkills = computed(() => {
+// 过滤后的command列表
+const filteredCommandList = computed(() => {
   if (!message.value.startsWith(COMMAND_SYMBOL)) return []
   const query = message.value.slice(1).toLowerCase()
-  return skillList.value.filter(
-    skill => skill.name.toLowerCase().includes(query) || skill.desc.toLowerCase().includes(query)
+  if (!query) return comandList.value
+  return comandList.value.filter(
+    item => item.command_name.toLowerCase().includes(query) || item.command_description.toLowerCase().includes(query)
   )
 })
 // 技能建议
-const skillSuggestionsVisible = ref(false)
-const skillSuggestionIndex = ref(0)
+const commandSuggestionsVisible = ref(false)
+const commandSuggestionIndex = ref(0)
 /**
  * 技能选择回调
- * @param {string} skill 选中的技能
+ * @param {CommandInfo} command 选中的技能
  * @param {boolean} pre 是否前置添加空格
  */
-const handleSkillSelected = (skill: string, pre: boolean = true) => {
-  message.value += (pre ? ' ' : '') + skill + ' '
+const handleCommandSelected = (command: CommandInfo, pre: boolean = true) => {
+  message.value += (pre ? ' ' : '') + command.full_command.slice(1) + ' '
 }
 /**
  * 技能建议选择回调
- * @param {string} skill 选中的技能
  */
-const handleSkillSuggestionSelected = (skill: string) => {
-  handleSkillSelected(skill, false)
-  if (selectedSkills.value.includes(skill)) return
-  selectedSkills.value.push(skill)
+const handleCommandSuggestionSelected = ({ index, command }: { index: number; command: CommandInfo }) => {
+  handleCommandSelected(command, false)
 }
 
 watch(message, value => {
-  // skill 建议显隐控制
-  if (value.startsWith(COMMAND_SYMBOL) && filteredSkills.value.length > 0) {
-    skillSuggestionsVisible.value = true
-    skillSuggestionIndex.value = 0
+  // command 建议显隐控制
+  if (value.startsWith(COMMAND_SYMBOL) && filteredCommandList.value.length > 0) {
+    commandSuggestionsVisible.value = true
+    commandSuggestionIndex.value = 0
   } else {
-    skillSuggestionsVisible.value = false
+    commandSuggestionsVisible.value = false
   }
-
-  // 提取消息中的skill命令
-  const matches = value.match(/\/([a-zA-Z0-9_-]+)/g) || []
-  const skillNames = matches.map(m => m.slice(1))
-  // 过滤出已选中的skill
-  selectedSkills.value = skillNames.filter(name => selectedSkills.value.includes(name))
 })
 
 /**
@@ -149,25 +131,28 @@ const handleKeyDown = (e: KeyboardEvent) => {
     return
   }
 
-  if (skillSuggestionsVisible.value && filteredSkills.value.length > 0) {
+  if (commandSuggestionsVisible.value && filteredCommandList.value.length > 0) {
     if (e.key === 'ArrowDown') {
       e.preventDefault()
-      skillSuggestionIndex.value = Math.min(skillSuggestionIndex.value + 1, filteredSkills.value.length - 1)
+      commandSuggestionIndex.value = Math.min(commandSuggestionIndex.value + 1, filteredCommandList.value.length - 1)
       return
     }
     if (e.key === 'ArrowUp') {
       e.preventDefault()
-      skillSuggestionIndex.value = Math.max(skillSuggestionIndex.value - 1, 0)
+      commandSuggestionIndex.value = Math.max(commandSuggestionIndex.value - 1, 0)
       return
     }
     if (e.key === 'Enter' || e.key === 'Tab') {
       e.preventDefault()
-      handleSkillSuggestionSelected(filteredSkills.value[skillSuggestionIndex.value].name)
+      handleCommandSuggestionSelected({
+        index: commandSuggestionIndex.value,
+        command: filteredCommandList.value[commandSuggestionIndex.value]
+      })
       return
     }
     if (e.key === 'Escape') {
       e.preventDefault()
-      skillSuggestionsVisible.value = false
+      commandSuggestionsVisible.value = false
       return
     }
   }
@@ -274,7 +259,7 @@ const handleAbort = () => {
       }
     }
 
-    .skill-suggestion-container {
+    .command-suggestion-container {
       position: absolute;
       right: 0;
       bottom: 100%;
